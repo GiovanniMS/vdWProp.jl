@@ -1,0 +1,35 @@
+using Polynomials
+
+using EngThermBase
+
+# par pressao e temperatura
+
+function p3vr(Pr,Tr) #Polinomio de 3 grau de vr utilizando Pr e Tr
+    
+    return roots(Poly([(-3/8),(9/8),(-Tr - (Pr/8)),(3*Pr/8)]))
+    
+end
+
+# par pressao e energia interna
+
+function p3vr(Pr,ur,ϕ,C1) #Polinomio de 3 grau de vr utilizando Pr e ur
+    
+    return roots(Poly([-3,(9 - (9/ϕ)),(-Pr - (ur - C1)*(3/ϕ)),3*Pr]))
+    
+end
+
+# par pressao e entalpia
+
+function p3vr2(Pr,hr,ϕ,C1) #Polinomio de 3 grau de vr utilizando Pr e hr
+    
+    return roots(Poly([(-ϕ),(3*ϕ - 3),(-(ϕ*Pr/3) - (hr - C1)),(ϕ*Pr + Pr)]))
+    
+end
+
+# par energia interna e entalpia
+
+function p2vr(ur,hr,ϕ,C1) #Polinomio de 3 grau de vr utilizando Pr e hr
+    
+    return roots(Poly([ϕ,((-ϕ/3)*(ur - C1) + 3*ϕ + 3 + (ϕ/3)*(hr - C1) - 6*ϕ),((ϕ + 1)*(ur - C1) - ϕ*(hr - C1))]))
+    
+end
