@@ -6,16 +6,6 @@
 
 #FUNCOES
 
-#V1(vr1) = 3vr1 - 1
-
-#V2(vr2) = 3vr2 - 1
-
-#℘(V1,V2) = V1 / V2
-
-#V1(℘) = ((℘^2)*(-2℘ + (℘ + 1)*log(℘) + 2)) / ((℘^2) - 2*℘*log(℘) -1)
-
-#V2(℘) = (℘*(-2℘ + (℘ + 1)*log(℘) + 2)) / ((℘^2) - 2*℘*log(℘) -1)
-
 V2(℘) = (2*log(℘)/(℘-1) - 1/℘ - 1) / (2 - (℘+1)*log(℘)/(℘-1))
 
 V1(℘) = V2(℘)*℘
@@ -30,7 +20,7 @@ Pr_sat(V1,V2) = (27*(-V1 - V2 + (V1 + 1)*(V2 + 1) - 2)) / (((V1 + 1)^2)*((V2 + 1
 
 #####################################################################################
 
-#ARRAYS
+#valores do domo para as constantes e para Pr, Tr e vr
 
 points = 10000
 
@@ -74,39 +64,49 @@ end
 
 ########################################################################################
 
-#PLOT Pxv
+#PLOT Prxvr e Prxlogvr
 
-using Makie
+# o "using Makie" esta comentado para poupar tempo, caso seja desejado a plotagem o comando deve ser feito exteriormente"
 
-x1 = Array{Float64,1}(vr1list)
+#using Makie
 
-x2 = Array{Float64,1}(vr2list)
+function PlotDomoPrVr(name::String)
+    
+    if name == "Pr x vr"
 
-y = Array{Float64,1}(Pr_sat_list)
+        x1 = Array{Float64,1}(vr1list)
 
-scene = lines(x1, y, color = :blue)
+        x2 = Array{Float64,1}(vr2list)
 
-lines!(scene, x2, y, color = :green)
+        y = Array{Float64,1}(Pr_sat_list)
 
-display(scene)
+        scene = lines(x1, y, color = :blue)
 
-##########################################################################################
+        lines!(scene, x2, y, color = :green)
 
-#PLOT Pxv(log)
+        Makie.save("Pr x vr.jpg", scene)
+        
+    elseif name == "Pr x log(vr)"
 
-using Makie
+        x1 = Array{Float64,1}(vr1listlog)
 
-x1 = Array{Float64,1}(vr1listlog)
+        x2 = Array{Float64,1}(vr2listlog)
 
-x2 = Array{Float64,1}(vr2listlog)
+        y = Array{Float64,1}(Pr_sat_list)
 
-y = Array{Float64,1}(Pr_sat_list)
+        scene = lines(x1, y, color = :blue)
 
-scene = lines(x1, y, color = :blue)
+        lines!(scene, x2, y, color = :green)
 
-lines!(scene, x2, y, color = :green)
-
-display(scene)
+        Makie.save("Pr x log(vr).jpg", scene)
+        
+    else
+        
+        print("name must be Pr x vr or Pr x log(vr)")
+        
+    end
+    
+end
 
 ########################################################################################
 
@@ -139,7 +139,7 @@ C=0
 
 # Funcao para obter as propriedades e plots em todos os casos
 
-function domoprop(ϕ::Number,C1::Number,C2::Number)
+function domoprop(ϕ::Number,C1::Number,C2::Number,plot::String, array::String)
     
     if ϕ == ϕ1 || ϕ == ϕ2 || ϕ == ϕ3
 
@@ -174,42 +174,82 @@ function domoprop(ϕ::Number,C1::Number,C2::Number)
             append!(hr2list,Float64(hr(vr2list[i],Tr_sat_list[i],ϕ,C1)))
 
         end
+        
+        if plot == "yes"
 
-        x1 = Array{Float64,1}(sr1list)
+            x1 = Array{Float64,1}(sr1list)
 
-        x2 = Array{Float64,1}(sr2list)
+            x2 = Array{Float64,1}(sr2list)
 
-        y = Array{Float64,1}(Pr_sat_list)
+            y = Array{Float64,1}(Pr_sat_list)
 
-        scene = lines(x1, y, color = :blue)
+            scene = lines(x1, y, color = :blue)
 
-        lines!(scene, x2, y, color = :green)
+            lines!(scene, x2, y, color = :green)
 
-        Makie.save("Pr x sr.jpg", scene)
+            Makie.save("Pr x sr.jpg", scene)
 
-        x1 = Array{Float64,1}(ur1list)
+            x1 = Array{Float64,1}(ur1list)
 
-        x2 = Array{Float64,1}(ur2list)
+            x2 = Array{Float64,1}(ur2list)
 
-        y = Array{Float64,1}(Pr_sat_list)
+            y = Array{Float64,1}(Pr_sat_list)
 
-        scene = lines(x1, y, color = :blue)
+            scene = lines(x1, y, color = :blue)
 
-        lines!(scene, x2, y, color = :green)
+            lines!(scene, x2, y, color = :green)
 
-        Makie.save("Pr x ur.jpg", scene)
+            Makie.save("Pr x ur.jpg", scene)
 
-        x1 = Array{Float64,1}(hr1list)
+            x1 = Array{Float64,1}(hr1list)
 
-        x2 = Array{Float64,1}(hr2list)
+            x2 = Array{Float64,1}(hr2list)
 
-        y = Array{Float64,1}(Pr_sat_list)
+            y = Array{Float64,1}(Pr_sat_list)
 
-        scene = lines(x1, y, color = :blue)
+            scene = lines(x1, y, color = :blue)
 
-        lines!(scene, x2, y, color = :green)
+            lines!(scene, x2, y, color = :green)
 
-        Makie.save("Pr x hr.jpg", scene)
+            Makie.save("Pr x hr.jpg", scene)
+            
+        elseif plot == "no" 
+            
+            if array == "sr1"
+            
+                return sr1list
+            
+            elseif array == "ur1"
+                
+                return ur1list
+                
+            elseif array == "hr1"
+                
+                return hr1list
+                
+            elseif array == "sr2"
+                
+                return sr2list
+                
+            elseif array == "ur2"
+                
+                return ur2list
+                
+            elseif array == "hr2"
+                
+                return hr2list
+                
+            else
+                
+                print("ERROR")
+                
+            end
+            
+        else
+            
+            print("plot must be yes or no")
+            
+        end
         
     else 
         
@@ -218,3 +258,45 @@ function domoprop(ϕ::Number,C1::Number,C2::Number)
     end
         
 end
+
+#Funcao para achar o valor do domo mais proximo ao desejado
+
+function findclosest(array::Array,x::Number,p::Number)
+
+    for i in 1:points
+    
+        y = x - array[i]
+    
+        if y < p
+            
+            return i
+        
+            break
+            
+        end    
+        
+        if y < 0 
+            
+            return i - 1
+            
+            break
+            
+        end
+        
+    end
+
+end
+
+#valores do domo para sr, ur e hr
+
+srlist1 = domoprop(7/2,C,C,"no","sr1")
+
+urlist1 = domoprop(7/2,C,C,"no","ur1")
+
+hrlist1 = domoprop(7/2,C,C,"no","hr1")
+
+srlist2 = domoprop(7/2,C,C,"no","sr2")
+
+urlist2 = domoprop(7/2,C,C,"no","ur2")
+
+hrlist2 = domoprop(7/2,C,C,"no","hr2")

@@ -1,14 +1,17 @@
 using EngThermBase
 
+include("domo.jl")
+
 # criacao da estrutura da substancia que sera utilizada como argumento
 
 struct vdWGas
     nome::String
-    Pc::AbstractFloat
-    Tc::AbstractFloat
-    α::AbstractFloat
-    b::AbstractFloat
-    M::AbstractFloat
+    Pc::sysP{Float64,EX}
+    Tc::sysT{Float64,EX}
+    α::_Amt{Float64,EX}
+    b::vAmt{Float64,EX,MA}
+    M::mAmt{Float64,EX,MO}
+    Rvdw::RAmt{Float64,EX,MA}
 end
 
 nome(gas::vdWGas) = gas.nome
@@ -17,27 +20,31 @@ Tc(gas::vdWGas) = gas.Tc
 α(gas::vdWGas) = gas.α
 b(gas::vdWGas) = gas.b
 M(gas::vdWGas) = gas.M
+Rvdw(gas::vdWGas) = gas.R
+vc(gas::vdWGas) = 3*gas.b
 
-# Funcoes de conversao de unidades
+#exemplo de substancia
 
-convertP(P::Float64) = AbstractFloat(P*101.325)
-convertM(M::Float64) = AbstractFloat(M*0.001)
-convertv(v::Float64,M::AbstractFloat) = AbstractFloat(v*(10^(-6))/M)
-convertα(α::Float64,M::AbstractFloat) = AbstractFloat(α*101.325*0.000001/(M^2))
-convertb(b::Float64,M::AbstractFloat) = AbstractFloat(b*(10^(-2))*0.001/M)
+He = vdWGas("Helio", P(228.9945), T(5.21), P(1)*(v(1)^2)*0.21562534694033178, v(1)*0.005945540844366726, (N(1)^-1)*4.003,R(2.0769))
 
-# Funcao para dar a estrutura nas unidades convertidas
+# A partir da estrutura as funcoes de propriedades podem ser implementadas
 
-function vdWGasC(nome::String,Pc::AbstractFloat,Tc::AbstractFloat,α::AbstractFloat,b::AbstractFloat,M::AbstractFloat)
+Tr(Tc::sysT{Float64,EX}, T::sysT{Float64,EX}) = T/Tc
+
+Pr(Pc::sysT{Float64,EX}, P::sysT{Float64,EX}) = P/Pc
+
+vr(vc::vAmt{Float64,EX,MA}, v::vAmt{Float64,EX,MA}) = v/vc
+
+function Pvdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA}) 
     
-    Pcon = convertP(Pc)
+    if vr2list[findclosest(Tr_sat_list, T, (10^-3))] < v < vr1list[findclosest(Tr_sat_list, T, (10^-3))]
+        
+        return 8*Tr(Tc(gas),T)/(3*vr(vc(gas),v) - 1) - 3/(vr(vc(gas),v)^2)
     
-    Mcon = convertM(M)
-    
-    αcon = convertα(α,Mcon)
-    
-    bcon = convertb(b,Mcon)
-    
-    return vdWGas(nome,Pcon,Tc,αcon,bcon,Mcon)
+    else 
+        
+        return Pr_sat_list[findclosest(Tr_sat_list, T, (10^-3))]
+        
+    end
     
 end
