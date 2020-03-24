@@ -35,15 +35,29 @@ Pr(Pc::sysT{Float64,EX}, P::sysT{Float64,EX}) = P/Pc
 
 vr(vc::vAmt{Float64,EX,MA}, v::vAmt{Float64,EX,MA}) = v/vc
 
-function Pvdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA}) 
+function P_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA}) 
     
-    if vr2list[findclosest(Tr_sat_list, T, (10^-3))] < v < vr1list[findclosest(Tr_sat_list, T, (10^-3))]
+    if vr1list[findclosest(Tr_sat_list, T, (10^-3))] <= v <= vr2list[findclosest(Tr_sat_list, T, (10^-3))]
         
-        return 8*Tr(Tc(gas),T)/(3*vr(vc(gas),v) - 1) - 3/(vr(vc(gas),v)^2)
+        return Pc(gas)*(Pr_sat_list[findclosest(Tr_sat_list, T, (10^-3))])
     
     else 
         
-        return Pr_sat_list[findclosest(Tr_sat_list, T, (10^-3))]
+        return Pc(gas)*(8*Tr(Tc(gas),T)/(3*vr(vc(gas),v) - 1) - 3/(vr(vc(gas),v)^2))
+    
+    end
+    
+end
+
+function T_vdw(gas::vdWGas, P::sysT{Float64,EX}, v::vAmt{Float64,EX,MA})
+    
+    if vr1list[findclosest(Pr_sat_list, P, (10^-3))] <= v <= vr2list[findclosest(Pr_sat_list, P, (10^-3))]
+        
+        return Tc(gas)*(Tr_sat_list[findclosest(Pr_sat_list, P, (10^-3))])
+        
+    else
+        
+        return Tc(gas)*(((Pr(Pc(gas), P)*(3*vr(vc(gas), v) - 1))/8) + (3/(8*(vr(vc(gas), v)^2))))
         
     end
     
