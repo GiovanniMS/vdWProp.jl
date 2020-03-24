@@ -1,6 +1,6 @@
 using EngThermBase
 
-include("domo.jl")
+include("dome.jl")
 
 # criacao da estrutura da substancia que sera utilizada como argumento
 
