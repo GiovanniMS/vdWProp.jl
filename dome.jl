@@ -1,10 +1,10 @@
-### Domo de Saturacao ###
+### Saturation Dome ###
 
-# para obtencao do domo sao necessarios ℘ V1 V2 vr1 vr2 Tr_sat Pr_sat
+#  ℘ V1 V2 vr1 vr2 Tr_sat Pr_sat - are needed
 
 ###################################################################################
 
-#FUNCOES
+#Functions
 
 V2(℘) = (2*log(℘)/(℘-1) - 1/℘ - 1) / (2 - (℘+1)*log(℘)/(℘-1))
 
@@ -20,7 +20,7 @@ Pr_sat(V1,V2) = (27*(-V1 - V2 + (V1 + 1)*(V2 + 1) - 2)) / (((V1 + 1)^2)*((V2 + 1
 
 #####################################################################################
 
-#valores do domo para as constantes e para Pr, Tr e vr
+# Arrays
 
 points = 10000
 
@@ -66,7 +66,7 @@ end
 
 #PLOT Prxvr e Prxlogvr
 
-# o "using Makie" esta comentado para poupar tempo, caso seja desejado a plotagem o comando deve ser feito exteriormente"
+# "using Makie" is needed only to get the plots, but can be used externally, thats why it is commented
 
 #using Makie
 
@@ -110,9 +110,9 @@ end
 
 ########################################################################################
 
-# utilizando as propriedades do domo podemos encontrar as demais propriedades associadas
-# a partir das demais propriedades, havera variacao dependendo do tipo de gas (por causa do ϕ) e dependendo das constantes escolhidas
-# portanto deve-se escolher as constantes e fazer um domo para cada tipo de gas (3 domos)
+# using the dome properties, it is possible to get the other associated properties
+# the properties bellow depends on the constants \phi and integration constants
+# it's needed to plot all the domes for each \phi
 
 Zc = 3/8
 
@@ -124,10 +124,10 @@ ur(vr,Tr,ϕ,C1) = C1 + (8/3)*Tr*ϕ - (3/vr)
 
 hr(vr,Tr,ϕ,C1) = C1 + (8/3)*Tr*ϕ + ((8*Tr*vr)/(3vr - 1)) - (6/vr)
 
-# inicialmente serao considerados C1 = C2 = 0
-# caso 1 - ϕ = 3/2
-# caso 2 - ϕ = 5/2
-# caso 3 - ϕ = 7/2
+# C1 = C2 = 0
+# case 1 - ϕ = 3/2
+# case 2 - ϕ = 5/2
+# case 3 - ϕ = 7/2
 
 ϕ1 = 3/2
 
@@ -137,7 +137,7 @@ hr(vr,Tr,ϕ,C1) = C1 + (8/3)*Tr*ϕ + ((8*Tr*vr)/(3vr - 1)) - (6/vr)
 
 C=0
 
-# Funcao para obter as propriedades e plots em todos os casos
+# Functions to get the plots and properties for ur, hr, and sr
 
 function domoprop(ϕ::Number,C1::Number,C2::Number,plot::String, array::String)
     
@@ -259,7 +259,7 @@ function domoprop(ϕ::Number,C1::Number,C2::Number,plot::String, array::String)
         
 end
 
-#Funcao para achar o valor do domo mais proximo ao desejado
+# Function to find the closest number in an array comparing to a specified number
 
 function findclosest(array::Array,x::Number,p::Number)
 
@@ -287,16 +287,44 @@ function findclosest(array::Array,x::Number,p::Number)
 
 end
 
-#valores do domo para sr, ur e hr
+# Dome properties for case 1
 
-srlist1 = domoprop(7/2,C,C,"no","sr1")
+srlist1c1 = domoprop(ϕ1,C,C,"no","sr1")
 
-urlist1 = domoprop(7/2,C,C,"no","ur1")
+urlist1c1 = domoprop(ϕ1,C,C,"no","ur1")
 
-hrlist1 = domoprop(7/2,C,C,"no","hr1")
+hrlist1c1 = domoprop(ϕ1,C,C,"no","hr1")
 
-srlist2 = domoprop(7/2,C,C,"no","sr2")
+srlist2c1 = domoprop(ϕ1,C,C,"no","sr2")
 
-urlist2 = domoprop(7/2,C,C,"no","ur2")
+urlist2c1 = domoprop(ϕ1,C,C,"no","ur2")
 
-hrlist2 = domoprop(7/2,C,C,"no","hr2")
+hrlist2c1 = domoprop(ϕ1,C,C,"no","hr2")
+
+# Dome properties for case 2
+
+srlist1c2 = domoprop(ϕ2,C,C,"no","sr1")
+
+urlist1c2 = domoprop(ϕ2,C,C,"no","ur1")
+
+hrlist1c2 = domoprop(ϕ2,C,C,"no","hr1")
+
+srlist2c2 = domoprop(ϕ2,C,C,"no","sr2")
+
+urlist2c2 = domoprop(ϕ2,C,C,"no","ur2")
+
+hrlist2c2 = domoprop(ϕ2,C,C,"no","hr2")
+
+# Dome properties for case 3
+
+srlist1c3 = domoprop(ϕ3,C,C,"no","sr1")
+
+urlist1c3 = domoprop(ϕ3,C,C,"no","ur1")
+
+hrlist1c3 = domoprop(ϕ3,C,C,"no","hr1")
+
+srlist2c3 = domoprop(ϕ3,C,C,"no","sr2")
+
+urlist2c3 = domoprop(ϕ3,C,C,"no","ur2")
+
+hrlist2c3 = domoprop(ϕ3,C,C,"no","hr2")

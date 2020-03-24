@@ -2,7 +2,7 @@ using EngThermBase
 
 include("dome.jl")
 
-# criacao da estrutura da substancia que sera utilizada como argumento
+# creating a structure to van der Waals gases
 
 struct vdWGas
     nome::String
@@ -23,11 +23,11 @@ M(gas::vdWGas) = gas.M
 Rvdw(gas::vdWGas) = gas.R
 vc(gas::vdWGas) = 3*gas.b
 
-#exemplo de substancia
+# Gas example
 
 He = vdWGas("Helio", P(228.9945), T(5.21), P(1)*(v(1)^2)*0.21562534694033178, v(1)*0.005945540844366726, (N(1)^-1)*4.003,R(2.0769))
 
-# A partir da estrutura as funcoes de propriedades podem ser implementadas
+# Now the functions are implemented using the vdWGas as an argument
 
 Tr(Tc::sysT{Float64,EX}, T::sysT{Float64,EX}) = T/Tc
 
