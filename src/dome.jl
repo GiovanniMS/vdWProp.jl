@@ -328,3 +328,109 @@ srlist2c3 = domoprop(ϕ3,C,C,"no","sr2")
 urlist2c3 = domoprop(ϕ3,C,C,"no","ur2")
 
 hrlist2c3 = domoprop(ϕ3,C,C,"no","hr2")
+
+function DomeList(ϕ::Number, x::String)
+    
+    if x == "ur1"
+        
+        if ϕ == ϕ1
+            
+            return urlist1c1
+            
+        elseif ϕ == ϕ2
+            
+            return urlist1c2
+            
+        elseif ϕ == ϕ3
+            
+            return urlist1c3
+            
+        end
+        
+    elseif x == "ur2"
+        
+        if ϕ == ϕ1
+            
+            return urlist2c1
+            
+        elseif ϕ == ϕ2
+            
+            return urlist2c2
+            
+        elseif ϕ == ϕ3
+            
+            return urlist2c3
+            
+        end
+        
+    elseif x == "hr1"
+        
+        if ϕ == ϕ1
+            
+            return hrlist1c1
+            
+        elseif ϕ == ϕ2
+            
+            return hrlist1c2
+            
+        elseif ϕ == ϕ3
+            
+            return hrlist1c3
+            
+        end
+        
+    elseif x == "hr2"
+        
+        if ϕ == ϕ1
+            
+            return hrlist2c1
+            
+        elseif ϕ == ϕ2
+            
+            return hrlist2c2
+            
+        elseif ϕ == ϕ3
+            
+            return hrlist2c3
+            
+        end
+        
+    elseif x == "sr1"
+        
+        if ϕ == ϕ1
+            
+            return srlist1c1
+            
+        elseif ϕ == ϕ2
+            
+            return srlist1c2
+            
+        elseif ϕ == ϕ3
+            
+            return srlist1c3
+            
+        end
+        
+    elseif x == "sr2"
+        
+        if ϕ == ϕ1
+            
+            return srlist2c1
+            
+        elseif ϕ == ϕ2
+            
+            return srlist2c2
+            
+        elseif ϕ == ϕ3
+            
+            return srlist2c3
+            
+        end
+       
+    end
+    
+end
+        
+        
+    
+    
