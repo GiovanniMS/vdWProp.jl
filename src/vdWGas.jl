@@ -99,3 +99,137 @@ function vr_vdw(gas::vdWGas, P::sysT{Float64,EX}, T::sysT{Float64,EX})
     end
     
 end
+
+# Verification if the pair of properties given is inside or outside of the dome. The function is divided in parts of different pairs because the order changes the logic.
+
+function DomeVerification(gas::vdWGas, v::vAmt{Float64,EX,MA}, u::uAmt{Float64,EX,MA})
+    
+    if findclosest(Domelist(ϕ(gas), "ur1"), ur(u, Pc(gas), vc(gas)), (10^-3)) == -1 && findclosest(Domelist(ϕ(gas), "ur2"), ur(u, Pc(gas), vc(gas)), (10^-3)) == -1
+        
+        return "out"
+        
+    else
+        
+        if vr1list[findclosest(Domelist(ϕ(gas), "ur1"), ur(u, Pc(gas), vc(gas)), (10^-3))] <= vr(vc(gas), v) <= vr2list[findclosest(Domelist(ϕ(gas), "ur2"), ur(u, Pc(gas), vc(gas)), (10^-3))]
+            
+            return "in"
+            
+        else
+            
+            return "out"
+            
+        end
+        
+    end
+    
+end
+
+function DomeVerification(gas::vdWGas, v::vAmt{Float64,EX,MA}, h::hAmt{Float64,EX,MA})
+    
+    if findclosest(Domelist(ϕ(gas), "hr1"), hr(h, Pc(gas), vc(gas)), (10^-3)) == -1 && findclosest(Domelist(ϕ(gas), "hr2"), hr(h, Pc(gas), vc(gas)), (10^-3)) == -1
+        
+        return "out"
+        
+    else
+        
+        if vr1list[findclosest(Domelist(ϕ(gas), "hr1"), hr(h, Pc(gas), vc(gas)), (10^-3))] <= vr(vc(gas), v) <= vr2list[findclosest(Domelist(ϕ(gas), "hr2"), hr(h, Pc(gas), vc(gas)), (10^-3))]
+            
+            return "in"
+            
+        else
+            
+            return "out"
+            
+        end
+        
+    end
+    
+end
+
+function DomeVerification(gas::vdWGas, v::vAmt{Float64,EX,MA}, s::sAmt{Float64,EX,MA})
+    
+    if findclosest(Domelist(ϕ(gas), "sr1"), sr(s, Pc(gas), vc(gas), Tc(gas)), (10^-3)) == -1 && findclosest(Domelist(ϕ(gas), "sr2"), sr(s, Pc(gas), vc(gas), Tc(gas)), (10^-3)) == -1
+        
+        return "out"
+        
+    else
+        
+        if vr1list[findclosest(Domelist(ϕ(gas), "sr1"), sr(s, Pc(gas), vc(gas), T(gas)), (10^-3))] <= vr(vc(gas), v) <= vr2list[findclosest(Domelist(ϕ(gas), "sr2"), sr(s, Pc(gas), vc(gas), Tc(gas)), (10^-3))]
+            
+            return "in"
+            
+        else
+            
+            return "out"
+            
+        end
+        
+    end
+    
+end
+
+function DomeVerification(gas::vdWGas, h::hAmt{Float64,EX,MA}, u::uAmt{Float64,EX,MA})
+    
+    if findclosest(Domelist(ϕ(gas), "ur1"), ur(u, Pc(gas), vc(gas)), (10^-3)) == -1 && findclosest(Domelist(ϕ(gas), "ur2"), ur(u, Pc(gas), vc(gas)), (10^-3)) == -1
+        
+        return "out"
+        
+    else
+        
+        if Domelist(ϕ(gas), "hr1")[findclosest(Domelist(ϕ(gas), "ur1"), ur(u, Pc(gas), vc(gas)), (10^-3))] <= hr(h, Pc(gas), vc(gas)) <= Domelist(ϕ(gas), "hr2")[findclosest(Domelist(ϕ(gas), "ur2"), ur(u, Pc(gas), vc(gas)), (10^-3))]
+            
+            return "in"
+            
+        else
+            
+            return "out"
+            
+        end
+        
+    end
+    
+end
+
+function DomeVerification(gas::vdWGas, h::hAmt{Float64,EX,MA}, s::sAmt{Float64,EX,MA})
+    
+    if findclosest(Domelist(ϕ(gas), "sr1"), sr(s, Pc(gas), vc(gas), Tc(gas)), (10^-3)) == -1 && findclosest(Domelist(ϕ(gas), "sr2"), sr(s, Pc(gas), vc(gas), Tc(gas)), (10^-3)) == -1
+        
+        return "out"
+        
+    else
+        
+        if Domelist(ϕ(gas), "hr1")[findclosest(Domelist(ϕ(gas), "sr1"), sr(s, Pc(gas), vc(gas), T(gas)), (10^-3))] <= hr(h, Pc(gas), vc(gas)) <= Domelist(ϕ(gas), "hr2")[findclosest(Domelist(ϕ(gas), "sr2"), sr(s, Pc(gas), vc(gas), Tc(gas)), (10^-3))]
+            
+            return "in"
+            
+        else
+            
+            return "out"
+            
+        end
+        
+    end
+    
+end
+
+function DomeVerification(gas::vdWGas, s::sAmt{Float64,EX,MA}, u::uAmt{Float64,EX,MA})
+    
+    if findclosest(Domelist(ϕ(gas), "ur1"), ur(u, Pc(gas), vc(gas)), (10^-3)) == -1 && findclosest(Domelist(ϕ(gas), "ur2"), ur(u, Pc(gas), vc(gas)), (10^-3)) == -1
+        
+        return "out"
+        
+    else
+        
+        if Domelist(ϕ(gas), "sr1")[findclosest(Domelist(ϕ(gas), "ur1"), ur(u, Pc(gas), vc(gas)), (10^-3))] <= sr(s, Pc(gas), vc(gas), Tc(gas)) <= Domelist(ϕ(gas), "sr2")[findclosest(Domelist(ϕ(gas), "ur2"), ur(u, Pc(gas), vc(gas)), (10^-3))]
+            
+            return "in"
+            
+        else
+            
+            return "out"
+            
+        end
+        
+    end
+    
+end

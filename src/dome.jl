@@ -266,8 +266,12 @@ function findclosest(array::Array,x::Number,p::Number)
     for i in 1:points
     
         y = x - array[i]
+        
+        if array[points] < x || array[1] > x
+            
+            return -1
     
-        if y < p
+        elseif y < p
             
             return i
         
