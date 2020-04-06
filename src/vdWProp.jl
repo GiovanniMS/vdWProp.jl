@@ -312,6 +312,84 @@ function v_vdw(gas::vdWGas, P::sysP{Float64,EX}, T::sysT{Float64,EX}, Mol::Bool 
     
 end
 
+function s_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA})
+    
+    SatP = findclosest(Tr_sat_list, Tr(Tc(gas), T), (10^-3))
+    
+    if vr1list[SatP] <= vr(vc(gas), v) <= vr2list[SatP]
+        
+        Q = (vr(vc(gas), v) - vr1list[SatP])/(vr2list[SatP] - vr1list[SatP])
+        
+        srf1 = Domelist(ϕ(gas), "sr1")[SatP] + Q*(Domelist(ϕ(gas), "sr2")[SatP] - Domelist(ϕ(gas), "sr1")[SatP])
+        
+        Mol ? srf2 = srf1*M(gas) : srf2 = srf1 
+        
+        return Pc(gas)*vc(gas)*srf2/Tc(gas)
+        
+    else 
+        
+        srf1 = (8/3)*log(3*vr(vc(gas), v) - 1) + (8*ϕ(gas)/3)*log(Tr(Tc(gas), T)) - C2()
+        
+        Mol ? srf2 = srf1*M(gas) : srf2 = srf1 
+        
+        return Pc(gas)*vc(gas)*srf2/Tc(gas)
+        
+    end
+    
+end
+
+function u_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA})
+    
+    SatP = findclosest(Tr_sat_list, Tr(Tc(gas), T), (10^-3))
+    
+    if vr1list[SatP] <= vr(vc(gas), v) <= vr2list[SatP]
+        
+        Q = (vr(vc(gas), v) - vr1list[SatP])/(vr2list[SatP] - vr1list[SatP])
+        
+        urf1 = Domelist(ϕ(gas), "ur1")[SatP] + Q*(Domelist(ϕ(gas), "ur2")[SatP] - Domelist(ϕ(gas), "ur1")[SatP])
+        
+        Mol ? urf2 = urf1*M(gas) : urf2 = urf1 
+        
+        return Pc(gas)*vc(gas)*urf2
+        
+    else 
+        
+        urf1 = C1() + (8*Tr(Tc(gas), T)*ϕ(gas)/3) - (3/vr(vc(gas), v))
+        
+        Mol ? urf2 = urf1*M(gas) : urf2 = urf1 
+        
+        return Pc(gas)*vc(gas)*urf2
+        
+    end
+    
+end
+
+function h_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA})
+    
+    SatP = findclosest(Tr_sat_list, Tr(Tc(gas), T), (10^-3))
+    
+    if vr1list[SatP] <= vr(vc(gas), v) <= vr2list[SatP]
+        
+        Q = (vr(vc(gas), v) - vr1list[SatP])/(vr2list[SatP] - vr1list[SatP])
+        
+        hrf1 = Domelist(ϕ(gas), "hr1")[SatP] + Q*(Domelist(ϕ(gas), "hr2")[SatP] - Domelist(ϕ(gas), "hr1")[SatP])
+        
+        Mol ? hrf2 = hrf1*M(gas) : hrf2 = hrf1 
+        
+        return Pc(gas)*vc(gas)*hrf2
+        
+    else 
+        
+        hrf1 = C1() + (8*Tr(Tc(gas), T)*ϕ(gas)/3) + (8*Tr(Tc(gas), T)*vr(vc(gas), v)/(3*vr(vc(gas), v) - 1)) - (6/vr(vc(gas), v))
+        
+        Mol ? hrf2 = hrf1*M(gas) : hrf2 = hrf1 
+        
+        return Pc(gas)*vc(gas)*hrf2
+        
+    end
+    
+end
+
 function T_vdw(gas::vdWGas, v::vAmt{Float64,EX,MA}, s::sAmt{Float64,EX,MA})
     
     if DomeVerification(v,s) == "in"
@@ -619,6 +697,112 @@ function v_vdw(gas::vdWGas, T::sysT{Float64,EX}, h::hAmt{Float64,EX,MA}, Mol::Bo
         Mol ? vrf2 = vrf1*M(gas) : vrf2 = vrf1 
         
         return vc(gas)*vrf2
+        
+    end
+    
+end
+
+# with all the possible pairs implemented, the next step is to implement a function that get all the six properties when a random pair is given
+
+function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol::Bool = False)
+    
+    ta = typeof(a)
+    
+    tb = typeof(b)
+    
+    if (ta == sysP{Float64,EX} && tb == sysT{Float64,EX}) || (tb == sysP{Float64,EX} && ta == sysT{Float64,EX})
+        
+        ta == sysP{Float64,EX} ? P = a : P = b
+        
+        tb == sysT{Float64,EX} ? T = b : T = a
+        
+        v = v_vdw(gas, P, T)
+        
+        u = u_vdw(gas, T, v)
+        
+        h = h_vdw(gas, T, v)
+        
+        s = s_vdw(gas, T, v)
+        
+        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas)] : St = [P, T, v, u, h, s]
+        
+        return St
+        
+    elseif (ta == sysP{Float64,EX} && tb == vAmt{Float64,EX,MA}) || (tb == sysP{Float64,EX} && ta == vAmt{Float64,EX,MA})
+        
+        ta == sysP{Float64,EX} ? P = a : P = b
+        
+        tb == vAmt{Float64,EX,MA} ? v = b : v = a
+        
+        T = T_vdw(gas, P, v)
+        
+        u = u_vdw(gas, T, v)
+        
+        h = h_vdw(gas, T, v)
+        
+        s = s_vdw(gas, T, v)
+        
+        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas)] : St = [P, T, v, u, h, s]
+        
+        return St
+        
+    elseif (ta == sysP{Float64,EX} && tb == uAmt{Float64,EX,MA}) || (tb == sysP{Float64,EX} && ta == uAmt{Float64,EX,MA})
+        
+        ta == sysP{Float64,EX} ? P = a : P = b
+        
+        tb == uAmt{Float64,EX,MA} ? u = b : u = a
+        
+        v = v_vdw(gas, P, u)
+        
+        T = T_vdw(gas, P, v)
+        
+        h = h_vdw(gas, T, v)
+        
+        s = s_vdw(gas, T, v)
+        
+        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas)] : St = [P, T, v, u, h, s]
+        
+        return St
+        
+    elseif (ta == sysP{Float64,EX} && tb == hAmt{Float64,EX,MA}) || (tb == sysP{Float64,EX} && ta == hAmt{Float64,EX,MA})
+        
+        ta == sysP{Float64,EX} ? P = a : P = b
+        
+        tb == hAmt{Float64,EX,MA} ? h = b : h = a
+        
+        v = v_vdw(gas, P, h)
+        
+        T = T_vdw(gas, P, v)
+        
+        u = u_vdw(gas, T, v)
+        
+        s = s_vdw(gas, T, v)
+        
+        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas)] : St = [P, T, v, u, h, s]
+        
+        return St
+        
+    elseif (ta == sysP{Float64,EX} && tb == sAmt{Float64,EX,MA}) || (tb == sysP{Float64,EX} && ta == sAmt{Float64,EX,MA})
+        
+        ta == sysP{Float64,EX} ? P = a : P = b
+        
+        tb == sAmt{Float64,EX,MA} ? s = b : s = a
+        
+        v = v_vdw(gas, P, s)
+        
+        T = T_vdw(gas, P, v)
+        
+        u = u_vdw(gas, T, v)
+        
+        h = h_vdw(gas, T, v)
+        
+        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas)] : St = [P, T, v, u, h, s]
+        
+        return St
+        
+    else
+        
+        println("ERROR, the arguments need to be properties between P,T,v,h,u,s and the base for the intensive ones needs to be mass.")
         
     end
     
