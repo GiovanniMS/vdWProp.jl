@@ -702,7 +702,7 @@ function v_vdw(gas::vdWGas, T::sysT{Float64,EX}, h::hAmt{Float64,EX,MA}, Mol::Bo
     
 end
 
-# with all the possible pairs implemented, the next step is to implement a function that get all the six properties when a random pair is given
+# with all the possible pairs implemented, the next step is implement a function that gets all the six properties when a random pair is given
 
 function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol::Bool = False)
     
@@ -800,9 +800,189 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         
         return St
         
+    elseif (ta == sysT{Float64,EX} && tb == vAmt{Float64,EX,MA}) || (tb == sysT{Float64,EX} && ta == vAmt{Float64,EX,MA})
+        
+        ta == sysT{Float64,EX} ? T = a : T = b
+        
+        tb == vAmt{Float64,EX,MA} ? v = b : v = a
+        
+        P = P_vdw(gas, T, v)
+        
+        u = u_vdw(gas, T, v)
+        
+        h = h_vdw(gas, T, v)
+        
+        s = s_vdw(gas, T, v)
+        
+        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas)] : St = [P, T, v, u, h, s]
+        
+        return St
+        
+    elseif (ta == sysT{Float64,EX} && tb == sAmt{Float64,EX,MA}) || (tb == sysT{Float64,EX} && ta == sAmt{Float64,EX,MA})
+        
+        ta == sysT{Float64,EX} ? T = a : T = b
+        
+        tb == sAmt{Float64,EX,MA} ? s = b : s = a
+        
+        v = v_vdw(gas, T, s)
+        
+        P = P_vdw(gas, T, v)
+        
+        u = u_vdw(gas, T, v)
+        
+        h = h_vdw(gas, T, v)
+        
+        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas)] : St = [P, T, v, u, h, s]
+        
+        return St
+        
+    elseif (ta == sysT{Float64,EX} && tb == hAmt{Float64,EX,MA}) || (tb == sysT{Float64,EX} && ta == hAmt{Float64,EX,MA})
+        
+        ta == sysT{Float64,EX} ? T = a : T = b
+        
+        tb == hAmt{Float64,EX,MA} ? h = b : h = a
+        
+        v = v_vdw(gas, T, h)
+        
+        P = P_vdw(gas, T, v)
+        
+        u = u_vdw(gas, T, v)
+        
+        s = s_vdw(gas, T, v)
+        
+        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas)] : St = [P, T, v, u, h, s]
+        
+        return St
+        
+    elseif (ta == sysT{Float64,EX} && tb == uAmt{Float64,EX,MA}) || (tb == sysT{Float64,EX} && ta == uAmt{Float64,EX,MA})
+        
+        ta == sysT{Float64,EX} ? T = a : T = b
+        
+        tb == uAmt{Float64,EX,MA} ? u = b : u = a
+        
+        v = v_vdw(gas, T, u)
+        
+        P = P_vdw(gas, T, v)
+        
+        h = h_vdw(gas, T, v)
+        
+        s = s_vdw(gas, T, v)
+        
+        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas)] : St = [P, T, v, u, h, s]
+        
+        return St
+        
+    elseif (ta == vAmt{Float64,EX,MA} && tb == sAmt{Float64,EX,MA}) || (tb == vAmt{Float64,EX,MA} && ta == sAmt{Float64,EX,MA})
+        
+        ta == vAmt{Float64,EX,MA} ? v = a : v = b
+        
+        tb == sAmt{Float64,EX,MA} ? s = b : s = a
+        
+        T = T_vdw(gas, v, s)
+                
+        P = P_vdw(gas, T, v)
+        
+        h = h_vdw(gas, T, v)
+        
+        u = u_vdw(gas, T, v)
+        
+        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas)] : St = [P, T, v, u, h, s]
+        
+        return St
+        
+    elseif (ta == vAmt{Float64,EX,MA} && tb == hAmt{Float64,EX,MA}) || (tb == vAmt{Float64,EX,MA} && ta == hAmt{Float64,EX,MA})
+        
+        ta == vAmt{Float64,EX,MA} ? v = a : v = b
+        
+        tb == hAmt{Float64,EX,MA} ? h = b : h = a
+        
+        T = T_vdw(gas, v, h)
+                
+        P = P_vdw(gas, T, v)
+        
+        s = s_vdw(gas, T, v)
+        
+        u = u_vdw(gas, T, v)
+        
+        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas)] : St = [P, T, v, u, h, s]
+        
+        return St
+        
+    elseif (ta == vAmt{Float64,EX,MA} && tb == uAmt{Float64,EX,MA}) || (tb == vAmt{Float64,EX,MA} && ta == uAmt{Float64,EX,MA})
+        
+        ta == vAmt{Float64,EX,MA} ? v = a : v = b
+        
+        tb == uAmt{Float64,EX,MA} ? u = b : u = a
+        
+        T = T_vdw(gas, v, u)
+                
+        P = P_vdw(gas, T, v)
+        
+        h = h_vdw(gas, T, v)
+        
+        s = s_vdw(gas, T, v)
+        
+        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas)] : St = [P, T, v, u, h, s]
+        
+        return St
+        
+    elseif (ta == sAmt{Float64,EX,MA} && tb == hAmt{Float64,EX,MA}) || (tb == sAmt{Float64,EX,MA} && ta == hAmt{Float64,EX,MA})
+        
+        ta == sAmt{Float64,EX,MA} ? s = a : s = b
+        
+        tb == hAmt{Float64,EX,MA} ? h = b : h = a
+        
+        v = v_vdw(gas, s, h)
+        
+        T = T_vdw(gas, v, s)
+                
+        P = P_vdw(gas, T, v)
+        
+        u = u_vdw(gas, T, v)
+        
+        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas)] : St = [P, T, v, u, h, s]
+        
+        return St
+        
+    elseif (ta == sAmt{Float64,EX,MA} && tb == uAmt{Float64,EX,MA}) || (tb == sAmt{Float64,EX,MA} && ta == uAmt{Float64,EX,MA})
+        
+        ta == sAmt{Float64,EX,MA} ? s = a : s = b
+        
+        tb == uAmt{Float64,EX,MA} ? u = b : u = a
+        
+        v = v_vdw(gas, u, s)
+        
+        T = T_vdw(gas, v, s)
+                
+        P = P_vdw(gas, T, v)
+        
+        h = h_vdw(gas, T, v)
+        
+        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas)] : St = [P, T, v, u, h, s]
+        
+        return St
+        
+    elseif (ta == hAmt{Float64,EX,MA} && tb == uAmt{Float64,EX,MA}) || (tb == hAmt{Float64,EX,MA} && ta == uAmt{Float64,EX,MA})
+        
+        ta == hAmt{Float64,EX,MA} ? h = a : h = b
+        
+        tb == uAmt{Float64,EX,MA} ? u = b : u = a
+        
+        v = v_vdw(gas, u, h)
+        
+        T = T_vdw(gas, v, h)
+                
+        P = P_vdw(gas, T, v)
+        
+        s = s_vdw(gas, T, v)
+        
+        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas)] : St = [P, T, v, u, h, s]
+        
+        return St
+        
     else
         
-        println("ERROR, the arguments need to be properties between P,T,v,h,u,s and the base for the intensive ones needs to be mass.")
+        println("ERROR, the arguments needs to be properties between P,T,v,h,u,s and the base for the intensive ones needs to be mass.")
         
     end
     
