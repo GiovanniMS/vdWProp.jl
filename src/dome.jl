@@ -261,17 +261,17 @@ end
 
 # Function to find the closest number in an array comparing to a specified number
 
-function findclosest(array::Array,x::Number,p::Number)
+function findclosest(array::Array,x::AMOUNTS{Float64,EX},p::Number)
 
     for i in 1:points
     
-        y = x - array[i]
+        y = x - AMT(array[i])
         
-        if array[points] < x || array[1] > x
+        if AMT(maximum(array)) < x || AMT(minimum(array)) > x
             
             return -1
     
-        elseif y < p
+        elseif y < AMT(p)
             
             return i
         
@@ -279,7 +279,7 @@ function findclosest(array::Array,x::Number,p::Number)
             
         end    
         
-        if y < 0 
+        if y < AMT(0) 
             
             return i - 1
             
@@ -333,7 +333,7 @@ urlist2c3 = domoprop(ϕ3,C,C,"no","ur2")
 
 hrlist2c3 = domoprop(ϕ3,C,C,"no","hr2")
 
-function DomeList(ϕ::Number, x::String)
+function Domelist(ϕ::Number, x::String)
     
     if x == "ur1"
         

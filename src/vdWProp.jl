@@ -246,6 +246,22 @@ function FindQ(a::BProperty{Float64,EX,MA}, b::BProperty{Float64,EX,MA}, aArray1
     
 end
 
+#Function to find the real root in the array that will be the result for the 3 degree polinomial
+
+function ImVerification(a::Array)
+    
+    i = 1
+    
+    while i > 0 && i < 4
+        
+        imag(a[i]) == 0 ? break : i = i + 1
+        
+    end
+    
+    return Float64(a[i])
+    
+end
+
 # Now the functions are implemented using the vdWGas as an argument
 
 Tr(Tc::sysT{Float64,EX}, T::sysT{Float64,EX}) = T/Tc
