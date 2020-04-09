@@ -46,141 +46,7 @@ vc(gas::vdWGas) = 3*gas.b
 
 He = vdWGas("Helio", P(228.9945), T(5.21), P(1)*(v(1)^2)*0.21562534694033178, v(1)*0.005945540844366726, (N(1)^-1)*4.003,R(2.0769))
 
-# Verification if the pair of properties given is inside or outside of the dome. The function is divided in parts of different pairs because the order changes the logic.
-
-function DomeVerification(gas::vdWGas, v::vAmt{Float64,EX,MA}, u::uAmt{Float64,EX,MA})
-    
-    if findclosest(Domelist(ϕ(gas), "ur1"), ur(u, Pc(gas), vc(gas)), (10^-3)) == -1 && findclosest(Domelist(ϕ(gas), "ur2"), ur(u, Pc(gas), vc(gas)), (10^-3)) == -1
-        
-        return "out"
-        
-    else
-        
-        if vr1list[findclosest(Domelist(ϕ(gas), "ur1"), ur(u, Pc(gas), vc(gas)), (10^-3))] <= vr(vc(gas), v) <= vr2list[findclosest(Domelist(ϕ(gas), "ur2"), ur(u, Pc(gas), vc(gas)), (10^-3))]
-            
-            return "in"
-            
-        else
-            
-            return "out"
-            
-        end
-        
-    end
-    
-end
-
-function DomeVerification(gas::vdWGas, v::vAmt{Float64,EX,MA}, h::hAmt{Float64,EX,MA})
-    
-    if findclosest(Domelist(ϕ(gas), "hr1"), hr(h, Pc(gas), vc(gas)), (10^-3)) == -1 && findclosest(Domelist(ϕ(gas), "hr2"), hr(h, Pc(gas), vc(gas)), (10^-3)) == -1
-        
-        return "out"
-        
-    else
-        
-        if vr1list[findclosest(Domelist(ϕ(gas), "hr1"), hr(h, Pc(gas), vc(gas)), (10^-3))] <= vr(vc(gas), v) <= vr2list[findclosest(Domelist(ϕ(gas), "hr2"), hr(h, Pc(gas), vc(gas)), (10^-3))]
-            
-            return "in"
-            
-        else
-            
-            return "out"
-            
-        end
-        
-    end
-    
-end
-
-function DomeVerification(gas::vdWGas, v::vAmt{Float64,EX,MA}, s::sAmt{Float64,EX,MA})
-    
-    if findclosest(Domelist(ϕ(gas), "sr1"), sr(s, Pc(gas), vc(gas), Tc(gas)), (10^-3)) == -1 && findclosest(Domelist(ϕ(gas), "sr2"), sr(s, Pc(gas), vc(gas), Tc(gas)), (10^-3)) == -1
-        
-        return "out"
-        
-    else
-        
-        if vr1list[findclosest(Domelist(ϕ(gas), "sr1"), sr(s, Pc(gas), vc(gas), T(gas)), (10^-3))] <= vr(vc(gas), v) <= vr2list[findclosest(Domelist(ϕ(gas), "sr2"), sr(s, Pc(gas), vc(gas), Tc(gas)), (10^-3))]
-            
-            return "in"
-            
-        else
-            
-            return "out"
-            
-        end
-        
-    end
-    
-end
-
-function DomeVerification(gas::vdWGas, h::hAmt{Float64,EX,MA}, u::uAmt{Float64,EX,MA})
-    
-    if findclosest(Domelist(ϕ(gas), "ur1"), ur(u, Pc(gas), vc(gas)), (10^-3)) == -1 && findclosest(Domelist(ϕ(gas), "ur2"), ur(u, Pc(gas), vc(gas)), (10^-3)) == -1
-        
-        return "out"
-        
-    else
-        
-        if Domelist(ϕ(gas), "hr1")[findclosest(Domelist(ϕ(gas), "ur1"), ur(u, Pc(gas), vc(gas)), (10^-3))] <= hr(h, Pc(gas), vc(gas)) <= Domelist(ϕ(gas), "hr2")[findclosest(Domelist(ϕ(gas), "ur2"), ur(u, Pc(gas), vc(gas)), (10^-3))]
-            
-            return "in"
-            
-        else
-            
-            return "out"
-            
-        end
-        
-    end
-    
-end
-
-function DomeVerification(gas::vdWGas, h::hAmt{Float64,EX,MA}, s::sAmt{Float64,EX,MA})
-    
-    if findclosest(Domelist(ϕ(gas), "sr1"), sr(s, Pc(gas), vc(gas), Tc(gas)), (10^-3)) == -1 && findclosest(Domelist(ϕ(gas), "sr2"), sr(s, Pc(gas), vc(gas), Tc(gas)), (10^-3)) == -1
-        
-        return "out"
-        
-    else
-        
-        if Domelist(ϕ(gas), "hr1")[findclosest(Domelist(ϕ(gas), "sr1"), sr(s, Pc(gas), vc(gas), T(gas)), (10^-3))] <= hr(h, Pc(gas), vc(gas)) <= Domelist(ϕ(gas), "hr2")[findclosest(Domelist(ϕ(gas), "sr2"), sr(s, Pc(gas), vc(gas), Tc(gas)), (10^-3))]
-            
-            return "in"
-            
-        else
-            
-            return "out"
-            
-        end
-        
-    end
-    
-end
-
-function DomeVerification(gas::vdWGas, s::sAmt{Float64,EX,MA}, u::uAmt{Float64,EX,MA})
-    
-    if findclosest(Domelist(ϕ(gas), "ur1"), ur(u, Pc(gas), vc(gas)), (10^-3)) == -1 && findclosest(Domelist(ϕ(gas), "ur2"), ur(u, Pc(gas), vc(gas)), (10^-3)) == -1
-        
-        return "out"
-        
-    else
-        
-        if Domelist(ϕ(gas), "sr1")[findclosest(Domelist(ϕ(gas), "ur1"), ur(u, Pc(gas), vc(gas)), (10^-3))] <= sr(s, Pc(gas), vc(gas), Tc(gas)) <= Domelist(ϕ(gas), "sr2")[findclosest(Domelist(ϕ(gas), "ur2"), ur(u, Pc(gas), vc(gas)), (10^-3))]
-            
-            return "in"
-            
-        else
-            
-            return "out"
-            
-        end
-        
-    end
-    
-end
-
-# function to find the quality of a saturated mixture when P and T are not given
+# function to find the quality of a saturated mixture when P and T are not given, and also find if the pair is inside or outside of the dome.
 
 function FindQ(a::BProperty{Float64,EX,MA}, b::BProperty{Float64,EX,MA}, aArray1::Array, aArray2::Array, bArray1::Array, bArray2::Array)
 
@@ -188,49 +54,85 @@ function FindQ(a::BProperty{Float64,EX,MA}, b::BProperty{Float64,EX,MA}, aArray1
     
     while i <= points
         
-        y = ((a - aArray1[i])/(aArray2[i] - aArray1[i])) - ((b - bArray1[i])/(bArray2[i] - bArray1[i]))
+        typeof(a) == vAmt{Float64,EX,MA} ? A = [v(aArray1[i]), v(aArray2[i])] : 
+    
+        typeof(a) == uAmt{Float64,EX,MA} ? A = [u(aArray1[i]), u(aArray2[i])] : 
+
+        typeof(a) == hAmt{Float64,EX,MA} ? A = [h(aArray1[i]), h(aArray2[i])] : 
+
+        typeof(a) == sAmt{Float64,EX,MA} ? A = [s(aArray1[i]), s(aArray2[i])] : z = 1
+
+        typeof(b) == vAmt{Float64,EX,MA} ? B = [v(aArray1[i]), v(aArray2[i])] : 
+
+        typeof(b) == uAmt{Float64,EX,MA} ? B = [u(aArray1[i]), u(aArray2[i])] :
+
+        typeof(b) == hAmt{Float64,EX,MA} ? B = [h(aArray1[i]), h(aArray2[i])] :
+
+        typeof(b) == sAmt{Float64,EX,MA} ? B = [s(aArray1[i]), s(aArray2[i])] : z = 1
         
-        if round(y, digits = 3) == 0
+        y = ((a - A[1])/(A[2] - A[1])) - ((b - B[1])/(B[2] - B[1]))
+        
+        if y < AMT(0.001)
             
-            return [((a - aArray1[i])/(aArray2[i] - aArray1[i])), aArray1[i]] 
+            return [((a - A[1])/(A[2] - A[1])), A[1]] 
             
         else
             
-            yt(j) = ((a - aArray1[j])/(aArray2[j] - aArray1[j])) - ((b - bArray1[j])/(bArray2[j] - bArray1[j]))
+            function yt(j) 
+                
+                typeof(a) == vAmt{Float64,EX,MA} ? A = [v(aArray1[j]), v(aArray2[j])] : 
+    
+                typeof(a) == uAmt{Float64,EX,MA} ? A = [u(aArray1[j]), u(aArray2[j])] : 
+
+                typeof(a) == hAmt{Float64,EX,MA} ? A = [h(aArray1[j]), h(aArray2[j])] : 
+
+                typeof(a) == sAmt{Float64,EX,MA} ? A = [s(aArray1[j]), s(aArray2[j])] : z = 1
+
+                typeof(b) == vAmt{Float64,EX,MA} ? B = [v(aArray1[j]), v(aArray2[j])] : 
+
+                typeof(b) == uAmt{Float64,EX,MA} ? B = [u(aArray1[j]), u(aArray2[j])] :
+
+                typeof(b) == hAmt{Float64,EX,MA} ? B = [h(aArray1[j]), h(aArray2[j])] :
+
+                typeof(b) == sAmt{Float64,EX,MA} ? B = [s(aArray1[j]), s(aArray2[j])] : z = 1
+                
+                return ((a - A[1])/(A[2] - A[1])) - ((b - B[1])/(B[2] - B[1]))
+                
+            end
             
-            j1 = i + 0.5*points
+            j1 = Integer(i + 0.5*points)
             
-            j2 = i + 0.3*points
+            j2 = Integer(i + 0.3*points)
             
-            j3 = i + 0.1*points
+            j3 = Integer(i + 0.1*points)
             
-            j4 = i + 0.05*points
+            j4 = Integer(i + 0.05*points)
             
-            j5 = i + 0.01*points
+            j5 = Integer(i + 0.01*points)
             
-            j6 = i + 0.001*points
+            j6 = Integer(i + 0.001*points)
             
-            if j1 <= points && yt(j1)*y > 0
+            if j1 <= points && yt(j1)*y > AMT(0)
                     
                 i = j1
                 
-            elseif j2 <= points && yt(j2)*y > 0
+            elseif j2 <= points && yt(j2)*y > AMT(0)
                     
                 i = j2   
                     
-            elseif j3 <= points && yt(j3)*y > 0
+            elseif j3 <= points && yt(j3)*y > AMT(0)
                     
                 i = j3
                         
-            elseif j4 <= points && yt(j4)*y > 0
+            elseif j4 <= points && yt(j4)*y > AMT(0)
                     
                 i = j4
                             
-            elseif j5 <= points && yt(j5)*y > 0
+            elseif j5 <= points && yt(j5)*y > AMT(0)
                     
                 i = j5
                 
-            elseif j6 <= points && yt(j6)*y > 0
+            elseif j6 <= points && yt(j6)*y > AMT(0)
                     
                 i = j6
                 
@@ -243,6 +145,8 @@ function FindQ(a::BProperty{Float64,EX,MA}, b::BProperty{Float64,EX,MA}, aArray1
         end
         
     end
+    
+    return "out"
     
 end
 
@@ -408,17 +312,17 @@ end
 
 function T_vdw(gas::vdWGas, v::vAmt{Float64,EX,MA}, s::sAmt{Float64,EX,MA})
     
-    if DomeVerification(v,s) == "in"
+    FQ = FindQ(vr(vc(gas), v), sr(s, Pc(gas), vc(gas), Tc(gas)), vrlist1, vrlist2, Domelist(ϕ(gas), "sr1"), Domelist(ϕ(gas), "sr2"))
+    
+    if FQ == "out"
         
-        Q = FindQ(vr(vc(gas), v), sr(s, Pc(gas), vc(gas), Tc(gas)), vrlist1, vrlist2, Domelist(ϕ(gas), "sr1"), Domelist(ϕ(gas), "sr2"))[1]
-        
-        vl = FindQ(vr(vc(gas), v), sr(s, Pc(gas), vc(gas), Tc(gas)), vrlist1, vrlist2, Domelist(ϕ(gas), "sr1"), Domelist(ϕ(gas), "sr2"))[2]
-        
-        return Tc(gas)*Tr_sat_list[findclosest(vr1list, vr(vc(gas), vl), (10^-3))]
+        return Tc(gas)*(exp((3/(8*ϕ(gas)))*(sr(s,Pc(gas), vc(gas), Tc(gas)) + C2())))*((3*vr(vc(gas), v) - 1)^(-1/ϕ(gas)))
         
     else
         
-        return Tc(gas)*(exp((3/(8*ϕ(gas)))*(sr(s,Pc(gas), vc(gas), Tc(gas)) + C2())))*((3*vr(vc(gas), v) - 1)^(-1/ϕ(gas)))
+        vl = FQ[2]
+        
+        return Tc(gas)*Tr_sat_list[findclosest(vr1list, vr(vc(gas), vl), (10^-3))]
         
     end
     
@@ -426,17 +330,17 @@ end
 
 function T_vdw(gas::vdWGas, v::vAmt{Float64,EX,MA}, u::uAmt{Float64,EX,MA})
     
-    if DomeVerification(v,u) == "in"
+    FQ = FindQ(vr(vc(gas), v), sr(s, Pc(gas), vc(gas), Tc(gas)), vrlist1, vrlist2, Domelist(ϕ(gas), "sr1"), Domelist(ϕ(gas), "sr2"))
+    
+    if FQ == "out"
         
-        Q = FindQ(vr(vc(gas), v), sr(s, Pc(gas), vc(gas), Tc(gas)), vrlist1, vrlist2, Domelist(ϕ(gas), "sr1"), Domelist(ϕ(gas), "sr2"))[1]
-        
-        vl = FindQ(vr(vc(gas), v), sr(s, Pc(gas), vc(gas), Tc(gas)), vrlist1, vrlist2, Domelist(ϕ(gas), "sr1"), Domelist(ϕ(gas), "sr2"))[2]
-        
-        return Tc(gas)*Tr_sat_list[findclosest(vr1list, vr(vc(gas), vl), (10^-3))]
+        return Tc(gas)*(3/8*ϕ(gas))*(ur(u, Pc(gas), vc(gas)) - C1 + (3/vr(vc(gas), v)))
         
     else
         
-        return Tc(gas)*(3/8*ϕ(gas))*(ur(u, Pc(gas), vc(gas)) - C1 + (3/vr(vc(gas), v)))
+        vl = FQ[2]
+        
+        return Tc(gas)*Tr_sat_list[findclosest(vr1list, vr(vc(gas), vl), (10^-3))]
         
     end
     
@@ -444,17 +348,17 @@ end
 
 function T_vdw(gas::vdWGas, v::vAmt{Float64,EX,MA}, h::hAmt{Float64,EX,MA})
     
-    if DomeVerification(gas, v, h) == "in"
+    FQ = FindQ(vr(vc(gas), v), sr(s, Pc(gas), vc(gas), Tc(gas)), vrlist1, vrlist2, Domelist(ϕ(gas), "sr1"), Domelist(ϕ(gas), "sr2")) 
+    
+    if FQ == "out"
         
-        Q = FindQ(vr(vc(gas), v), sr(s, Pc(gas), vc(gas), Tc(gas)), vrlist1, vrlist2, Domelist(ϕ(gas), "sr1"), Domelist(ϕ(gas), "sr2"))[1]
-        
-        vl = FindQ(vr(vc(gas), v), sr(s, Pc(gas), vc(gas), Tc(gas)), vrlist1, vrlist2, Domelist(ϕ(gas), "sr1"), Domelist(ϕ(gas), "sr2"))[2]
-        
-        return Tc(gas)*Tr_sat_list[findclosest(vr1list, vr(vc(gas), vl), (10^-3))]
+        return Tc(gas)*(hr(h, Pc(gas), vc(gas)) - C1() + (6/vr(vc(gas), v)))/((8*ϕ(gas)/3) + (8*vr(vc(gas), v)/(3*vr(vc(gas), v) - 1)))
         
     else
         
-        return Tc(gas)*(hr(h, Pc(gas), vc(gas)) - C1() + (6/vr(vc(gas), v)))/((8*ϕ(gas)/3) + (8*vr(vc(gas), v)/(3*vr(vc(gas), v) - 1)))
+        vl = FQ[2]
+        
+        return Tc(gas)*Tr_sat_list[findclosest(vr1list, vr(vc(gas), vl), (10^-3))]
         
     end
     
@@ -594,11 +498,23 @@ end
 
 function v_vdw(gas::vdWGas, u::uAmt{Float64,EX,MA}, s::sAmt{Float64,EX,MA}, Mol::Bool = False)
     
-    if DomeVerification(gas, s, u) == "in"
+    FQ = FindQ(sr(s, Pc(gas), vc(gas), Tc(gas)), ur(u, Pc(gas), vc(gas)), DomeList(ϕ(gas), "sr1"), DomeList(ϕ(gas), "sr2"), Domelist(ϕ(gas), "ur1"), Domelist(ϕ(gas), "ur2"))
+    
+    if FQ == "out"
         
-        Q = FindQ(sr(s, Pc(gas), vc(gas), Tc(gas)), ur(u, Pc(gas), vc(gas)), DomeList(ϕ(gas), "sr1"), DomeList(ϕ(gas), "sr2"), Domelist(ϕ(gas), "ur1"), Domelist(ϕ(gas), "ur2"))[1]
+        f(vr) = (8*ϕ(gas)/3)*(exp((3/(8*ϕ(gas)))*(sr(s, Pc(gas), vc(gas), Tc(gas)) + C2())))*((3*vr - 1)^(-1/ϕ(gas))) - ur(u, Pc(gas), vc(gas)) - (3/vr) + C1()
+    
+        vrf1 = find_zero(f,0.5,Order1()) #metodo da secante
         
-        sl = FindQ(sr(s, Pc(gas), vc(gas), Tc(gas)), ur(u, Pc(gas), vc(gas)), DomeList(ϕ(gas), "sr1"), DomeList(ϕ(gas), "sr2"), Domelist(ϕ(gas), "ur1"), Domelist(ϕ(gas), "ur2"))[2]
+        Mol ? vrf2 = vrf1*M(gas) : vrf2 = vrf1 
+        
+        return vc(gas)*vrf2         
+        
+    else
+        
+        Q = FQ[1]
+        
+        sl = FQ[2]
         
         sv = ((s - sl)/Q) + sl
         
@@ -610,17 +526,7 @@ function v_vdw(gas::vdWGas, u::uAmt{Float64,EX,MA}, s::sAmt{Float64,EX,MA}, Mol:
         
         Mol ? vrf2 = vrf1*M(gas) : vrf2 = vrf1 
         
-        return vc(gas)*vrf2
-        
-    else
-        
-        f(vr) = (8*ϕ(gas)/3)*(exp((3/(8*ϕ(gas)))*(sr(s, Pc(gas), vc(gas), Tc(gas)) + C2())))*((3*vr - 1)^(-1/ϕ(gas))) - ur(u, Pc(gas), vc(gas)) - (3/vr) + C1()
-    
-        vrf1 = find_zero(f,0.5,Order1()) #metodo da secante
-        
-        Mol ? vrf2 = vrf1*M(gas) : vrf2 = vrf1 
-        
-        return vc(gas)*vrf2        
+        return vc(gas)*vrf2    
         
     end
     
@@ -628,11 +534,21 @@ end
 
 function v_vdw(gas::vdWGas, u::uAmt{Float64,EX,MA}, h::hAmt{Float64,EX,MA}, Mol::Bool = False)
     
-    if DomeVerification(gas, h, u) == "in"
+    FQ = FindQ(hr(h, Pc(gas), vc(gas)), ur(u, Pc(gas), vc(gas)), DomeList(ϕ(gas), "hr1"), DomeList(ϕ(gas), "hr2"), Domelist(ϕ(gas), "ur1"), Domelist(ϕ(gas), "ur2"))
+    
+    if FQ == "out"
         
-        Q = FindQ(hr(h, Pc(gas), vc(gas)), ur(u, Pc(gas), vc(gas)), DomeList(ϕ(gas), "hr1"), DomeList(ϕ(gas), "hr2"), Domelist(ϕ(gas), "ur1"), Domelist(ϕ(gas), "ur2"))[1]
+        vrf1 = roots(Poly([ϕ(gas),((-ϕ(gas)/3)*(ur(u, Pc(gas), vc(gas)) - C1()) + 3*ϕ(gas) + 3 + (ϕ(gas)/3)*(hr(h, Pc(gas), vc(gas)) - C1()) - 6*ϕ(gas)),((ϕ(gas) + 1)*(ur(u, Pc(gas), vc(gas)) - C1()) - ϕ(gas)*(hr(h, Pc(gas), vc(gas)) - C1()))]))
         
-        hl = FindQ(hr(h, Pc(gas), vc(gas)), ur(u, Pc(gas), vc(gas)), DomeList(ϕ(gas), "hr1"), DomeList(ϕ(gas), "hr2"), Domelist(ϕ(gas), "ur1"), Domelist(ϕ(gas), "ur2"))[2]
+        Mol ? vrf2 = vrf1*M(gas) : vrf2 = vrf1 
+        
+        return vc(gas)*vrf2        
+        
+    else
+        
+        Q = FQ[1]
+        
+        hl = FQ[2]
         
         hv = ((h - hl)/Q) + hl
         
@@ -644,15 +560,7 @@ function v_vdw(gas::vdWGas, u::uAmt{Float64,EX,MA}, h::hAmt{Float64,EX,MA}, Mol:
         
         Mol ? vrf2 = vrf1*M(gas) : vrf2 = vrf1 
         
-        return vc(gas)*vrf2
-        
-    else
-            
-        vrf1 = roots(Poly([ϕ(gas),((-ϕ(gas)/3)*(ur(u, Pc(gas), vc(gas)) - C1()) + 3*ϕ(gas) + 3 + (ϕ(gas)/3)*(hr(h, Pc(gas), vc(gas)) - C1()) - 6*ϕ(gas)),((ϕ(gas) + 1)*(ur(u, Pc(gas), vc(gas)) - C1()) - ϕ(gas)*(hr(h, Pc(gas), vc(gas)) - C1()))]))
-        
-        Mol ? vrf2 = vrf1*M(gas) : vrf2 = vrf1 
-        
-        return vc(gas)*vrf2        
+        return vc(gas)*vrf2   
         
     end
     
@@ -660,11 +568,23 @@ end
 
 function v_vdw(gas::vdWGas, s::sAmt{Float64,EX,MA}, h::hAmt{Float64,EX,MA}, Mol::Bool = False)
     
-    if DomeVerification(gas, h, s) == "in"
+    FQ = FindQ(hr(h, Pc(gas), vc(gas)), sr(s, Pc(gas), vc(gas), Tc(gas)), DomeList(ϕ(gas), "hr1"), DomeList(ϕ(gas), "hr2"), Domelist(ϕ(gas), "sr1"), Domelist(ϕ(gas), "sr2"))
+    
+    if FQ == "out"
         
-        Q = FindQ(hr(h, Pc(gas), vc(gas)), sr(s, Pc(gas), vc(gas), Tc(gas)), DomeList(ϕ(gas), "hr1"), DomeList(ϕ(gas), "hr2"), Domelist(ϕ(gas), "sr1"), Domelist(ϕ(gas), "sr2"))[1]
+        f(vr) = ((8*ϕ(gas)/3) + (8*vr/(3*vr - 1)))*exp((3/(8*ϕ(gas)))*(sr(s, Pc(gas), vc(gas), Tc(gas)) + C2()))*((3*vr - 1)^(-1/ϕ(gas))) - hr(h, Pc(gas), vc(gas)) + C1() - (6/vr)
+    
+        vrf1 = find_zero(f,0.5,Order1()) #metodo da secante
         
-        hl = FindQ(hr(h, Pc(gas), vc(gas)), sr(s, Pc(gas), vc(gas), Tc(gas)), DomeList(ϕ(gas), "hr1"), DomeList(ϕ(gas), "hr2"), Domelist(ϕ(gas), "sr1"), Domelist(ϕ(gas), "sr2"))[2]
+        Mol ? vrf2 = vrf1*M(gas) : vrf2 = vrf1 
+        
+        return vc(gas)*vrf2 
+        
+    else
+        
+        Q = FQ[1]
+        
+        hl = FQ[2]
         
         hv = ((h - hl)/Q) + hl
         
@@ -676,17 +596,7 @@ function v_vdw(gas::vdWGas, s::sAmt{Float64,EX,MA}, h::hAmt{Float64,EX,MA}, Mol:
         
         Mol ? vrf2 = vrf1*M(gas) : vrf2 = vrf1 
         
-        return vc(gas)*vrf2
-        
-    else
-            
-        f(vr) = ((8*ϕ(gas)/3) + (8*vr/(3*vr - 1)))*exp((3/(8*ϕ(gas)))*(sr(s, Pc(gas), vc(gas), Tc(gas)) + C2()))*((3*vr - 1)^(-1/ϕ(gas))) - hr(h, Pc(gas), vc(gas)) + C1() - (6/vr)
-    
-        vrf1 = find_zero(f,0.5,Order1()) #metodo da secante
-        
-        Mol ? vrf2 = vrf1*M(gas) : vrf2 = vrf1 
-        
-        return vc(gas)*vrf2        
+        return vc(gas)*vrf2      
         
     end
     
