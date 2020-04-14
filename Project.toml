@@ -1,0 +1,9 @@
+name = "vdWProp"
+uuid = "5ac70b96-7553-458d-8b6a-0fa130d778da"
+authors = ["Giovanni de Medeiros Silvestri <gimsilvestri@gmail.com>"]
+version = "0.1.0"
+
+[deps]
+EngThermBase = "dffbff30-506a-45ba-b474-e78cc8ad254e"
+Polynomials = "f27b6e38-b328-58d1-80ce-0feddd5e7a45"
+Roots = "f2b01f46-fcfa-551c-844a-d8ac1e96c665"

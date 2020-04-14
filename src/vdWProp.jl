@@ -1,3 +1,5 @@
+module vdWProp
+
 using EngThermBase
 
 using Polynomials
@@ -1003,3 +1005,5 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
     end
     
 end
+
+end #module
