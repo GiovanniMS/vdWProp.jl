@@ -50,57 +50,23 @@ He = vdWGas("Helio", P(228.9945), T(5.21), P(1)*(v(1)^2)*0.21562534694033178, v(
 
 # function to find the quality of a saturated mixture when P and T are not given, and also find if the pair is inside or outside of the dome.
 
-function FindQ(a::BProperty{Float64,EX,MA}, b::BProperty{Float64,EX,MA}, aArray1::Array, aArray2::Array, bArray1::Array, bArray2::Array)
+function FindQ(a::_Amt{Float64,EX}, b::_Amt{Float64,EX}, aArray1::Array, aArray2::Array, bArray1::Array, bArray2::Array)
 
     i = 1
     
     while i <= points
         
-        typeof(a) == vAmt{Float64,EX,MA} ? A = [v(aArray1[i]), v(aArray2[i])] : 
-    
-        typeof(a) == uAmt{Float64,EX,MA} ? A = [u(aArray1[i]), u(aArray2[i])] : 
-
-        typeof(a) == hAmt{Float64,EX,MA} ? A = [h(aArray1[i]), h(aArray2[i])] : 
-
-        typeof(a) == sAmt{Float64,EX,MA} ? A = [s(aArray1[i]), s(aArray2[i])] : z = 1
-
-        typeof(b) == vAmt{Float64,EX,MA} ? B = [v(aArray1[i]), v(aArray2[i])] : 
-
-        typeof(b) == uAmt{Float64,EX,MA} ? B = [u(aArray1[i]), u(aArray2[i])] :
-
-        typeof(b) == hAmt{Float64,EX,MA} ? B = [h(aArray1[i]), h(aArray2[i])] :
-
-        typeof(b) == sAmt{Float64,EX,MA} ? B = [s(aArray1[i]), s(aArray2[i])] : z = 1
+        Q = ((a - AMT(aArray1[i]))/(AMT(aArray2[i] - aArray1[i])))
         
-        y = ((a - A[1])/(A[2] - A[1])) - ((b - B[1])/(B[2] - B[1]))
+        y = ((a - AMT(aArray1[i]))/(AMT(aArray2[i] - aArray1[i]))) - ((b - AMT(bArray1[i]))/(AMT(bArray2[i] - bArray1[i])))
         
-        if y < AMT(0.001)
+        if abs(AMTConvert(y)) < 0.001 && AMT(0) < Q < AMT(1) 
             
-            return [((a - A[1])/(A[2] - A[1])), A[1]] 
+            return [Q, aArray1[i]] 
             
         else
             
-            function yt(j) 
-                
-                typeof(a) == vAmt{Float64,EX,MA} ? A = [v(aArray1[j]), v(aArray2[j])] : 
-    
-                typeof(a) == uAmt{Float64,EX,MA} ? A = [u(aArray1[j]), u(aArray2[j])] : 
-
-                typeof(a) == hAmt{Float64,EX,MA} ? A = [h(aArray1[j]), h(aArray2[j])] : 
-
-                typeof(a) == sAmt{Float64,EX,MA} ? A = [s(aArray1[j]), s(aArray2[j])] : z = 1
-
-                typeof(b) == vAmt{Float64,EX,MA} ? B = [v(aArray1[j]), v(aArray2[j])] : 
-
-                typeof(b) == uAmt{Float64,EX,MA} ? B = [u(aArray1[j]), u(aArray2[j])] :
-
-                typeof(b) == hAmt{Float64,EX,MA} ? B = [h(aArray1[j]), h(aArray2[j])] :
-
-                typeof(b) == sAmt{Float64,EX,MA} ? B = [s(aArray1[j]), s(aArray2[j])] : z = 1
-                
-                return ((a - A[1])/(A[2] - A[1])) - ((b - B[1])/(B[2] - B[1]))
-                
-            end
+            yt(j) = ((a - AMT(aArray1[j]))/(AMT(aArray2[j] - aArray1[j]))) - ((b - AMT(bArray1[j]))/(AMT(bArray2[j] - bArray1[j])))
             
             j1 = Integer(i + 0.5*points)
             
@@ -202,13 +168,13 @@ function P_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA})
     
     SatP = findclosest(Tr_sat_list, Tr(Tc(gas), T), (10^-3)) # Array position for the saturated fluid and gas 
     
-    if AMT(vr1list[SatP]) <= vr(vc(gas), v) <= AMT(vr2list[SatP])
+    if SatP > 0 && AMT(vr1list[SatP]) < vr(vc(gas), v) < AMT(vr2list[SatP])
         
         return Pc(gas)*(Pr_sat_list[SatP])
     
     else 
         
-        return Pc(gas)*(8*Tr(Tc(gas),T)/(3*vr(vc(gas),v) - 1) - 3/(vr(vc(gas),v)^2))
+        return Pc(gas)*(8*Tr(Tc(gas),T)/(3*vr(vc(gas),v) - AMT(1)) - AMT(3)/(vr(vc(gas),v)^2))
     
     end
     
@@ -218,19 +184,19 @@ function T_vdw(gas::vdWGas, P::sysP{Float64,EX}, v::vAmt{Float64,EX,MA})
     
     SatP = findclosest(Pr_sat_list, Pr(Pc(gas), P), (10^-3))
     
-    if AMT(vr1list[SatP]) <= vr(vc(gas), v) <= AMT(vr2list[SatP])
+    if SatP > 0 && AMT(vr1list[SatP]) < vr(vc(gas), v) < AMT(vr2list[SatP])
         
         return Tc(gas)*(Tr_sat_list[SatP])
         
     else
         
-        return Tc(gas)*(((Pr(Pc(gas), P)*(3*vr(vc(gas), v) - 1))/8) + (3/(8*(vr(vc(gas), v)^2))))
+        return Tc(gas)*(((Pr(Pc(gas), P)*(3*vr(vc(gas), v) - AMT(1)))/8) + (AMT(3)/(8*(vr(vc(gas), v)^2))))
         
     end
     
 end
 
-function v_vdw(gas::vdWGas, P::sysP{Float64,EX}, T::sysT{Float64,EX}, Mol::Bool = False)
+function v_vdw(gas::vdWGas, P::sysP{Float64,EX}, T::sysT{Float64,EX}, Mol::Bool = false)
     
     SatP = findclosest(Pr_sat_list, Pr(Pc(gas), P), (10^-3))
 
@@ -241,8 +207,8 @@ function v_vdw(gas::vdWGas, P::sysP{Float64,EX}, T::sysT{Float64,EX}, Mol::Bool 
     vrvdw = roots(Poly([(-3/8),(9/8),(-Troots - (Proots/8)),(3*Proots/8)]))
     
     vrvdw = ImVerification(vrvdw)
-    
-    if vr1list[SatP] <= vrvdw <= vr2list[SatP]
+        
+    if SatP > 0 && vr1list[SatP] < vrvdw < vr2list[SatP]
         
         print("Error, T and P can only define a State outside the dome")
         
@@ -256,15 +222,15 @@ function v_vdw(gas::vdWGas, P::sysP{Float64,EX}, T::sysT{Float64,EX}, Mol::Bool 
     
 end
 
-function s_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA})
+function s_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA}, Mol::Bool = false)
     
     SatP = findclosest(Tr_sat_list, Tr(Tc(gas), T), (10^-3))
     
-    vr1 = AMT(vr1list[SatP])
+    if SatP > 0 && AMT(vr1list[SatP]) < vr(vc(gas), v) < AMT(vr2list[SatP])
+        
+        vr1 = AMT(vr1list[SatP])
     
-    vr2 = AMT(vr2list[SatP])
-    
-    if vr1 <= vr(vc(gas), v) <= vr2
+        vr2 = AMT(vr2list[SatP])
         
         Q = (vr(vc(gas), v) - vr1)/(vr2 - vr1)
         
@@ -276,7 +242,7 @@ function s_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA})
         
     else 
         
-        srf1 = (8/3)*log(3*vr(vc(gas), v) - 1) + (8*ϕ(gas)/3)*log(Tr(Tc(gas), T)) - C2()
+        srf1 = (8/3)*log(3*vr(vc(gas), v) - AMT(1)) + (8*ϕ(gas)/3)*log(Tr(Tc(gas), T)) - AMT(C2())
         
         Mol ? srf2 = srf1*M(gas) : srf2 = srf1 
         
@@ -286,15 +252,15 @@ function s_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA})
     
 end
 
-function u_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA})
+function u_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA}, Mol::Bool = false)
     
     SatP = findclosest(Tr_sat_list, Tr(Tc(gas), T), (10^-3))
     
-    vr1 = AMT(vr1list[SatP])
+    if SatP > 0 && AMT(vr1list[SatP]) < vr(vc(gas), v) < AMT(vr2list[SatP])
+        
+        vr1 = AMT(vr1list[SatP])
     
-    vr2 = AMT(vr2list[SatP])
-    
-    if vr1 <= vr(vc(gas), v) <= vr2
+        vr2 = AMT(vr2list[SatP])
         
         Q = (vr(vc(gas), v) - vr1)/(vr2 - vr1)
         
@@ -306,7 +272,7 @@ function u_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA})
         
     else 
         
-        urf1 = C1() + (8*Tr(Tc(gas), T)*ϕ(gas)/3) - (3/vr(vc(gas), v))
+        urf1 = AMT(C1()) + (8*Tr(Tc(gas), T)*ϕ(gas)/3) - (AMT(3)/vr(vc(gas), v))
         
         Mol ? urf2 = urf1*M(gas) : urf2 = urf1 
         
@@ -316,15 +282,15 @@ function u_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA})
     
 end
 
-function h_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA})
+function h_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA}, Mol::Bool = false)
     
     SatP = findclosest(Tr_sat_list, Tr(Tc(gas), T), (10^-3))
+    
+    if SatP > 0 && AMT(vr1list[SatP]) < vr(vc(gas), v) < AMT(vr2list[SatP])
         
         vr1 = AMT(vr1list[SatP])
         
         vr2 = AMT(vr2list[SatP])
-    
-    if vr1 <= vr(vc(gas), v) <= vr2
         
         Q = (vr(vc(gas), v) - vr1)/(vr2 - vr1)
         
@@ -336,7 +302,7 @@ function h_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA})
         
     else 
         
-        hrf1 = C1() + (8*Tr(Tc(gas), T)*ϕ(gas)/3) + (8*Tr(Tc(gas), T)*vr(vc(gas), v)/(3*vr(vc(gas), v) - 1)) - (6/vr(vc(gas), v))
+        hrf1 = AMT(C1()) + (8*Tr(Tc(gas), T)*ϕ(gas)/3) + (8*Tr(Tc(gas), T)*vr(vc(gas), v)/(3*vr(vc(gas), v) - AMT(1))) - (AMT(6)/vr(vc(gas), v))
         
         Mol ? hrf2 = hrf1*M(gas) : hrf2 = hrf1 
         
@@ -348,17 +314,17 @@ end
 
 function T_vdw(gas::vdWGas, v::vAmt{Float64,EX,MA}, s::sAmt{Float64,EX,MA})
     
-    FQ = FindQ(vr(vc(gas), v), sr(s, Pc(gas), vc(gas), Tc(gas)), vrlist1, vrlist2, Domelist(ϕ(gas), "sr1"), Domelist(ϕ(gas), "sr2"))
+    FQ = FindQ(vr(vc(gas), v), sr(s, Pc(gas), vc(gas), Tc(gas)), vr1list, vr2list, Domelist(ϕ(gas), "sr1"), Domelist(ϕ(gas), "sr2"))
     
     if FQ == "out"
         
-        return Tc(gas)*(exp((3/(8*ϕ(gas)))*(sr(s,Pc(gas), vc(gas), Tc(gas)) + C2())))*((3*vr(vc(gas), v) - 1)^(-1/ϕ(gas)))
+        return Tc(gas)*(exp((3/(8*ϕ(gas)))*(AMTConvert(sr(s,Pc(gas), vc(gas), Tc(gas))) + C2())))*((3*vr(vc(gas), v) - AMT(1))^(-1/ϕ(gas)))
         
     else
         
-        vl = FQ[2]
+        vlr = FQ[2]
         
-        return Tc(gas)*Tr_sat_list[findclosest(vr1list, vr(vc(gas), vl), (10^-3))]
+        return Tc(gas)*Tr_sat_list[findclosest(vr1list, AMT(vlr), (10^-3))]
         
     end
     
@@ -366,17 +332,17 @@ end
 
 function T_vdw(gas::vdWGas, v::vAmt{Float64,EX,MA}, u::uAmt{Float64,EX,MA})
     
-    FQ = FindQ(vr(vc(gas), v), sr(s, Pc(gas), vc(gas), Tc(gas)), vrlist1, vrlist2, Domelist(ϕ(gas), "sr1"), Domelist(ϕ(gas), "sr2"))
+    FQ = FindQ(vr(vc(gas), v), ur(u, Pc(gas), vc(gas)), vr1list, vr2list, Domelist(ϕ(gas), "ur1"), Domelist(ϕ(gas), "ur2"))
     
     if FQ == "out"
         
-        return Tc(gas)*(3/8*ϕ(gas))*(ur(u, Pc(gas), vc(gas)) - C1 + (3/vr(vc(gas), v)))
+        return Tc(gas)*(3/8*ϕ(gas))*(ur(u, Pc(gas), vc(gas)) - AMT(C1()) + (AMT(3)/vr(vc(gas), v)))
         
     else
         
-        vl = FQ[2]
+        vlr = FQ[2]
         
-        return Tc(gas)*Tr_sat_list[findclosest(vr1list, vr(vc(gas), vl), (10^-3))]
+        return Tc(gas)*Tr_sat_list[findclosest(vr1list, vlr, (10^-3))]
         
     end
     
@@ -384,17 +350,17 @@ end
 
 function T_vdw(gas::vdWGas, v::vAmt{Float64,EX,MA}, h::hAmt{Float64,EX,MA})
     
-    FQ = FindQ(vr(vc(gas), v), sr(s, Pc(gas), vc(gas), Tc(gas)), vrlist1, vrlist2, Domelist(ϕ(gas), "sr1"), Domelist(ϕ(gas), "sr2")) 
+    FQ = FindQ(vr(vc(gas), v), hr(h, Pc(gas), vc(gas)), vr1list, vr2list, Domelist(ϕ(gas), "hr1"), Domelist(ϕ(gas), "hr2")) 
     
     if FQ == "out"
         
-        return Tc(gas)*(hr(h, Pc(gas), vc(gas)) - C1() + (6/vr(vc(gas), v)))/((8*ϕ(gas)/3) + (8*vr(vc(gas), v)/(3*vr(vc(gas), v) - 1)))
+        return Tc(gas)*(hr(h, Pc(gas), vc(gas)) - AMT(C1()) + (AMT(6)/vr(vc(gas), v)))/(AMT(8*ϕ(gas)/3) + (8*vr(vc(gas), v)/(3*vr(vc(gas), v) - AMT(1))))
         
     else
         
-        vl = FQ[2]
+        vlr = FQ[2]
         
-        return Tc(gas)*Tr_sat_list[findclosest(vr1list, vr(vc(gas), vl), (10^-3))]
+        return Tc(gas)*Tr_sat_list[findclosest(vr1list, vlr, (10^-3))]
         
     end
     
