@@ -146,7 +146,19 @@ function AMTConvert(amt::_Amt{Float64,EX})
     
     b = parse(Float64, a)
     
-    return b
+    ba = AMT(b)
+    
+    d = amt - ba
+    
+    z2 = "$d"
+    
+    a2 = String(SubString(z2, 10:14))
+    
+    b2 = parse(Float64, a2)
+    
+    d < AMT(0) ? r = (b - b2) : r = (b + b2)
+    
+    return r
     
 end
 
@@ -336,7 +348,7 @@ function T_vdw(gas::vdWGas, v::vAmt{Float64,EX,MA}, u::uAmt{Float64,EX,MA})
     
     if FQ == "out"
         
-        return Tc(gas)*(3/8*ϕ(gas))*(ur(u, Pc(gas), vc(gas)) - AMT(C1()) + (AMT(3)/vr(vc(gas), v)))
+        return Tc(gas)*(3/(8*ϕ(gas)))*(ur(u, Pc(gas), vc(gas)) - AMT(C1()) + (AMT(3)/vr(vc(gas), v)))
         
     else
         
@@ -366,15 +378,15 @@ function T_vdw(gas::vdWGas, v::vAmt{Float64,EX,MA}, h::hAmt{Float64,EX,MA})
     
 end
 
-function v_vdw(gas::vdWGas, P::sysP{Float64,EX}, u::uAmt{Float64,EX,MA}, Mol::Bool = False)
+function v_vdw(gas::vdWGas, P::sysP{Float64,EX}, u::uAmt{Float64,EX,MA}, Mol::Bool = false)
     
     SatP = findclosest(Pr_sat_list, Pr(Pc(gas), P), (10^-3))
         
-    ur1 = AMT(Domelist(ϕ(gas), "ur1")[SatP])
+    if SatP > 0 && AMT(Domelist(ϕ(gas), "ur1")[SatP]) < ur(u, Pc(gas), vc(gas)) < AMT(Domelist(ϕ(gas), "ur2")[SatP])
         
-    ur2 = AMT(Domelist(ϕ(gas), "ur2")[SatP])
-    
-    if ur1 <= ur(u, Pc(gas), vc(gas)) <= ur2
+        ur1 = AMT(Domelist(ϕ(gas), "ur1")[SatP])
+        
+        ur2 = AMT(Domelist(ϕ(gas), "ur2")[SatP])
         
         Q = (ur(u ,Pc(gas), vc(gas)) - ur1)/(ur2 - ur1)
         
@@ -402,15 +414,15 @@ function v_vdw(gas::vdWGas, P::sysP{Float64,EX}, u::uAmt{Float64,EX,MA}, Mol::Bo
     
 end
 
-function v_vdw(gas::vdWGas, P::sysP{Float64,EX}, h::hAmt{Float64,EX,MA}, Mol::Bool = False)
+function v_vdw(gas::vdWGas, P::sysP{Float64,EX}, h::hAmt{Float64,EX,MA}, Mol::Bool = false)
     
     SatP = findclosest(Pr_sat_list, Pr(Pc(gas), P), (10^-3))
+                
+    if SatP > 0 && AMT(Domelist(ϕ(gas), "hr1")[SatP]) < hr(h, Pc(gas), vc(gas)) < AMT(Domelist(ϕ(gas), "hr2")[SatP])
         
         hr1 = AMT(Domelist(ϕ(gas), "hr1")[SatP])
         
         hr2 = AMT(Domelist(ϕ(gas), "hr2")[SatP])
-        
-    if hr1 <= hr(h, Pc(gas), vc(gas)) <= hr2
         
         Q = (hr(h ,Pc(gas), vc(gas)) - hr1)/(hr2 - hr1)
         
@@ -438,15 +450,15 @@ function v_vdw(gas::vdWGas, P::sysP{Float64,EX}, h::hAmt{Float64,EX,MA}, Mol::Bo
     
 end 
 
-function v_vdw(gas::vdWGas, P::sysP{Float64,EX}, s::sAmt{Float64,EX,MA}, Mol::Bool = False)
+function v_vdw(gas::vdWGas, P::sysP{Float64,EX}, s::sAmt{Float64,EX,MA}, Mol::Bool = false)
     
-    SatP = findclosest(Pr_sat_list, Pr(Pc(gas), P), (10^-3))
+    SatP = findclosest(Pr_sat_list, Pr(Pc(gas), P), (10^-3))        
+        
+    if SatP > 0 && AMT(Domelist(ϕ(gas), "sr1")[SatP]) < sr(s, Pc(gas), vc(gas), Tc(gas)) < AMT(Domelist(ϕ(gas), "sr2")[SatP])
         
         sr1 = AMT(Domelist(ϕ(gas), "sr1")[SatP])
         
         sr2 = AMT(Domelist(ϕ(gas), "sr2")[SatP])
-        
-    if sr1 <= sr(s, Pc(gas), vc(gas), Tc(gas)) <= sr2
         
         Q = (sr(s ,Pc(gas), vc(gas), Tc(gas)) - sr1)/(sr2 - sr1)
         
@@ -460,7 +472,7 @@ function v_vdw(gas::vdWGas, P::sysP{Float64,EX}, s::sAmt{Float64,EX,MA}, Mol::Bo
         
         Proots = AMTConvert(Pr(Pc(gas), P))
         
-        sroots = AMTConvert(sr(s, Pc(gas), vc(gas)), Tc(gas))        
+        sroots = AMTConvert(sr(s, Pc(gas), vc(gas), Tc(gas)))        
         
         f(vr) = (((8*exp((3/(8*ϕ(gas)))*(sroots) + C2())))/((3*vr - 1)^(1 + (1/ϕ(gas))))) - (3/vr^2) - Proots
         
@@ -474,15 +486,15 @@ function v_vdw(gas::vdWGas, P::sysP{Float64,EX}, s::sAmt{Float64,EX,MA}, Mol::Bo
     
 end
 
-function v_vdw(gas::vdWGas, T::sysT{Float64,EX}, u::uAmt{Float64,EX,MA}, Mol::Bool = False)
+function v_vdw(gas::vdWGas, T::sysT{Float64,EX}, u::uAmt{Float64,EX,MA}, Mol::Bool = false)
     
     SatP = findclosest(Tr_sat_list, Tr(Tc(gas), T), (10^-3))
+            
+    if SatP > 0 && AMT(Domelist(ϕ(gas), "ur1")[SatP]) < ur(u, Pc(gas), vc(gas)) < AMT(Domelist(ϕ(gas), "ur2")[SatP])
         
-    ur1 = AMT(Domelist(ϕ(gas), "ur1")[SatP])
-        
-    ur2 = AMT(Domelist(ϕ(gas), "ur2")[SatP])
-    
-    if ur1 <= ur(u, Pc(gas), vc(gas)) <= ur2
+        ur1 = AMT(Domelist(ϕ(gas), "ur1")[SatP])
+
+        ur2 = AMT(Domelist(ϕ(gas), "ur2")[SatP])
         
         Q = (ur(u ,Pc(gas), vc(gas)) - ur1)/(ur2 - ur1)
         
@@ -494,7 +506,7 @@ function v_vdw(gas::vdWGas, T::sysT{Float64,EX}, u::uAmt{Float64,EX,MA}, Mol::Bo
         
     else 
         
-        vrf1 = -3/(ur(u, Pc(gas), vc(gas)) - C1() - (8*Tr(Tc(gas), T)*ϕ(gas)/3))
+        vrf1 = -AMT(3)/(ur(u, Pc(gas), vc(gas)) - AMT(C1()) - (8*Tr(Tc(gas), T)*ϕ(gas)/3))
         
         Mol ? vrf2 = vrf1*M(gas) : vrf2 = vrf1 
         
@@ -504,15 +516,15 @@ function v_vdw(gas::vdWGas, T::sysT{Float64,EX}, u::uAmt{Float64,EX,MA}, Mol::Bo
     
 end
 
-function v_vdw(gas::vdWGas, T::sysT{Float64,EX}, s::sAmt{Float64,EX,MA}, Mol::Bool = False)
+function v_vdw(gas::vdWGas, T::sysT{Float64,EX}, s::sAmt{Float64,EX,MA}, Mol::Bool = false)
     
-    SatP = findclosest(Tr_sat_list, Tr(Tc(gas), T), (10^-3))
-        
-    sr1 = AMT(Domelist(ϕ(gas), "sr1")[SatP])
-        
-    sr2 = AMT(Domelist(ϕ(gas), "sr2")[SatP])
+    SatP = findclosest(Tr_sat_list, Tr(Tc(gas), T), (10^-3))        
     
-    if sr1 <= sr(s, Pc(gas), vc(gas), Tc(gas)) <= sr2
+    if SatP > 0 && AMT(Domelist(ϕ(gas), "sr1")[SatP]) < sr(s, Pc(gas), vc(gas), Tc(gas)) < AMT(Domelist(ϕ(gas), "sr2")[SatP])
+        
+        sr1 = AMT(Domelist(ϕ(gas), "sr1")[SatP])
+
+        sr2 = AMT(Domelist(ϕ(gas), "sr2")[SatP])
         
         Q = (sr(s ,Pc(gas), vc(gas), Tc(gas)) - sr1)/(sr2 - sr1)
         
@@ -524,7 +536,7 @@ function v_vdw(gas::vdWGas, T::sysT{Float64,EX}, s::sAmt{Float64,EX,MA}, Mol::Bo
         
     else 
         
-        vrf1 = (1/3)*(((Tr(Tc(gas), T)/exp((3/(8*ϕ(gas)))*(sr(s, Pc(gas), vc(gas), Tc(gas)) + C2)))^(-ϕ(gas))) + 1)
+        vrf1 = (1/3)*(((Tr(Tc(gas), T)/exp((3/(8*ϕ(gas)))*(AMTConvert(sr(s, Pc(gas), vc(gas), Tc(gas))) + C2())))^(-ϕ(gas))) + AMT(1))
         
         Mol ? vrf2 = vrf1*M(gas) : vrf2 = vrf1 
         
@@ -534,15 +546,15 @@ function v_vdw(gas::vdWGas, T::sysT{Float64,EX}, s::sAmt{Float64,EX,MA}, Mol::Bo
     
 end
 
-function v_vdw(gas::vdWGas, u::uAmt{Float64,EX,MA}, s::sAmt{Float64,EX,MA}, Mol::Bool = False)
+function v_vdw(gas::vdWGas, u::uAmt{Float64,EX,MA}, s::sAmt{Float64,EX,MA}, Mol::Bool = false)
     
-    FQ = FindQ(sr(s, Pc(gas), vc(gas), Tc(gas)), ur(u, Pc(gas), vc(gas)), DomeList(ϕ(gas), "sr1"), DomeList(ϕ(gas), "sr2"), Domelist(ϕ(gas), "ur1"), Domelist(ϕ(gas), "ur2"))
+    FQ = FindQ(sr(s, Pc(gas), vc(gas), Tc(gas)), ur(u, Pc(gas), vc(gas)), Domelist(ϕ(gas), "sr1"), Domelist(ϕ(gas), "sr2"), Domelist(ϕ(gas), "ur1"), Domelist(ϕ(gas), "ur2"))
     
     if FQ == "out"
         
         uroots = AMTConvert(ur(u, Pc(gas), vc(gas)))
         
-        sroots = AMTConvert(sr(s, Pc(gas), vc(gas)), Tc(gas))
+        sroots = AMTConvert(sr(s, Pc(gas), vc(gas), Tc(gas)))
         
         f(vr) = (8*ϕ(gas)/3)*(exp((3/(8*ϕ(gas)))*(sroots + C2())))*((3*vr - 1)^(-1/ϕ(gas))) - uroots - (3/vr) + C1()
     
@@ -556,13 +568,13 @@ function v_vdw(gas::vdWGas, u::uAmt{Float64,EX,MA}, s::sAmt{Float64,EX,MA}, Mol:
         
         Q = FQ[1]
         
-        sl = FQ[2]
+        slr = FQ[2]
         
-        sv = ((s - sl)/Q) + sl
+        svr = ((sr(s, Pc(gas), vc(gas), Tc(gas)) - slr)/Q) + slr
         
-        vlr = vr1list[findclosest(DomeList(ϕ(gas), "sr1"), sr(sl, Pc(gas), vc(gas), Tc(gas)), (10^-3))]
+        vlr = vr1list[findclosest(Domelist(ϕ(gas), "sr1"), slr, (10^-3))]
         
-        vvr = vr2list[findclosest(DomeList(ϕ(gas), "sr2"), sr(sv, Pc(gas), vc(gas), Tc(gas)), (10^-3))]
+        vvr = vr2list[findclosest(Domelist(ϕ(gas), "sr2"), svr, (10^-3))]
         
         vrf1 = AMT(vlr) + Q*(vvr - vlr)
         
@@ -574,9 +586,9 @@ function v_vdw(gas::vdWGas, u::uAmt{Float64,EX,MA}, s::sAmt{Float64,EX,MA}, Mol:
     
 end
 
-function v_vdw(gas::vdWGas, u::uAmt{Float64,EX,MA}, h::hAmt{Float64,EX,MA}, Mol::Bool = False)
+function v_vdw(gas::vdWGas, u::uAmt{Float64,EX,MA}, h::hAmt{Float64,EX,MA}, Mol::Bool = false)
     
-    FQ = FindQ(hr(h, Pc(gas), vc(gas)), ur(u, Pc(gas), vc(gas)), DomeList(ϕ(gas), "hr1"), DomeList(ϕ(gas), "hr2"), Domelist(ϕ(gas), "ur1"), Domelist(ϕ(gas), "ur2"))
+    FQ = FindQ(hr(h, Pc(gas), vc(gas)), ur(u, Pc(gas), vc(gas)), Domelist(ϕ(gas), "hr1"), Domelist(ϕ(gas), "hr2"), Domelist(ϕ(gas), "ur1"), Domelist(ϕ(gas), "ur2"))
     
     if FQ == "out"
         
@@ -594,13 +606,13 @@ function v_vdw(gas::vdWGas, u::uAmt{Float64,EX,MA}, h::hAmt{Float64,EX,MA}, Mol:
         
         Q = FQ[1]
         
-        hl = FQ[2]
+        hlr = FQ[2]
         
-        hv = ((h - hl)/Q) + hl
+        hvr = ((hr(h, Pc(gas), vc(gas)) - hlr)/Q) + hlr
         
-        vlr = vr1list[findclosest(DomeList(ϕ(gas), "hr1"), hr(hl, Pc(gas), vc(gas)), (10^-3))]
+        vlr = vr1list[findclosest(Domelist(ϕ(gas), "hr1"), hlr, (10^-3))]
         
-        vvr = vr2list[findclosest(DomeList(ϕ(gas), "hr2"), hr(hv, Pc(gas), vc(gas)), (10^-3))]
+        vvr = vr2list[findclosest(Domelist(ϕ(gas), "hr2"), hvr, (10^-3))]
         
         vrf1 = AMT(vlr) + Q*(vvr - vlr)
         
@@ -612,15 +624,15 @@ function v_vdw(gas::vdWGas, u::uAmt{Float64,EX,MA}, h::hAmt{Float64,EX,MA}, Mol:
     
 end
 
-function v_vdw(gas::vdWGas, s::sAmt{Float64,EX,MA}, h::hAmt{Float64,EX,MA}, Mol::Bool = False)
+function v_vdw(gas::vdWGas, s::sAmt{Float64,EX,MA}, h::hAmt{Float64,EX,MA}, Mol::Bool = false)
     
-    FQ = FindQ(hr(h, Pc(gas), vc(gas)), sr(s, Pc(gas), vc(gas), Tc(gas)), DomeList(ϕ(gas), "hr1"), DomeList(ϕ(gas), "hr2"), Domelist(ϕ(gas), "sr1"), Domelist(ϕ(gas), "sr2"))
+    FQ = FindQ(hr(h, Pc(gas), vc(gas)), sr(s, Pc(gas), vc(gas), Tc(gas)), Domelist(ϕ(gas), "hr1"), Domelist(ϕ(gas), "hr2"), Domelist(ϕ(gas), "sr1"), Domelist(ϕ(gas), "sr2"))
     
     if FQ == "out"
         
         hroots = AMTConvert(hr(h, Pc(gas), vc(gas)))
         
-        sroots = AMTConvert(sr(s, Pc(gas), vc(gas)), Tc(gas))
+        sroots = AMTConvert(sr(s, Pc(gas), vc(gas), Tc(gas)))
         
         f(vr) = ((8*ϕ(gas)/3) + (8*vr/(3*vr - 1)))*exp((3/(8*ϕ(gas)))*(sroots + C2()))*((3*vr - 1)^(-1/ϕ(gas))) - hroots + C1() - (6/vr)
     
@@ -634,13 +646,13 @@ function v_vdw(gas::vdWGas, s::sAmt{Float64,EX,MA}, h::hAmt{Float64,EX,MA}, Mol:
         
         Q = FQ[1]
         
-        hl = FQ[2]
+        hlr = FQ[2]
         
-        hv = ((h - hl)/Q) + hl
+        hvr = ((hr(h, Pc(gas), vc(gas)) - hlr)/Q) + hlr
         
-        vlr = vr1list[findclosest(DomeList(ϕ(gas), "hr1"), hr(hl, Pc(gas), vc(gas)), (10^-3))]
+        vlr = vr1list[findclosest(Domelist(ϕ(gas), "hr1"), hlr, (10^-3))]
         
-        vvr = vr2list[findclosest(DomeList(ϕ(gas), "hr2"), hr(hv, Pc(gas), vc(gas)), (10^-3))]
+        vvr = vr2list[findclosest(Domelist(ϕ(gas), "hr2"), hvr, (10^-3))]
         
         vrf1 = AMT(vlr) + Q*(vvr - vlr)
         
@@ -652,15 +664,15 @@ function v_vdw(gas::vdWGas, s::sAmt{Float64,EX,MA}, h::hAmt{Float64,EX,MA}, Mol:
     
 end
 
-function v_vdw(gas::vdWGas, T::sysT{Float64,EX}, h::hAmt{Float64,EX,MA}, Mol::Bool = False)
+function v_vdw(gas::vdWGas, T::sysT{Float64,EX}, h::hAmt{Float64,EX,MA}, Mol::Bool = false)
     
     SatP = findclosest(Tr_sat_list, Tr(Tc(gas), T), (10^-3))
         
-    hr1 = AMT(Domelist(ϕ(gas), "hr1")[SatP])
+    if  SatP > 0 && AMT(Domelist(ϕ(gas), "hr1")[SatP]) < hr(h, Pc(gas), vc(gas)) < AMT(Domelist(ϕ(gas), "hr2")[SatP])
         
-    hr2 = AMT(Domelist(ϕ(gas), "hr2")[SatP])
-    
-    if hr1 <= hr(h, Pc(gas), vc(gas)) <= hr2
+        hr1 = AMT(Domelist(ϕ(gas), "hr1")[SatP])
+
+        hr2 = AMT(Domelist(ϕ(gas), "hr2")[SatP])
         
         Q = (hr(h ,Pc(gas), vc(gas)) - hr1)/(hr2 - hr1)
         
