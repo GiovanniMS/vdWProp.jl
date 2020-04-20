@@ -354,7 +354,7 @@ function T_vdw(gas::vdWGas, v::vAmt{Float64,EX,MA}, u::uAmt{Float64,EX,MA})
         
         vlr = FQ[2]
         
-        return Tc(gas)*Tr_sat_list[findclosest(vr1list, vlr, (10^-3))]
+        return Tc(gas)*Tr_sat_list[findclosest(vr1list, AMT(vlr), (10^-3))]
         
     end
     
@@ -372,7 +372,7 @@ function T_vdw(gas::vdWGas, v::vAmt{Float64,EX,MA}, h::hAmt{Float64,EX,MA})
         
         vlr = FQ[2]
         
-        return Tc(gas)*Tr_sat_list[findclosest(vr1list, vlr, (10^-3))]
+        return Tc(gas)*Tr_sat_list[findclosest(vr1list, AMT(vlr), (10^-3))]
         
     end
     
@@ -568,7 +568,7 @@ function v_vdw(gas::vdWGas, u::uAmt{Float64,EX,MA}, s::sAmt{Float64,EX,MA}, Mol:
         
         Q = FQ[1]
         
-        slr = FQ[2]
+        slr = AMT(FQ[2])
         
         svr = ((sr(s, Pc(gas), vc(gas), Tc(gas)) - slr)/Q) + slr
         
@@ -606,7 +606,7 @@ function v_vdw(gas::vdWGas, u::uAmt{Float64,EX,MA}, h::hAmt{Float64,EX,MA}, Mol:
         
         Q = FQ[1]
         
-        hlr = FQ[2]
+        hlr = AMT(FQ[2])
         
         hvr = ((hr(h, Pc(gas), vc(gas)) - hlr)/Q) + hlr
         
@@ -646,7 +646,7 @@ function v_vdw(gas::vdWGas, s::sAmt{Float64,EX,MA}, h::hAmt{Float64,EX,MA}, Mol:
         
         Q = FQ[1]
         
-        hlr = FQ[2]
+        hlr = AMT(FQ[2])
         
         hvr = ((hr(h, Pc(gas), vc(gas)) - hlr)/Q) + hlr
         
