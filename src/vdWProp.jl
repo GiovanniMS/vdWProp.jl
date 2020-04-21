@@ -698,6 +698,86 @@ function v_vdw(gas::vdWGas, T::sysT{Float64,EX}, h::hAmt{Float64,EX,MA}, Mol::Bo
     
 end
 
+# functions of properties not given as arguments
+
+ar(gas::vdWGas, a::aAmt{Float64,EX,MA}) = a/(Pc(gas)*vc(gas))
+
+cpr(gas::vdWGas, cp::cpAmt{Float64,EX,MA}) = (Tc(gas)*cp)/(Pc(gas)*vc(gas))
+
+cvr(gas::vdWGas, cv::cvAmt{Float64,EX,MA}) = (Tc(gas)*cv)/(Pc(gas)*vc(gas))
+
+function a_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA}, Mol::Bool = false)
+    
+    SatP = findclosest(Tr_sat_list, Tr(Tc(gas), T), (10^-3))        
+    
+    if SatP > 0 && AMT(vr1list[SatP]) < vr(vc(gas), v) < AMT(vr2list[SatP])
+        
+        vlr = AMT(vr1list[SatP])
+
+        vvr = AMT(vr2list[SatP])
+        
+        Q = (vr(vc(gas), v) - vlr)/(vvr - vlr)
+       
+        arf1 = AMT(Domelist(ϕ(gas), "ar1")[SatP]) + Q*(Domelist(ϕ(gas), "ar2")[SatP] - Domelist(ϕ(gas), "ar1")[SatP])
+        
+        Mol ? arf2 = arf1*M(gas) : arf2 = arf1 
+        
+        return Pc(gas)*vc(gas)*arf2
+        
+    else 
+        
+        arf1 = AMT(C1()) + Tr(Tc(gas), T)*(C2() - (ϕ(gas)*log(AMTConvert(Tr(Tc(gas), T)))/Zc) + (ϕ(gas)/Zc)) - (8/3)*(Tr(Tc(gas), T)*log(3*AMTConvert(vr(vc(gas), v)) - 1)) - (AMT(3)/vr(vc(gas), v))
+        
+        Mol ? arf2 = arf1*M(gas) : arf2 = arf1 
+        
+        return Pc(gas)*vc(gas)*arf2
+        
+    end
+    
+end
+
+cv_vdw(gas::vdWGas) = (8/3)*ϕ(gas)
+
+function cp_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA}, Mol::Bool = false)
+    
+    SatP = findclosest(Tr_sat_list, Tr(Tc(gas), T), (10^-3))        
+    
+    if SatP > 0 && AMT(vr1list[SatP]) < vr(vc(gas), v) < AMT(vr2list[SatP])
+        
+        vlr = AMT(vr1list[SatP])
+
+        vvr = AMT(vr2list[SatP])
+        
+        Q = (vr(vc(gas), v) - vlr)/(vvr - vlr)
+       
+        cprf1 = AMT(Domelist(ϕ(gas), "cpr1")[SatP]) + Q*(Domelist(ϕ(gas), "cpr2")[SatP] - Domelist(ϕ(gas), "cpr1")[SatP])
+        
+        Mol ? cprf2 = cprf1*M(gas) : cprf2 = cprf1 
+        
+        return Pc(gas)*vc(gas)*cprf2/Tc(gas)
+        
+    else 
+        
+        cprf1 = (8*(4*Tr(Tc(gas), T)*(vr(vc(gas), v)^3) + ϕ(gas)*(4*Tr(Tc(gas), T)*(vr(vc(gas), v)^3) - (3*vr(vc(gas), v) - 1)^2)))/(3*(4*Tr(Tc(gas), T)*(vr(vc(gas), v)^3) - (3*vr(vc(gas), v) - 1)^2))
+        
+        Mol ? cprf2 = cprf1*M(gas) : cprf2 = cprf1 
+        
+        return Pc(gas)*vc(gas)*cprf2/Tc(gas)
+        
+    end
+    
+end
+
+γ(cp::cpAmt{Float64,EX,MA}, cv::cvAmt{Float64,EX,MA}) = cp/cv
+
+β(gas::vdWGas, v::vAmt{Float64,EX,MA}, P::sysP{Float64,EX}) = 8*(vr(vc(gas), v)^2)/(3*Tc(gas)*(Pr(Pc(gas), P)*(vr(vc(gas), v)^3) - 3*vr(vc(gas), v) + AMT(2)))
+
+Ks(gas::vdWGas, v::vAmt{Float64,EX,MA}, T::sysT{Float64,EX}) = (vr(vc(gas), v)^2)*((3*vr(vc(gas), v) - AMT(1))^2)/(6*Pc(gas)*(4*Tr(Tc(gas), T)*(vr(vc(gas), v)^3) - 9*(vr(vc(gas),v)^2) + 6*vr(vc(gas), v) - AMT(1)))
+
+Kt(gas::vdWGas, v::vAmt{Float64,EX,MA}, T::sysT{Float64,EX}) = Ks(gas, v, T)*ϕ(gas)*(4*Tr(Tc(gas), T)*(vr(vc(gas), v)^3) - (3*vr(vc(gas), v) - AMT(1))^2)/(4*Tr(Tc(gas), T)*(vr(vc(gas), v)^3) + ϕ(gas)*(4*Tr(Tc(gas), T)*(vr(vc(gas), v)^3) - (3*vr(vc(gas), v) - AMT(1))^2))
+
+k(gas::vdWGas, v::vAmt{Float64,EX,MA}, T::sysT{Float64,EX}) = 6*(4*Tr(Tc(gas), T)*ϕ(gas)*(vr(vc(gas), v)^3) + 4*Tr(Tc(gas), T)*(vr(vc(gas), v)^3) - 9*ϕ(gas)*(vr(vc(gas), v)^2) + 6*ϕ(gas)*vr(vc(gas), v) - ϕ(gas))/(ϕ(gas)*(3*vr(vc(gas), v) - AMT(1))*(8*Tr(Tc(gas), T)*(vr(vc(gas), v)^2) - 9*vr(vc(gas), v) + AMT(3)))
+
 # with all the possible pairs implemented, the next step is implement a function that gets all the six properties when a random pair is given
 
 function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol::Bool = False)
