@@ -736,7 +736,7 @@ function a_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA}, Mol::Bo
     
 end
 
-cv_vdw(gas::vdWGas) = (8/3)*ϕ(gas)
+cv_vdw(gas::vdWGas) = cv((8/3)*ϕ(gas))
 
 function cp_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA}, Mol::Bool = false)
     
@@ -800,7 +800,23 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         
         s = s_vdw(gas, T, v)
         
-        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas)] : St = [P, T, v, u, h, s]
+        a = a_vdw(gas, T, v)
+        
+        cv = cv_vdw(gas)
+        
+        cp = cp_vdw(gas, T, v)
+        
+        γ = γ(cp, cv)
+        
+        β = β(gas, v, P)
+        
+        Ks = Ks(gas, v, T)
+        
+        Kt = Kt(gas, v, T)
+        
+        k = k(gas, v, T)
+        
+        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k]
         
         return St
         
@@ -817,8 +833,24 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         h = h_vdw(gas, T, v)
         
         s = s_vdw(gas, T, v)
+
+        a = a_vdw(gas, T, v)
         
-        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas)] : St = [P, T, v, u, h, s]
+        cv = cv_vdw(gas)
+        
+        cp = cp_vdw(gas, T, v)
+        
+        γ = γ(cp, cv)
+        
+        β = β(gas, v, P)
+        
+        Ks = Ks(gas, v, T)
+        
+        Kt = Kt(gas, v, T)
+        
+        k = k(gas, v, T)
+        
+        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k]
         
         return St
         
@@ -836,7 +868,23 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         
         s = s_vdw(gas, T, v)
         
-        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas)] : St = [P, T, v, u, h, s]
+        a = a_vdw(gas, T, v)
+        
+        cv = cv_vdw(gas)
+        
+        cp = cp_vdw(gas, T, v)
+        
+        γ = γ(cp, cv)
+        
+        β = β(gas, v, P)
+        
+        Ks = Ks(gas, v, T)
+        
+        Kt = Kt(gas, v, T)
+        
+        k = k(gas, v, T)
+        
+        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k]
         
         return St
         
@@ -854,7 +902,23 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         
         s = s_vdw(gas, T, v)
         
-        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas)] : St = [P, T, v, u, h, s]
+        a = a_vdw(gas, T, v)
+        
+        cv = cv_vdw(gas)
+        
+        cp = cp_vdw(gas, T, v)
+        
+        γ = γ(cp, cv)
+        
+        β = β(gas, v, P)
+        
+        Ks = Ks(gas, v, T)
+        
+        Kt = Kt(gas, v, T)
+        
+        k = k(gas, v, T)
+        
+        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k]
         
         return St
         
@@ -872,7 +936,23 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         
         h = h_vdw(gas, T, v)
         
-        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas)] : St = [P, T, v, u, h, s]
+        a = a_vdw(gas, T, v)
+        
+        cv = cv_vdw(gas)
+        
+        cp = cp_vdw(gas, T, v)
+        
+        γ = γ(cp, cv)
+        
+        β = β(gas, v, P)
+        
+        Ks = Ks(gas, v, T)
+        
+        Kt = Kt(gas, v, T)
+        
+        k = k(gas, v, T)
+        
+        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k]
         
         return St
         
@@ -890,7 +970,23 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         
         s = s_vdw(gas, T, v)
         
-        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas)] : St = [P, T, v, u, h, s]
+        a = a_vdw(gas, T, v)
+        
+        cv = cv_vdw(gas)
+        
+        cp = cp_vdw(gas, T, v)
+        
+        γ = γ(cp, cv)
+        
+        β = β(gas, v, P)
+        
+        Ks = Ks(gas, v, T)
+        
+        Kt = Kt(gas, v, T)
+        
+        k = k(gas, v, T)
+        
+        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k]
         
         return St
         
@@ -908,7 +1004,23 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         
         h = h_vdw(gas, T, v)
         
-        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas)] : St = [P, T, v, u, h, s]
+        a = a_vdw(gas, T, v)
+        
+        cv = cv_vdw(gas)
+        
+        cp = cp_vdw(gas, T, v)
+        
+        γ = γ(cp, cv)
+        
+        β = β(gas, v, P)
+        
+        Ks = Ks(gas, v, T)
+        
+        Kt = Kt(gas, v, T)
+        
+        k = k(gas, v, T)
+        
+        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k]
         
         return St
         
@@ -926,7 +1038,23 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         
         s = s_vdw(gas, T, v)
         
-        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas)] : St = [P, T, v, u, h, s]
+        a = a_vdw(gas, T, v)
+        
+        cv = cv_vdw(gas)
+        
+        cp = cp_vdw(gas, T, v)
+        
+        γ = γ(cp, cv)
+        
+        β = β(gas, v, P)
+        
+        Ks = Ks(gas, v, T)
+        
+        Kt = Kt(gas, v, T)
+        
+        k = k(gas, v, T)
+        
+        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k]
         
         return St
         
@@ -944,7 +1072,23 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         
         s = s_vdw(gas, T, v)
         
-        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas)] : St = [P, T, v, u, h, s]
+        a = a_vdw(gas, T, v)
+        
+        cv = cv_vdw(gas)
+        
+        cp = cp_vdw(gas, T, v)
+        
+        γ = γ(cp, cv)
+        
+        β = β(gas, v, P)
+        
+        Ks = Ks(gas, v, T)
+        
+        Kt = Kt(gas, v, T)
+        
+        k = k(gas, v, T)
+        
+        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k]
         
         return St
         
@@ -962,7 +1106,23 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         
         u = u_vdw(gas, T, v)
         
-        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas)] : St = [P, T, v, u, h, s]
+        a = a_vdw(gas, T, v)
+        
+        cv = cv_vdw(gas)
+        
+        cp = cp_vdw(gas, T, v)
+        
+        γ = γ(cp, cv)
+        
+        β = β(gas, v, P)
+        
+        Ks = Ks(gas, v, T)
+        
+        Kt = Kt(gas, v, T)
+        
+        k = k(gas, v, T)
+        
+        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k]
         
         return St
         
@@ -980,7 +1140,23 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         
         u = u_vdw(gas, T, v)
         
-        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas)] : St = [P, T, v, u, h, s]
+        a = a_vdw(gas, T, v)
+        
+        cv = cv_vdw(gas)
+        
+        cp = cp_vdw(gas, T, v)
+        
+        γ = γ(cp, cv)
+        
+        β = β(gas, v, P)
+        
+        Ks = Ks(gas, v, T)
+        
+        Kt = Kt(gas, v, T)
+        
+        k = k(gas, v, T)
+        
+        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k]
         
         return St
         
@@ -998,7 +1174,23 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         
         s = s_vdw(gas, T, v)
         
-        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas)] : St = [P, T, v, u, h, s]
+        a = a_vdw(gas, T, v)
+        
+        cv = cv_vdw(gas)
+        
+        cp = cp_vdw(gas, T, v)
+        
+        γ = γ(cp, cv)
+        
+        β = β(gas, v, P)
+        
+        Ks = Ks(gas, v, T)
+        
+        Kt = Kt(gas, v, T)
+        
+        k = k(gas, v, T)
+        
+        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k]
         
         return St
         
@@ -1016,7 +1208,23 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         
         u = u_vdw(gas, T, v)
         
-        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas)] : St = [P, T, v, u, h, s]
+        a = a_vdw(gas, T, v)
+        
+        cv = cv_vdw(gas)
+        
+        cp = cp_vdw(gas, T, v)
+        
+        γ = γ(cp, cv)
+        
+        β = β(gas, v, P)
+        
+        Ks = Ks(gas, v, T)
+        
+        Kt = Kt(gas, v, T)
+        
+        k = k(gas, v, T)
+        
+        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k]
         
         return St
         
@@ -1034,7 +1242,23 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         
         h = h_vdw(gas, T, v)
         
-        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas)] : St = [P, T, v, u, h, s]
+        a = a_vdw(gas, T, v)
+        
+        cv = cv_vdw(gas)
+        
+        cp = cp_vdw(gas, T, v)
+        
+        γ = γ(cp, cv)
+        
+        β = β(gas, v, P)
+        
+        Ks = Ks(gas, v, T)
+        
+        Kt = Kt(gas, v, T)
+        
+        k = k(gas, v, T)
+        
+        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k]
         
         return St
         
@@ -1052,7 +1276,23 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         
         s = s_vdw(gas, T, v)
         
-        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas)] : St = [P, T, v, u, h, s]
+        a = a_vdw(gas, T, v)
+        
+        cv = cv_vdw(gas)
+        
+        cp = cp_vdw(gas, T, v)
+        
+        γ = γ(cp, cv)
+        
+        β = β(gas, v, P)
+        
+        Ks = Ks(gas, v, T)
+        
+        Kt = Kt(gas, v, T)
+        
+        k = k(gas, v, T)
+        
+        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k]
         
         return St
         
