@@ -162,6 +162,36 @@ function AMTConvert(amt::_Amt{Float64,EX})
     
 end
 
+# Function to find the closest number in an array where the numbers in sequence only increase
+
+function findclosest(array::Array,x::AMOUNTS{Float64,EX},p::Number)
+    
+    x = AMTConvert(x)
+
+    for i in 1:points
+    
+        y = x - array[i]
+        
+        if maximum(array) < x || minimum(array) > x
+            
+            return -1
+    
+        elseif abs(y) < p
+            
+            return i
+            
+        elseif i > 1 && y > x - array[i - 1]
+            
+            return i - 1
+            
+        end
+        
+    end    
+    
+    return points
+
+end
+
 # Now the functions are implemented using the vdWGas as an argument
 
 Tr(Tc::sysT{Float64,EX}, T::sysT{Float64,EX}) = T/Tc

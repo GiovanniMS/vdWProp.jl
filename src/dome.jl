@@ -2,8 +2,6 @@
 
 #  ℘ V1 V2 vr1 vr2 Tr_sat Pr_sat - are needed
 
-###################################################################################
-
 #Functions
 
 V2(℘) = (2*log(℘)/(℘-1) - 1/℘ - 1) / (2 - (℘+1)*log(℘)/(℘-1))
@@ -17,8 +15,6 @@ vr2(V2) = (V2 + 1) / 3
 Tr_sat(V1,V2) = (27*V1*V2*(V1 + V2 + 2)) / (8*((V1 + 1)^2)*((V2 + 1)^2))
 
 Pr_sat(V1,V2) = (27*(-V1 - V2 + (V1 + 1)*(V2 + 1) - 2)) / (((V1 + 1)^2)*((V2 + 1)^2))
-
-#####################################################################################
 
 # Arrays
 
@@ -62,13 +58,9 @@ for i in ℘list
     
 end
 
-########################################################################################
-
 #PLOT Prxvr e Prxlogvr
 
-# "using Makie" is needed only to get the plots, but can be used externally, thats why it is commented
-
-#using Makie
+# needs using Makie
 
 function PlotDomoPrVr(name::String)
     
@@ -108,8 +100,6 @@ function PlotDomoPrVr(name::String)
     
 end
 
-########################################################################################
-
 # using the dome properties, it is possible to get the other associated properties
 # the properties bellow depends on the constants \phi and integration constants
 # it's needed to plot all the domes for each \phi
@@ -140,6 +130,8 @@ cpr(vr,Tr,ϕ) = (8*(4*Tr*(vr^3) + ϕ*(4*Tr*(vr^3) - (3*vr - 1)^2)))/(3*(4*Tr*(vr
 C=0
 
 # Functions to get the plots and properties for ur, hr, and sr
+
+# Plot needs using Makie
 
 function domoprop(ϕ::Number,C1::Number,C2::Number,plot::String, array::String)
     
@@ -291,38 +283,6 @@ function domoprop(ϕ::Number,C1::Number,C2::Number,plot::String, array::String)
         
     end
         
-end
-
-# Function to find the closest number in an array comparing to a specified number
-
-function findclosest(array::Array,x::AMOUNTS{Float64,EX},p::Number)
-
-    for i in 1:points
-    
-        y = x - AMT(array[i])
-        
-        if AMT(maximum(array)) < x || AMT(minimum(array)) > x
-            
-            return -1
-    
-        elseif y < AMT(p)
-            
-            return i
-        
-            break
-            
-        end    
-        
-        if y < AMT(0) 
-            
-            return i - 1
-            
-            break
-            
-        end
-        
-    end
-
 end
 
 # Dome properties for case 1
