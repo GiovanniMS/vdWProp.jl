@@ -100,27 +100,49 @@ end
 
 function AMTConvert(amt::_Amt{Float64,EX})
     
-    x = amt + AMT(0.0001)
+    if amt < AMT(1)
+        
+        x = amt + AMT(0.000001)
     
-    z = "$x"
+        z = "$x"
+        
+        f = length(z) + 4
+
+        a = String(SubString(z, 10:f))
+
+        b = parse(Float64, a)
+        
+        return b
+        
+    else
     
-    a = String(SubString(z, 10:14))
-    
-    b = parse(Float64, a)
-    
-    ba = AMT(b)
-    
-    d = amt - ba
-    
-    z2 = "$d"
-    
-    a2 = String(SubString(z2, 10:14))
-    
-    b2 = parse(Float64, a2)
-    
-    d < AMT(0) ? r = (b - b2) : r = (b + b2)
-    
-    return r
+        x = amt + AMT(0.00000001)
+
+        z = "$x"
+        
+        f1 = length(z) + 4
+
+        a = String(SubString(z, 10:f1))
+
+        b = parse(Float64, a)
+
+        ba = AMT(b)
+
+        d = (amt - ba) + AMT(0.00000001)
+
+        z2 = "$d"
+        
+        f2 = length(z2) + 4
+
+        a2 = String(SubString(z2, 10:f2))
+
+        b2 = parse(Float64, a2)
+
+        d < AMT(0) ? r = (b - b2) : r = (b + b2)
+
+        return r
+        
+    end
     
 end
 
@@ -142,7 +164,7 @@ function findclosest(array::Array,x::AMOUNTS{Float64,EX},p::Number)
             
             return i
             
-        elseif i > 1 && y > x - array[i - 1]
+        elseif i > 1 && abs(y) > abs(x - array[i - 1])
             
             return i - 1
             
@@ -618,7 +640,7 @@ end
 
 function v_vdw(gas::vdWGas, s::sAmt{Float64,EX,MA}, h::hAmt{Float64,EX,MA}, Mol::Bool = false)
     
-    FQ = FindQ(hr(h, Pc(gas), vc(gas)), sr(s, Pc(gas), vc(gas), Tc(gas)), Domelist(ϕ(gas), "hr1"), Domelist(ϕ(gas), "hr2"), Domelist(ϕ(gas), "sr1"), Domelist(ϕ(gas), "sr2"))
+    FQ = FindQ(sr(s, Pc(gas), vc(gas), Tc(gas)), hr(h, Pc(gas), vc(gas)), Domelist(ϕ(gas), "sr1"), Domelist(ϕ(gas), "sr2"), Domelist(ϕ(gas), "hr1"), Domelist(ϕ(gas), "hr2"))
     
     if FQ == "out"
         
@@ -638,13 +660,13 @@ function v_vdw(gas::vdWGas, s::sAmt{Float64,EX,MA}, h::hAmt{Float64,EX,MA}, Mol:
         
         Q = FQ[1]
         
-        hlr = AMT(FQ[2])
+        slr = AMT(FQ[2])
         
-        hvr = ((hr(h, Pc(gas), vc(gas)) - hlr)/Q) + hlr
+        svr = ((sr(s, Pc(gas), vc(gas), Tc(gas)) - slr)/Q) + slr
         
-        vlr = vr1list[findclosest(Domelist(ϕ(gas), "hr1"), hlr, (10^-3))]
+        vlr = vr1list[findclosest(Domelist(ϕ(gas), "sr1"), slr, (10^-3))]
         
-        vvr = vr2list[findclosest(Domelist(ϕ(gas), "hr2"), hvr, (10^-3))]
+        vvr = vr2list[findclosest(Domelist(ϕ(gas), "sr2"), svr, (10^-3))]
         
         vrf1 = AMT(vlr) + Q*(vvr - vlr)
         
