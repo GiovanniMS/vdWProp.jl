@@ -146,6 +146,22 @@ function AMTConvert(amt::_Amt{Float64,EX})
     
 end
 
+# Units
+
+T1 = T(1)
+
+P1 = P(1)
+
+v1 = v(1)
+
+u1 = u(1)
+
+s1 = s(1)
+
+h1 = h(1)
+
+a1 = a(1)
+
 # Function to find the closest number in an array where the numbers in sequence only increase
 
 function findclosest(array::Array,x::AMOUNTS{Float64,EX},p::Number)
@@ -264,7 +280,7 @@ function s_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA}, Mol::Bo
         
         Mol ? srf2 = srf1*M(gas) : srf2 = srf1 
         
-        return Pc(gas)*vc(gas)*srf2/Tc(gas)
+        return s(AMTConvert((Pc(gas)*vc(gas)*srf2/Tc(gas))/s1))
         
     else 
         
@@ -272,7 +288,7 @@ function s_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA}, Mol::Bo
         
         Mol ? srf2 = srf1*M(gas) : srf2 = srf1 
         
-        return Pc(gas)*vc(gas)*srf2/Tc(gas)
+        return s(AMTConvert((Pc(gas)*vc(gas)*srf2/Tc(gas))/s1))
         
     end
     
@@ -294,15 +310,15 @@ function u_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA}, Mol::Bo
         
         Mol ? urf2 = urf1*M(gas) : urf2 = urf1 
         
-        return Pc(gas)*vc(gas)*urf2
+        return u(AMTConvert((Pc(gas)*vc(gas)*urf2)/u1))
         
-    else 
-        
+    else
+            
         urf1 = AMT(C1()) + (8*Tr(Tc(gas), T)*ϕ(gas)/3) - (AMT(3)/vr(vc(gas), v))
         
         Mol ? urf2 = urf1*M(gas) : urf2 = urf1 
         
-        return Pc(gas)*vc(gas)*urf2
+        return u(AMTConvert((Pc(gas)*vc(gas)*urf2)/u1))
         
     end
     
@@ -324,7 +340,7 @@ function h_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA}, Mol::Bo
         
         Mol ? hrf2 = hrf1*M(gas) : hrf2 = hrf1 
         
-        return Pc(gas)*vc(gas)*hrf2
+        return h(AMTConvert((Pc(gas)*vc(gas)*hrf2)/h1))
         
     else 
         
@@ -332,7 +348,7 @@ function h_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA}, Mol::Bo
         
         Mol ? hrf2 = hrf1*M(gas) : hrf2 = hrf1 
         
-        return Pc(gas)*vc(gas)*hrf2
+        return h(AMTConvert((Pc(gas)*vc(gas)*hrf2)/h1))
         
     end
     
@@ -736,7 +752,7 @@ function a_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA}, Mol::Bo
         
         Mol ? arf2 = arf1*M(gas) : arf2 = arf1 
         
-        return Pc(gas)*vc(gas)*arf2
+        return a(AMTConvert((Pc(gas)*vc(gas)*arf2)/a1))
         
     else 
         
@@ -744,7 +760,7 @@ function a_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA}, Mol::Bo
         
         Mol ? arf2 = arf1*M(gas) : arf2 = arf1 
         
-        return Pc(gas)*vc(gas)*arf2
+        return a(AMTConvert((Pc(gas)*vc(gas)*arf2)/a1))
         
     end
     
@@ -768,15 +784,15 @@ function cp_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA}, Mol::B
         
         Mol ? cprf2 = cprf1*M(gas) : cprf2 = cprf1 
         
-        return Pc(gas)*vc(gas)*cprf2/Tc(gas)
+        return cp(AMTConvert((Pc(gas)*vc(gas)*cprf2/Tc(gas))/s1))
         
     else 
         
-        cprf1 = (8*(4*Tr(Tc(gas), T)*(vr(vc(gas), v)^3) + ϕ(gas)*(4*Tr(Tc(gas), T)*(vr(vc(gas), v)^3) - (3*vr(vc(gas), v) - 1)^2)))/(3*(4*Tr(Tc(gas), T)*(vr(vc(gas), v)^3) - (3*vr(vc(gas), v) - 1)^2))
+        cprf1 = (8*(4*Tr(Tc(gas), T)*(vr(vc(gas), v)^3) + ϕ(gas)*(4*Tr(Tc(gas), T)*(vr(vc(gas), v)^3) - (3*vr(vc(gas), v) - AMT(1))^2)))/(3*(4*Tr(Tc(gas), T)*(vr(vc(gas), v)^3) - (3*vr(vc(gas), v) - AMT(1))^2))
         
         Mol ? cprf2 = cprf1*M(gas) : cprf2 = cprf1 
         
-        return Pc(gas)*vc(gas)*cprf2/Tc(gas)
+        return cp(AMTConvert((Pc(gas)*vc(gas)*cprf2/Tc(gas))/s1))
         
     end
     
@@ -1315,6 +1331,18 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         println("ERROR, the arguments needs to be properties between P,T,v,h,u,s and the base for the intensive ones needs to be mass.")
         
     end
+    
+end
+
+# Function to calculate the initial and final State of a process where there is a property that doesn't change
+
+function IsoProp(gas::vdWGas, iso::AMOUNTS{Float64,EX}, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol::Bool = false)
+
+    St1 = State(gas, iso, a, Mol)
+    
+    St2 = State(gas, iso, b, Mol)
+    
+    return hcat(St1, St2)
     
 end
 
