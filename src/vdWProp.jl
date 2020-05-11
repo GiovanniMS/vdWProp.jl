@@ -22,7 +22,7 @@ function FindQ(a::_Amt{Float64,EX}, b::_Amt{Float64,EX}, aArray1::Array, aArray2
         
         y = ((a - AMT(aArray1[i]))/(AMT(aArray2[i] - aArray1[i]))) - ((b - AMT(bArray1[i]))/(AMT(bArray2[i] - bArray1[i])))
         
-        if abs(AMTConvert(y)) < 0.001 && AMT(0) < Q < AMT(1) 
+        if abs(amt(y).val) < 0.001 && AMT(0) < Q < AMT(1) 
             
             return [Q, aArray1[i]] 
             
@@ -96,56 +96,6 @@ function ImVerification(a::Array)
     
 end
 
-#Function to convert a AMT into a Float64
-
-function AMTConvert(amt::_Amt{Float64,EX})
-    
-    if amt < AMT(1)
-        
-        x = amt + AMT(0.000001)
-    
-        z = "$x"
-        
-        f = length(z) + 4
-
-        a = String(SubString(z, 10:f))
-
-        b = parse(Float64, a)
-        
-        return b
-        
-    else
-    
-        x = amt + AMT(0.00000001)
-
-        z = "$x"
-        
-        f1 = length(z) + 4
-
-        a = String(SubString(z, 10:f1))
-
-        b = parse(Float64, a)
-
-        ba = AMT(b)
-
-        d = (amt - ba) + AMT(0.00000001)
-
-        z2 = "$d"
-        
-        f2 = length(z2) + 4
-
-        a2 = String(SubString(z2, 10:f2))
-
-        b2 = parse(Float64, a2)
-
-        d < AMT(0) ? r = (b - b2) : r = (b + b2)
-
-        return r
-        
-    end
-    
-end
-
 # Units
 
 T1 = T(1)
@@ -166,7 +116,7 @@ a1 = a(1)
 
 function findclosest(array::Array,x::AMOUNTS{Float64,EX},p::Number)
     
-    x = AMTConvert(x)
+    x = amt(x).val
 
     for i in 1:points
     
@@ -232,7 +182,7 @@ function T_vdw(gas::vdWGas, P::sysP{Float64,EX}, v::vAmt{Float64,EX,MA})
         
     else
         
-        return Tc(gas)*(((Pr(Pc(gas), P)*(3*vr(vc(gas), v) - AMT(1)))/8) + (AMT(3)/(8*(vr(vc(gas), v)^2))))
+        return Tc(gas)*(((Pr(Pc(gas), P)*(3*vr(vc(gas), v) - AMT(1)))/8) + ((AMT(3)*(3*vr(vc(gas), v) - AMT(1)))/(8*(vr(vc(gas), v)^2))))
         
     end
     
@@ -242,9 +192,9 @@ function v_vdw(gas::vdWGas, P::sysP{Float64,EX}, T::sysT{Float64,EX}, Mol::Bool 
     
     SatP = findclosest(Pr_sat_list, Pr(Pc(gas), P), (10^-3))
 
-    Proots = AMTConvert(Pr(Pc(gas), P))
+    Proots = amt(Pr(Pc(gas), P)).val
     
-    Troots = AMTConvert(Tr(Tc(gas), T))
+    Troots = amt(Tr(Tc(gas), T)).val
     
     vrvdw = roots(Poly([(-3/8),(9/8),(-Troots - (Proots/8)),(3*Proots/8)]))
     
@@ -280,7 +230,7 @@ function s_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA}, Mol::Bo
         
         Mol ? srf2 = srf1*M(gas) : srf2 = srf1 
         
-        return s(AMTConvert((Pc(gas)*vc(gas)*srf2/Tc(gas))/s1))
+        return s(amt((Pc(gas)*vc(gas)*srf2/Tc(gas))/s1).val)
         
     else 
         
@@ -288,7 +238,7 @@ function s_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA}, Mol::Bo
         
         Mol ? srf2 = srf1*M(gas) : srf2 = srf1 
         
-        return s(AMTConvert((Pc(gas)*vc(gas)*srf2/Tc(gas))/s1))
+        return s(amt((Pc(gas)*vc(gas)*srf2/Tc(gas))/s1).val)
         
     end
     
@@ -310,7 +260,7 @@ function u_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA}, Mol::Bo
         
         Mol ? urf2 = urf1*M(gas) : urf2 = urf1 
         
-        return u(AMTConvert((Pc(gas)*vc(gas)*urf2)/u1))
+        return u(amt((Pc(gas)*vc(gas)*urf2)/u1).val)
         
     else
             
@@ -318,7 +268,7 @@ function u_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA}, Mol::Bo
         
         Mol ? urf2 = urf1*M(gas) : urf2 = urf1 
         
-        return u(AMTConvert((Pc(gas)*vc(gas)*urf2)/u1))
+        return u(amt((Pc(gas)*vc(gas)*urf2)/u1).val)
         
     end
     
@@ -340,7 +290,7 @@ function h_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA}, Mol::Bo
         
         Mol ? hrf2 = hrf1*M(gas) : hrf2 = hrf1 
         
-        return h(AMTConvert((Pc(gas)*vc(gas)*hrf2)/h1))
+        return h(amt((Pc(gas)*vc(gas)*hrf2)/h1).val)
         
     else 
         
@@ -348,7 +298,7 @@ function h_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA}, Mol::Bo
         
         Mol ? hrf2 = hrf1*M(gas) : hrf2 = hrf1 
         
-        return h(AMTConvert((Pc(gas)*vc(gas)*hrf2)/h1))
+        return h(amt((Pc(gas)*vc(gas)*hrf2)/h1).val)
         
     end
     
@@ -360,7 +310,7 @@ function T_vdw(gas::vdWGas, v::vAmt{Float64,EX,MA}, s::sAmt{Float64,EX,MA})
     
     if FQ == "out"
         
-        return Tc(gas)*(exp((3/(8*ϕ(gas)))*(AMTConvert(sr(s,Pc(gas), vc(gas), Tc(gas))) + C2())))*((3*vr(vc(gas), v) - AMT(1))^(-1/ϕ(gas)))
+        return Tc(gas)*(exp((3/(8*ϕ(gas)))*(amt(sr(s,Pc(gas), vc(gas), Tc(gas))).val + C2())))*((3*vr(vc(gas), v) - AMT(1))^(-1/ϕ(gas)))
         
     else
         
@@ -428,9 +378,9 @@ function v_vdw(gas::vdWGas, P::sysP{Float64,EX}, u::uAmt{Float64,EX,MA}, Mol::Bo
         
     else 
         
-        Proots = AMTConvert(Pr(Pc(gas), P))
+        Proots = amt(Pr(Pc(gas), P)).val
         
-        uroots = AMTConvert(ur(u, Pc(gas), vc(gas)))
+        uroots = amt(ur(u, Pc(gas), vc(gas))).val
         
         vrf1 = roots(Poly([-3,(9 - (9/ϕ(gas))),(-Proots - (uroots - C1())*(3/ϕ(gas))),3*Proots]))
         
@@ -464,9 +414,9 @@ function v_vdw(gas::vdWGas, P::sysP{Float64,EX}, h::hAmt{Float64,EX,MA}, Mol::Bo
         
     else 
         
-        Proots = AMTConvert(Pr(Pc(gas), P))
+        Proots = amt(Pr(Pc(gas), P)).val
         
-        hroots = AMTConvert(hr(h, Pc(gas), vc(gas)))
+        hroots = amt(hr(h, Pc(gas), vc(gas))).val
         
         vrf1 = roots(Poly([(-ϕ(gas)),(3*ϕ(gas) - 3),(-(ϕ(gas)*Proots/3) - (hroots) - C1()),(ϕ(gas)*Proots + Proots)]))
         
@@ -500,9 +450,9 @@ function v_vdw(gas::vdWGas, P::sysP{Float64,EX}, s::sAmt{Float64,EX,MA}, Mol::Bo
         
     else 
         
-        Proots = AMTConvert(Pr(Pc(gas), P))
+        Proots = amt(Pr(Pc(gas), P)).val
         
-        sroots = AMTConvert(sr(s, Pc(gas), vc(gas), Tc(gas)))        
+        sroots = amt(sr(s, Pc(gas), vc(gas), Tc(gas))).val        
         
         f(vr) = (((8*exp((3/(8*ϕ(gas)))*(sroots) + C2())))/((3*vr - 1)^(1 + (1/ϕ(gas))))) - (3/vr^2) - Proots
         
@@ -536,7 +486,11 @@ function v_vdw(gas::vdWGas, T::sysT{Float64,EX}, u::uAmt{Float64,EX,MA}, Mol::Bo
         
     else 
         
-        vrf1 = -AMT(3)/(ur(u, Pc(gas), vc(gas)) - AMT(C1()) - (8*Tr(Tc(gas), T)*ϕ(gas)/3))
+        p1 = amt(ur(u, Pc(gas), vc(gas))).val
+        
+        p2 = (8*amt(Tr(Tc(gas), T)).val*ϕ(gas)/3)
+        
+        vrf1 = (-3)/(p1 - C1() - p2)
         
         Mol ? vrf2 = vrf1*M(gas) : vrf2 = vrf1 
         
@@ -566,7 +520,7 @@ function v_vdw(gas::vdWGas, T::sysT{Float64,EX}, s::sAmt{Float64,EX,MA}, Mol::Bo
         
     else 
         
-        vrf1 = (1/3)*(((Tr(Tc(gas), T)/exp((3/(8*ϕ(gas)))*(AMTConvert(sr(s, Pc(gas), vc(gas), Tc(gas))) + C2())))^(-ϕ(gas))) + AMT(1))
+        vrf1 = (1/3)*(((Tr(Tc(gas), T)/exp((3/(8*ϕ(gas)))*(amt(sr(s, Pc(gas), vc(gas), Tc(gas))).val + C2())))^(-ϕ(gas))) + AMT(1))
         
         Mol ? vrf2 = vrf1*M(gas) : vrf2 = vrf1 
         
@@ -582,9 +536,9 @@ function v_vdw(gas::vdWGas, u::uAmt{Float64,EX,MA}, s::sAmt{Float64,EX,MA}, Mol:
     
     if FQ == "out"
         
-        uroots = AMTConvert(ur(u, Pc(gas), vc(gas)))
+        uroots = amt(ur(u, Pc(gas), vc(gas))).val
         
-        sroots = AMTConvert(sr(s, Pc(gas), vc(gas), Tc(gas)))
+        sroots = amt(sr(s, Pc(gas), vc(gas), Tc(gas))).val
         
         f(vr) = (8*ϕ(gas)/3)*(exp((3/(8*ϕ(gas)))*(sroots + C2())))*((3*vr - 1)^(-1/ϕ(gas))) - uroots - (3/vr) + C1()
     
@@ -622,9 +576,9 @@ function v_vdw(gas::vdWGas, u::uAmt{Float64,EX,MA}, h::hAmt{Float64,EX,MA}, Mol:
     
     if FQ == "out"
         
-        uroots = AMTConvert(ur(u, Pc(gas), vc(gas)))
+        uroots = amt(ur(u, Pc(gas), vc(gas))).val
         
-        hroots = AMTConvert(hr(h, Pc(gas), vc(gas)))
+        hroots = amt(hr(h, Pc(gas), vc(gas))).val
         
         vrf1 = roots(Poly([ϕ(gas),((-ϕ(gas)/3)*(uroots) - C1()) + 3*ϕ(gas) + 3 + (ϕ(gas)/3)*(hroots - C1()) - 6*ϕ(gas),((ϕ(gas) + 1)*(uroots - C1()) - ϕ(gas)*(hroots - C1()))]))[2]
         
@@ -660,9 +614,9 @@ function v_vdw(gas::vdWGas, s::sAmt{Float64,EX,MA}, h::hAmt{Float64,EX,MA}, Mol:
     
     if FQ == "out"
         
-        hroots = AMTConvert(hr(h, Pc(gas), vc(gas)))
+        hroots = amt(hr(h, Pc(gas), vc(gas))).val
         
-        sroots = AMTConvert(sr(s, Pc(gas), vc(gas), Tc(gas)))
+        sroots = amt(sr(s, Pc(gas), vc(gas), Tc(gas))).val
         
         f(vr) = ((8*ϕ(gas)/3) + (8*vr/(3*vr - 1)))*exp((3/(8*ϕ(gas)))*(sroots + C2()))*((3*vr - 1)^(-1/ϕ(gas))) - hroots + C1() - (6/vr)
     
@@ -714,9 +668,9 @@ function v_vdw(gas::vdWGas, T::sysT{Float64,EX}, h::hAmt{Float64,EX,MA}, Mol::Bo
         
     else 
         
-        Troots = AMTConvert(Tr(Tc(gas), T))
+        Troots = amt(Tr(Tc(gas), T)).val
         
-        hroots = AMTConvert(hr(h, Pc(gas), vc(gas)))
+        hroots = amt(hr(h, Pc(gas), vc(gas))).val
         
         vrf1 = roots(Poly([6, ((-8*ϕ(gas)*Troots/3) + hroots) - C1() - 18, (8*Troots*(ϕ(gas) + 1) - 3*hroots + 3*C1())]))[2]
         
@@ -752,15 +706,15 @@ function a_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA}, Mol::Bo
         
         Mol ? arf2 = arf1*M(gas) : arf2 = arf1 
         
-        return a(AMTConvert((Pc(gas)*vc(gas)*arf2)/a1))
+        return a(amt((Pc(gas)*vc(gas)*arf2)/a1).val)
         
     else 
         
-        arf1 = AMT(C1()) + Tr(Tc(gas), T)*(C2() - (ϕ(gas)*log(AMTConvert(Tr(Tc(gas), T)))/Zc) + (ϕ(gas)/Zc)) - (8/3)*(Tr(Tc(gas), T)*log(3*AMTConvert(vr(vc(gas), v)) - 1)) - (AMT(3)/vr(vc(gas), v))
+        arf1 = AMT(C1()) + Tr(Tc(gas), T)*(C2() - (ϕ(gas)*log(amt(Tr(Tc(gas), T)).val)/Zc) + (ϕ(gas)/Zc)) - (8/3)*(Tr(Tc(gas), T)*log(3*amt(vr(vc(gas), v)).val - 1)) - (AMT(3)/vr(vc(gas), v))
         
         Mol ? arf2 = arf1*M(gas) : arf2 = arf1 
         
-        return a(AMTConvert((Pc(gas)*vc(gas)*arf2)/a1))
+        return a(amt((Pc(gas)*vc(gas)*arf2)/a1).val)
         
     end
     
@@ -784,7 +738,7 @@ function cp_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA}, Mol::B
         
         Mol ? cprf2 = cprf1*M(gas) : cprf2 = cprf1 
         
-        return cp(AMTConvert((Pc(gas)*vc(gas)*cprf2/Tc(gas))/s1))
+        return cp(amt((Pc(gas)*vc(gas)*cprf2/Tc(gas))/s1).val)
         
     else 
         
@@ -792,7 +746,7 @@ function cp_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA}, Mol::B
         
         Mol ? cprf2 = cprf1*M(gas) : cprf2 = cprf1 
         
-        return cp(AMTConvert((Pc(gas)*vc(gas)*cprf2/Tc(gas))/s1))
+        return cp(amt((Pc(gas)*vc(gas)*cprf2/Tc(gas))/s1).val)
         
     end
     
@@ -806,7 +760,7 @@ ks(gas::vdWGas, v::vAmt{Float64,EX,MA}, T::sysT{Float64,EX}) = (vr(vc(gas), v)^2
 
 kt(gas::vdWGas, v::vAmt{Float64,EX,MA}, T::sysT{Float64,EX}) = ks(gas, v, T)*ϕ(gas)*(4*Tr(Tc(gas), T)*(vr(vc(gas), v)^3) - (3*vr(vc(gas), v) - AMT(1))^2)/(4*Tr(Tc(gas), T)*(vr(vc(gas), v)^3) + ϕ(gas)*(4*Tr(Tc(gas), T)*(vr(vc(gas), v)^3) - (3*vr(vc(gas), v) - AMT(1))^2))
 
-k_vdw(gas::vdWGas, v::vAmt{Float64,EX,MA}, T::sysT{Float64,EX}) = 6*(4*Tr(Tc(gas), T)*ϕ(gas)*(vr(vc(gas), v)^3) + 4*Tr(Tc(gas), T)*(vr(vc(gas), v)^3) - 9*ϕ(gas)*(vr(vc(gas), v)^2) + 6*ϕ(gas)*vr(vc(gas), v) - ϕ(gas))/(ϕ(gas)*(3*vr(vc(gas), v) - AMT(1))*(8*Tr(Tc(gas), T)*(vr(vc(gas), v)^2) - 9*vr(vc(gas), v) + AMT(3)))
+k_vdw(gas::vdWGas, v::vAmt{Float64,EX,MA}, T::sysT{Float64,EX}) = 6*(4*Tr(Tc(gas), T)*ϕ(gas)*(vr(vc(gas), v)^3) + 4*Tr(Tc(gas), T)*(vr(vc(gas), v)^3) - 9*ϕ(gas)*(vr(vc(gas), v)^2) + 6*ϕ(gas)*vr(vc(gas), v) - AMT(ϕ(gas)))/(ϕ(gas)*(3*vr(vc(gas), v) - AMT(1))*(8*Tr(Tc(gas), T)*(vr(vc(gas), v)^2) - 9*vr(vc(gas), v) + AMT(3)))
 
 # with all the possible pairs implemented, the next step is implement a function that gets all the six properties when a random pair is given
 
