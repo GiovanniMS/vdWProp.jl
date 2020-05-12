@@ -580,7 +580,9 @@ function v_vdw(gas::vdWGas, u::uAmt{Float64,EX,MA}, h::hAmt{Float64,EX,MA}, Mol:
         
         hroots = amt(hr(h, Pc(gas), vc(gas))).val
         
-        vrf1 = roots(Poly([ϕ(gas),((-ϕ(gas)/3)*(uroots) - C1()) + 3*ϕ(gas) + 3 + (ϕ(gas)/3)*(hroots - C1()) - 6*ϕ(gas),((ϕ(gas) + 1)*(uroots - C1()) - ϕ(gas)*(hroots - C1()))]))[2]
+        vrf0 = roots(Poly([-3, (-uroots + (9/ϕ(gas)) + hroots - 9), (3*uroots + (3*uroots/ϕ(gas)) - (3*C1()/ϕ(gas)) - 3*hroots)]))
+        
+        vrf1 = vrf0[2]
         
         Mol ? vrf2 = vrf1*M(gas) : vrf2 = vrf1 
         
