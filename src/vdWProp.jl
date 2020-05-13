@@ -112,6 +112,12 @@ h1 = h(1)
 
 a1 = a(1)
 
+# Constants
+
+C1 = 0
+
+C2 = 0
+
 # Function to find the closest number in an array where the numbers in sequence only increase
 
 function findclosest(array::Array,x::AMOUNTS{Float64,EX},p::Number)
@@ -234,7 +240,7 @@ function s_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA}, Mol::Bo
         
     else 
         
-        srf1 = (8/3)*log(3*vr(vc(gas), v) - AMT(1)) + (8*ϕ(gas)/3)*log(Tr(Tc(gas), T)) - AMT(C2())
+        srf1 = (8/3)*log(3*vr(vc(gas), v) - AMT(1)) + (8*ϕ(gas)/3)*log(Tr(Tc(gas), T)) - AMT(C2)
         
         Mol ? srf2 = srf1*M(gas) : srf2 = srf1 
         
@@ -264,7 +270,7 @@ function u_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA}, Mol::Bo
         
     else
             
-        urf1 = AMT(C1()) + (8*Tr(Tc(gas), T)*ϕ(gas)/3) - (AMT(3)/vr(vc(gas), v))
+        urf1 = AMT(C1) + (8*Tr(Tc(gas), T)*ϕ(gas)/3) - (AMT(3)/vr(vc(gas), v))
         
         Mol ? urf2 = urf1*M(gas) : urf2 = urf1 
         
@@ -294,7 +300,7 @@ function h_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA}, Mol::Bo
         
     else 
         
-        hrf1 = AMT(C1()) + (8*Tr(Tc(gas), T)*ϕ(gas)/3) + (8*Tr(Tc(gas), T)*vr(vc(gas), v)/(3*vr(vc(gas), v) - AMT(1))) - (AMT(6)/vr(vc(gas), v))
+        hrf1 = AMT(C1) + (8*Tr(Tc(gas), T)*ϕ(gas)/3) + (8*Tr(Tc(gas), T)*vr(vc(gas), v)/(3*vr(vc(gas), v) - AMT(1))) - (AMT(6)/vr(vc(gas), v))
         
         Mol ? hrf2 = hrf1*M(gas) : hrf2 = hrf1 
         
@@ -310,7 +316,7 @@ function T_vdw(gas::vdWGas, v::vAmt{Float64,EX,MA}, s::sAmt{Float64,EX,MA})
     
     if FQ == "out"
         
-        return Tc(gas)*(exp((3/(8*ϕ(gas)))*(amt(sr(s,Pc(gas), vc(gas), Tc(gas))).val + C2())))*((3*vr(vc(gas), v) - AMT(1))^(-1/ϕ(gas)))
+        return Tc(gas)*(exp((3/(8*ϕ(gas)))*(amt(sr(s,Pc(gas), vc(gas), Tc(gas))).val + C2)))*((3*vr(vc(gas), v) - AMT(1))^(-1/ϕ(gas)))
         
     else
         
@@ -328,7 +334,7 @@ function T_vdw(gas::vdWGas, v::vAmt{Float64,EX,MA}, u::uAmt{Float64,EX,MA})
     
     if FQ == "out"
         
-        return Tc(gas)*(3/(8*ϕ(gas)))*(ur(u, Pc(gas), vc(gas)) - AMT(C1()) + (AMT(3)/vr(vc(gas), v)))
+        return Tc(gas)*(3/(8*ϕ(gas)))*(ur(u, Pc(gas), vc(gas)) - AMT(C1) + (AMT(3)/vr(vc(gas), v)))
         
     else
         
@@ -346,7 +352,7 @@ function T_vdw(gas::vdWGas, v::vAmt{Float64,EX,MA}, h::hAmt{Float64,EX,MA})
     
     if FQ == "out"
         
-        return Tc(gas)*(hr(h, Pc(gas), vc(gas)) - AMT(C1()) + (AMT(6)/vr(vc(gas), v)))/(AMT(8*ϕ(gas)/3) + (8*vr(vc(gas), v)/(3*vr(vc(gas), v) - AMT(1))))
+        return Tc(gas)*(hr(h, Pc(gas), vc(gas)) - AMT(C1) + (AMT(6)/vr(vc(gas), v)))/(AMT(8*ϕ(gas)/3) + (8*vr(vc(gas), v)/(3*vr(vc(gas), v) - AMT(1))))
         
     else
         
@@ -382,7 +388,7 @@ function v_vdw(gas::vdWGas, P::sysP{Float64,EX}, u::uAmt{Float64,EX,MA}, Mol::Bo
         
         uroots = amt(ur(u, Pc(gas), vc(gas))).val
         
-        vrf1 = roots(Poly([-3,(9 - (9/ϕ(gas))),(-Proots - (uroots - C1())*(3/ϕ(gas))),3*Proots]))
+        vrf1 = roots(Poly([-3,(9 - (9/ϕ(gas))),(-Proots - (uroots - C1)*(3/ϕ(gas))),3*Proots]))
         
         vrf1 = ImVerification(vrf1)
         
@@ -418,7 +424,7 @@ function v_vdw(gas::vdWGas, P::sysP{Float64,EX}, h::hAmt{Float64,EX,MA}, Mol::Bo
         
         hroots = amt(hr(h, Pc(gas), vc(gas))).val
         
-        vrf1 = roots(Poly([(-ϕ(gas)),(3*ϕ(gas) - 3),(-(ϕ(gas)*Proots/3) - (hroots) - C1()),(ϕ(gas)*Proots + Proots)]))
+        vrf1 = roots(Poly([(-ϕ(gas)),(3*ϕ(gas) - 3),(-(ϕ(gas)*Proots/3) - (hroots) - C1),(ϕ(gas)*Proots + Proots)]))
         
         vrf1 = ImVerification(vrf1)
         
@@ -454,7 +460,7 @@ function v_vdw(gas::vdWGas, P::sysP{Float64,EX}, s::sAmt{Float64,EX,MA}, Mol::Bo
         
         sroots = amt(sr(s, Pc(gas), vc(gas), Tc(gas))).val        
         
-        f(vr) = (((8*exp((3/(8*ϕ(gas)))*(sroots) + C2())))/((3*vr - 1)^(1 + (1/ϕ(gas))))) - (3/vr^2) - Proots
+        f(vr) = (((8*exp((3/(8*ϕ(gas)))*(sroots) + C2)))/((3*vr - 1)^(1 + (1/ϕ(gas))))) - (3/vr^2) - Proots
         
         vrf1 = find_zero(f,0.5,Order1())
         
@@ -490,7 +496,7 @@ function v_vdw(gas::vdWGas, T::sysT{Float64,EX}, u::uAmt{Float64,EX,MA}, Mol::Bo
         
         p2 = (8*amt(Tr(Tc(gas), T)).val*ϕ(gas)/3)
         
-        vrf1 = (-3)/(p1 - C1() - p2)
+        vrf1 = (-3)/(p1 - C1 - p2)
         
         Mol ? vrf2 = vrf1*M(gas) : vrf2 = vrf1 
         
@@ -520,131 +526,11 @@ function v_vdw(gas::vdWGas, T::sysT{Float64,EX}, s::sAmt{Float64,EX,MA}, Mol::Bo
         
     else 
         
-        vrf1 = (1/3)*(((Tr(Tc(gas), T)/exp((3/(8*ϕ(gas)))*(amt(sr(s, Pc(gas), vc(gas), Tc(gas))).val + C2())))^(-ϕ(gas))) + AMT(1))
+        vrf1 = (1/3)*(((Tr(Tc(gas), T)/exp((3/(8*ϕ(gas)))*(amt(sr(s, Pc(gas), vc(gas), Tc(gas))).val + C2)))^(-ϕ(gas))) + AMT(1))
         
         Mol ? vrf2 = vrf1*M(gas) : vrf2 = vrf1 
         
         return vc(gas)*vrf2
-        
-    end
-    
-end
-
-function v_vdw(gas::vdWGas, u::uAmt{Float64,EX,MA}, s::sAmt{Float64,EX,MA}, Mol::Bool = false)
-    
-    FQ = FindQ(sr(s, Pc(gas), vc(gas), Tc(gas)), ur(u, Pc(gas), vc(gas)), Domelist(ϕ(gas), "sr1"), Domelist(ϕ(gas), "sr2"), Domelist(ϕ(gas), "ur1"), Domelist(ϕ(gas), "ur2"))
-    
-    if FQ == "out"
-        
-        uroots = amt(ur(u, Pc(gas), vc(gas))).val
-        
-        sroots = amt(sr(s, Pc(gas), vc(gas), Tc(gas))).val
-        
-        f(vr) = (8*ϕ(gas)/3)*(exp((3/(8*ϕ(gas)))*(sroots + C2())))*((3*vr - 1)^(-1/ϕ(gas))) - uroots - (3/vr) + C1()
-    
-        vrf1 = find_zero(f,0.5,Order1()) #metodo da secante
-        
-        Mol ? vrf2 = vrf1*M(gas) : vrf2 = vrf1 
-        
-        return vc(gas)*vrf2         
-        
-    else
-        
-        Q = FQ[1]
-        
-        slr = AMT(FQ[2])
-        
-        svr = ((sr(s, Pc(gas), vc(gas), Tc(gas)) - slr)/Q) + slr
-        
-        vlr = vr1list[findclosest(Domelist(ϕ(gas), "sr1"), slr, (10^-3))]
-        
-        vvr = vr2list[findclosest(Domelist(ϕ(gas), "sr2"), svr, (10^-3))]
-        
-        vrf1 = AMT(vlr) + Q*(vvr - vlr)
-        
-        Mol ? vrf2 = vrf1*M(gas) : vrf2 = vrf1 
-        
-        return vc(gas)*vrf2    
-        
-    end
-    
-end
-
-function v_vdw(gas::vdWGas, u::uAmt{Float64,EX,MA}, h::hAmt{Float64,EX,MA}, Mol::Bool = false)
-    
-    FQ = FindQ(hr(h, Pc(gas), vc(gas)), ur(u, Pc(gas), vc(gas)), Domelist(ϕ(gas), "hr1"), Domelist(ϕ(gas), "hr2"), Domelist(ϕ(gas), "ur1"), Domelist(ϕ(gas), "ur2"))
-    
-    if FQ == "out"
-        
-        uroots = amt(ur(u, Pc(gas), vc(gas))).val
-        
-        hroots = amt(hr(h, Pc(gas), vc(gas))).val
-        
-        vrf0 = roots(Poly([-3, (-uroots + (9/ϕ(gas)) + hroots - 9), (3*uroots + (3*uroots/ϕ(gas)) - (3*C1()/ϕ(gas)) - 3*hroots)]))
-        
-        vrf1 = vrf0[2]
-        
-        Mol ? vrf2 = vrf1*M(gas) : vrf2 = vrf1 
-        
-        return vc(gas)*vrf2        
-        
-    else
-        
-        Q = FQ[1]
-        
-        hlr = AMT(FQ[2])
-        
-        hvr = ((hr(h, Pc(gas), vc(gas)) - hlr)/Q) + hlr
-        
-        vlr = vr1list[findclosest(Domelist(ϕ(gas), "hr1"), hlr, (10^-3))]
-        
-        vvr = vr2list[findclosest(Domelist(ϕ(gas), "hr2"), hvr, (10^-3))]
-        
-        vrf1 = AMT(vlr) + Q*(vvr - vlr)
-        
-        Mol ? vrf2 = vrf1*M(gas) : vrf2 = vrf1 
-        
-        return vc(gas)*vrf2   
-        
-    end
-    
-end
-
-function v_vdw(gas::vdWGas, s::sAmt{Float64,EX,MA}, h::hAmt{Float64,EX,MA}, Mol::Bool = false)
-    
-    FQ = FindQ(sr(s, Pc(gas), vc(gas), Tc(gas)), hr(h, Pc(gas), vc(gas)), Domelist(ϕ(gas), "sr1"), Domelist(ϕ(gas), "sr2"), Domelist(ϕ(gas), "hr1"), Domelist(ϕ(gas), "hr2"))
-    
-    if FQ == "out"
-        
-        hroots = amt(hr(h, Pc(gas), vc(gas))).val
-        
-        sroots = amt(sr(s, Pc(gas), vc(gas), Tc(gas))).val
-        
-        f(vr) = ((8*ϕ(gas)/3) + (8*vr/(3*vr - 1)))*exp((3/(8*ϕ(gas)))*(sroots + C2()))*((3*vr - 1)^(-1/ϕ(gas))) - hroots + C1() - (6/vr)
-    
-        vrf1 = find_zero(f,0.5,Order1()) #metodo da secante
-        
-        Mol ? vrf2 = vrf1*M(gas) : vrf2 = vrf1 
-        
-        return vc(gas)*vrf2 
-        
-    else
-        
-        Q = FQ[1]
-        
-        slr = AMT(FQ[2])
-        
-        svr = ((sr(s, Pc(gas), vc(gas), Tc(gas)) - slr)/Q) + slr
-        
-        vlr = vr1list[findclosest(Domelist(ϕ(gas), "sr1"), slr, (10^-3))]
-        
-        vvr = vr2list[findclosest(Domelist(ϕ(gas), "sr2"), svr, (10^-3))]
-        
-        vrf1 = AMT(vlr) + Q*(vvr - vlr)
-        
-        Mol ? vrf2 = vrf1*M(gas) : vrf2 = vrf1 
-        
-        return vc(gas)*vrf2      
         
     end
     
@@ -674,7 +560,7 @@ function v_vdw(gas::vdWGas, T::sysT{Float64,EX}, h::hAmt{Float64,EX,MA}, Mol::Bo
         
         hroots = amt(hr(h, Pc(gas), vc(gas))).val
         
-        vrf1 = roots(Poly([6, ((-8*ϕ(gas)*Troots/3) + hroots) - C1() - 18, (8*Troots*(ϕ(gas) + 1) - 3*hroots + 3*C1())]))[2]
+        vrf1 = roots(Poly([6, ((-8*ϕ(gas)*Troots/3) + hroots) - C1 - 18, (8*Troots*(ϕ(gas) + 1) - 3*hroots + 3*C1)]))[2]
         
         Mol ? vrf2 = vrf1*M(gas) : vrf2 = vrf1 
         
@@ -712,7 +598,7 @@ function a_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA}, Mol::Bo
         
     else 
         
-        arf1 = AMT(C1()) + Tr(Tc(gas), T)*(C2() - (ϕ(gas)*log(amt(Tr(Tc(gas), T)).val)/Zc) + (ϕ(gas)/Zc)) - (8/3)*(Tr(Tc(gas), T)*log(3*amt(vr(vc(gas), v)).val - 1)) - (AMT(3)/vr(vc(gas), v))
+        arf1 = AMT(C1) + Tr(Tc(gas), T)*(C2 - (ϕ(gas)*log(amt(Tr(Tc(gas), T)).val)/Zc) + (ϕ(gas)/Zc)) - (8/3)*(Tr(Tc(gas), T)*log(3*amt(vr(vc(gas), v)).val - 1)) - (AMT(3)/vr(vc(gas), v))
         
         Mol ? arf2 = arf1*M(gas) : arf2 = arf1 
         
@@ -1180,111 +1066,9 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         
         return St
         
-    elseif (ta == sAmt{Float64,EX,MA} && tb == hAmt{Float64,EX,MA}) || (tb == sAmt{Float64,EX,MA} && ta == hAmt{Float64,EX,MA})
-        
-        ta == sAmt{Float64,EX,MA} ? s = a : s = b
-        
-        tb == hAmt{Float64,EX,MA} ? h = b : h = a
-        
-        v = v_vdw(gas, s, h)
-        
-        T = T_vdw(gas, v, s)
-                
-        P = P_vdw(gas, T, v)
-        
-        u = u_vdw(gas, T, v)
-        
-        a = a_vdw(gas, T, v)
-        
-        cv = cv_vdw(gas)
-        
-        cp = cp_vdw(gas, T, v)
-        
-        γ = gamma(cp, cv)
-        
-        β = beta(gas, v, P)
-        
-        Ks = ks(gas, v, T)
-        
-        Kt = kt(gas, v, T)
-        
-        k = k_vdw(gas, v, T)
-        
-        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k]
-        
-        return St
-        
-    elseif (ta == sAmt{Float64,EX,MA} && tb == uAmt{Float64,EX,MA}) || (tb == sAmt{Float64,EX,MA} && ta == uAmt{Float64,EX,MA})
-        
-        ta == sAmt{Float64,EX,MA} ? s = a : s = b
-        
-        tb == uAmt{Float64,EX,MA} ? u = b : u = a
-        
-        v = v_vdw(gas, u, s)
-        
-        T = T_vdw(gas, v, s)
-                
-        P = P_vdw(gas, T, v)
-        
-        h = h_vdw(gas, T, v)
-        
-        a = a_vdw(gas, T, v)
-        
-        cv = cv_vdw(gas)
-        
-        cp = cp_vdw(gas, T, v)
-        
-        γ = gamma(cp, cv)
-        
-        β = beta(gas, v, P)
-        
-        Ks = ks(gas, v, T)
-        
-        Kt = kt(gas, v, T)
-        
-        k = k_vdw(gas, v, T)
-        
-        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k]
-        
-        return St
-        
-    elseif (ta == hAmt{Float64,EX,MA} && tb == uAmt{Float64,EX,MA}) || (tb == hAmt{Float64,EX,MA} && ta == uAmt{Float64,EX,MA})
-        
-        ta == hAmt{Float64,EX,MA} ? h = a : h = b
-        
-        tb == uAmt{Float64,EX,MA} ? u = b : u = a
-        
-        v = v_vdw(gas, u, h)
-        
-        T = T_vdw(gas, v, h)
-                
-        P = P_vdw(gas, T, v)
-        
-        s = s_vdw(gas, T, v)
-        
-        a = a_vdw(gas, T, v)
-        
-        cv = cv_vdw(gas)
-        
-        cp = cp_vdw(gas, T, v)
-        
-        γ = gamma(cp, cv)
-        
-        β = beta(gas, v, P)
-        
-        Ks = ks(gas, v, T)
-        
-        Kt = kt(gas, v, T)
-        
-        k = k_vdw(gas, v, T)
-        
-        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k]
-        
-        return St
-        
     else
         
-        println("ERROR, the arguments needs to be properties between P,T,v,h,u,s and the base for the intensive ones needs to be mass.")
+        println("ERROR, the arguments needs to be properties between P,T,v,h,u,s (except (u,h), (u,s) and (s,h)) and the base for the intensive ones needs to be mass.")
         
     end
     
@@ -1292,14 +1076,128 @@ end
 
 # Function to calculate the initial and final State of a process where there is a property that doesn't change
 
-function IsoProp(gas::vdWGas, iso::AMOUNTS{Float64,EX}, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol::Bool = false)
+function IsoProp(gas::vdWGas, a1::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, a2::AMOUNTS{Float64,EX},iso::String, Mol::Bool = false)
 
-    St1 = State(gas, iso, a, Mol)
+    St1 = State(gas, a1, b, Mol)
     
-    St2 = State(gas, iso, b, Mol)
+    iso == "P" ? St2 = State(gas, a2, St1[1], Mol) : 
+    
+    iso == "T" ? St2 = State(gas, a2, St1[2], Mol) : 
+    
+    iso == "v" ? St2 = State(gas, a2, St1[3], Mol) :
+    
+    iso == "u" ? St2 = State(gas, a2, St1[4], Mol) :
+    
+    iso == "h" ? St2 = State(gas, a2, St1[5], Mol) :
+    
+    iso == "s" ? St2 = State(gas, a2, St1[6], Mol) : println("The supported iso properties are P,T,v,u,h,s.")
     
     return hcat(St1, St2)
     
+end
+
+# Functions for tests
+
+function isoh(gas::vdWGas, T1::sysT{Float64,EX}, v1::vAmt{Float64,EX,MA}, T2::sysT{Float64,EX}, v2::vAmt{Float64,EX,MA})
+    
+    Tr1 = amt(Tr(Tc(gas), T1)).val
+    
+    Tr2 = amt(Tr(Tc(gas), T2)).val
+    
+    vr1 = amt(vr(vc(gas), v1)).val
+    
+    vr2 = amt(vr(vc(gas), v2)).val    
+    
+    test1 = ((8*ϕ(gas)/3)*(Tr2 - Tr1))
+    
+    test2 = 8*((Tr2*vr2/(3*vr2 - 1)) - (Tr1*vr1/(3*vr1 - 1)))
+    
+    test3 = 6*((1/vr2) - (1/vr1))
+    
+    test4 = test1 + test2 - test3
+    
+    return test4
+
+end
+
+function isou(gas::vdWGas, T1::sysT{Float64,EX}, v1::vAmt{Float64,EX,MA}, T2::sysT{Float64,EX}, v2::vAmt{Float64,EX,MA})
+    
+    Tr1 = amt(Tr(Tc(gas), T1)).val
+    
+    Tr2 = amt(Tr(Tc(gas), T2)).val
+    
+    vr1 = amt(vr(vc(gas), v1)).val
+    
+    vr2 = amt(vr(vc(gas), v2)).val 
+        
+    test1 = (8*ϕ(gas)/9)*(Tr2 - Tr1)
+        
+    test2 = ((1/vr2) - (1/vr1))
+        
+    test3 = test1 - test2
+    
+    return test3
+
+end
+    
+function isos(gas::vdWGas, T1::sysT{Float64,EX}, v1::vAmt{Float64,EX,MA}, T2::sysT{Float64,EX}, v2::vAmt{Float64,EX,MA})
+    
+    Tr1 = amt(Tr(Tc(gas), T1)).val
+    
+    Tr2 = amt(Tr(Tc(gas), T2)).val
+    
+    vr1 = amt(vr(vc(gas), v1)).val
+    
+    vr2 = amt(vr(vc(gas), v2)).val 
+        
+    test1 = (Tr2/Tr1)^(ϕ(gas))
+        
+    test2 = (3*vr1 - 1)/(3*vr2 - 1)
+        
+    test3 = test1 - test2
+    
+    return test3
+
+end
+    
+function isoP(gas::vdWGas, T1::sysT{Float64,EX}, v1::vAmt{Float64,EX,MA}, T2::sysT{Float64,EX}, v2::vAmt{Float64,EX,MA})
+    
+    Tr1 = amt(Tr(Tc(gas), T1)).val
+    
+    Tr2 = amt(Tr(Tc(gas), T2)).val
+    
+    vr1 = amt(vr(vc(gas), v1)).val
+    
+    vr2 = amt(vr(vc(gas), v2)).val 
+        
+    test1 = (Tr2/(3*vr2 - 1)) - (Tr1/(3*vr1 - 1))
+        
+    test2 = (3/8)*((1/(vr2^2)) - (1/(vr1^2)))
+        
+    test3 = test1 - test2
+    
+    return test3
+
+end
+    
+function isoT(gas::vdWGas, P1::sysP{Float64,EX}, v1::vAmt{Float64,EX,MA}, P2::sysP{Float64,EX}, v2::vAmt{Float64,EX,MA})
+    
+    Pr1 = amt(Pr(Pc(gas), P1)).val
+    
+    Pr2 = amt(Pr(Pc(gas), P2)).val
+    
+    vr1 = amt(vr(vc(gas), v1)).val
+    
+    vr2 = amt(vr(vc(gas), v2)).val 
+        
+    test1 = (Pr2 - Pr1)
+        
+    test2 = 3*((Pr1*vr1 - Pr2*vr2) + (((3*vr1 - 1)/(vr1^2)) - ((3*vr2 - 1)/(vr2^2))))
+        
+    test3 = test1 + test2
+    
+    return test3
+
 end
 
 end #module
