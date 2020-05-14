@@ -1200,4 +1200,8 @@ function isoT(gas::vdWGas, P1::sysP{Float64,EX}, v1::vAmt{Float64,EX,MA}, P2::sy
 
 end
 
+export State
+
+export IsoProp
+
 end #module
