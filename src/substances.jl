@@ -28,11 +28,11 @@ M(gas::vdWGas) = gas.M
 
 ϕ(gas::vdWGas) = gas.ϕ
 
-R(gas::vdWGas) = 8*(gas.Pc/gas.Tc)*(gas.vc/3)
+R_gas(gas::vdWGas) = 8*(gas.Pc/gas.Tc)*(gas.vc/3)
 
-α(gas::vdWGas) = (27/64)*(R(gas)^2)*(gas.Tc^2)/gas.Pc
+α(gas::vdWGas) = (27/64)*(R_gas(gas)^2)*(gas.Tc^2)/gas.Pc
 
-b(gas::vdWGas) = (R(gas)/8)*gas.Tc/gas.Pc
+b(gas::vdWGas) = (R_gas(gas)/8)*gas.Tc/gas.Pc
 
 export name
 
