@@ -1112,7 +1112,9 @@ function IsoProp(gas::vdWGas, a1::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, a
     
     iso == "s" ? St2 = State(gas, a2, St1[6]/M(gas), Mol) : println("The supported iso properties are P,T,v,u,h,s.")
     
-    return hcat(St1, St2)    
+    return hcat(St1, St2)  
+        
+    end
     
 end
 
