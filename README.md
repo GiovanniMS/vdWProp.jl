@@ -4,7 +4,7 @@ This package uses the van der Waals Equation of State to implement a function wi
 
 ## Base
 
-All the functions from this package are based in the EngThermBase.jl package, so all the properties required as arguments need to be in the [EngThermBase](https://github.com/JEngTherm/EngThermBase.jl) format, and all the notations used (including this documentation) are the same as well.
+All the functions from this package are based in the EngThermBase.jl package, so all the properties required as arguments need to be in the [EngThermBase](https://github.com/JEngTherm/EngThermBase.jl) format, and all the notations used (including this documentation) are the same as well. Also, the [EngTherm](https://github.com/JEngTherm/EngTherm.jl) page is very informative about the formats and notations.
 
 ## Constant Specific Heat at constant volume Hypothesis
 
