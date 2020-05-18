@@ -1077,6 +1077,8 @@ end
 # Function to calculate the initial and final State of a process where there is a property that doesn't change
 
 function IsoProp(gas::vdWGas, a1::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, a2::AMOUNTS{Float64,EX},iso::String, Mol::Bool = false)
+    
+    if Mol == false
 
     St1 = State(gas, a1, b, Mol)
     
@@ -1093,6 +1095,24 @@ function IsoProp(gas::vdWGas, a1::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, a
     iso == "s" ? St2 = State(gas, a2, St1[6], Mol) : println("The supported iso properties are P,T,v,u,h,s.")
     
     return hcat(St1, St2)
+        
+    else
+        
+    St1 = State(gas, a1, b, Mol)
+    
+    iso == "P" ? St2 = State(gas, a2, St1[1], Mol) : 
+    
+    iso == "T" ? St2 = State(gas, a2, St1[2], Mol) : 
+    
+    iso == "v" ? St2 = State(gas, a2, St1[3]/M(gas), Mol) :
+    
+    iso == "u" ? St2 = State(gas, a2, St1[4]/M(gas), Mol) :
+    
+    iso == "h" ? St2 = State(gas, a2, St1[5]/M(gas), Mol) :
+    
+    iso == "s" ? St2 = State(gas, a2, St1[6]/M(gas), Mol) : println("The supported iso properties are P,T,v,u,h,s.")
+    
+    return hcat(St1, St2)    
     
 end
 
