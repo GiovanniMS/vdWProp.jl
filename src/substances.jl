@@ -46,7 +46,7 @@ export M
 
 export ϕ
 
-export R
+export R_gas
 
 export α
 
