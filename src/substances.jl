@@ -16,7 +16,7 @@ struct vdWGas
     
 end
 
-nome(gas::vdWGas) = gas.nome
+name(gas::vdWGas) = gas.nome
 
 Pc(gas::vdWGas) = gas.Pc
 
@@ -28,11 +28,29 @@ M(gas::vdWGas) = gas.M
 
 ϕ(gas::vdWGas) = gas.ϕ
 
-R_vdw(gas::vdWGas) = 8*(gas.Pc/gas.Tc)*(gas.vc/3)
+R_gas(gas::vdWGas) = 8*(gas.Pc/gas.Tc)*(gas.vc/3)
 
 α(gas::vdWGas) = (27/64)*(gas.R_vdw^2)*(gas.Tc^2)/gas.Pc
 
 b(gas::vdWGas) = (R_vdw(gas)/8)*gas.Tc/gas.Pc
+
+export name
+
+export Pc
+
+export Tc
+
+export vc  
+
+export M
+
+export ϕ
+
+export R_gas
+
+export α
+
+export b
 
 # Substances
 
