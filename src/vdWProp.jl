@@ -664,7 +664,7 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         
         tb == sysT{Float64,EX} ? T = b : T = a
         
-        v = v_vdw(gas, P, T)[1]
+        v = v_vdw(gas, P, T)
         
         u = u_vdw(gas, T, v)[1]
         
@@ -672,7 +672,7 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         
         s = s_vdw(gas, T, v)[1]
         
-        Q = v_vdw(gas, P, T)[2]
+        Q = u_vdw(gas, T, v)[2]
         
         a = a_vdw(gas, T, v)
         
