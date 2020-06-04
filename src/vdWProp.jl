@@ -80,7 +80,91 @@ function FindQ(a::_Amt{Float64,EX}, b::_Amt{Float64,EX}, aArray1::Array, aArray2
     
 end
 
-#Function to find the real root in the array that will be the result for the 3 degree polinomial
+# Function to find the point in the array that a property gets the given quality
+
+function FindWithQ(pr::Number, Q::Number, Array1::Array, Array2::Array)
+    
+    if 0 <= Q <= 1
+    
+        i = 1
+
+        Eq(i) = round(Q, digits = 3) - round((pr - Array1[i])/(Array2[i] - Array1[i]), digits = 3)
+
+        i1 = Integer(round((points/2), digits = 0))
+
+        i2 = Integer(round((points/3), digits = 0))
+
+        i3 = Integer(round((points/4), digits = 0))
+
+        i4 = Integer(round((points/5), digits = 0))
+
+        i5 = Integer(round((points/10), digits = 0))
+
+        i6 = Integer(round((points/100), digits = 0))
+
+        i7 = Integer(round((points/1000), digits = 0))
+
+        while i <= points
+
+            if Eq(i) == 0
+
+                break
+                
+            elseif abs(Eq(i)) < abs(Eq(i + 1))
+                    
+                break
+
+            else
+
+                if (i + points/2) < points && Eq(i + i1)*Eq(i) > 0
+
+                    i = (i + i1)
+
+                elseif (i + points/3) < points && Eq(i + i2)*Eq(i) > 0
+
+                    i = (i + i2)  
+
+                elseif (i + points/4) < points && Eq(i + i3)*Eq(i) > 0
+
+                    i = (i + i3)  
+
+                elseif (i + points/5) < points && Eq(i + i4)*Eq(i) > 0
+
+                    i = (i + i4)  
+
+                elseif (i + points/10) < points && Eq(i + i5)*Eq(i) > 0
+
+                    i = (i + i5)  
+
+                elseif (i + points/100) < points && Eq(i + i6)*Eq(i) > 0
+
+                    i = (i + i6)  
+
+                elseif (i + points/1000) < points && Eq(i + i7)*Eq(i) > 0
+
+                    i = (i + i7)  
+
+                else
+
+                    i = i + 1
+
+                end
+                
+            end
+
+        end
+
+        return i
+        
+    else
+        
+        println("Quality must be between 0 and 1")
+        
+    end
+    
+end
+
+# Function to find the real root in the array that will be the result for the 3 degree polinomial
 
 function ImVerification(a::Array)
     
@@ -570,6 +654,128 @@ function v_vdw(gas::vdWGas, T::sysT{Float64,EX}, h::hAmt{Float64,EX,MA}, Mol::Bo
     
 end
 
+# Pairs with only u/s/h
+
+function v_vdw(gas::vdWGas, u::uAmt{Float64,EX,MA}, s::sAmt{Float64,EX,MA}, Mol::Bool = false)
+    
+    FQ = FindQ(sr(s, Pc(gas), vc(gas), Tc(gas)), ur(u, Pc(gas), vc(gas)), Domelist(ϕ(gas), "sr1"), Domelist(ϕ(gas), "sr2"), Domelist(ϕ(gas), "ur1"), Domelist(ϕ(gas), "ur2"))
+    
+    if FQ == "out"
+        
+        uroots = amt(ur(u, Pc(gas), vc(gas))).val
+        
+        sroots = amt(sr(s, Pc(gas), vc(gas), Tc(gas))).val
+        
+        f(vr) = (8*ϕ(gas)/3)*(exp((3/(8*ϕ(gas)))*(sroots + C2())))*((3*vr - 1)^(-1/ϕ(gas))) - uroots - (3/vr) + C1()
+    
+        vrf1 = find_zero(f,0.5,Order1()) #metodo da secante
+        
+        Mol ? vrf2 = vrf1*M(gas) : vrf2 = vrf1 
+        
+        return [vc(gas)*vrf2, "out"]         
+        
+    else
+        
+        Q = FQ[1]
+        
+        slr = AMT(FQ[2])
+        
+        svr = ((sr(s, Pc(gas), vc(gas), Tc(gas)) - slr)/Q) + slr
+        
+        vlr = vr1list[findclosest(Domelist(ϕ(gas), "sr1"), slr, (10^-3))]
+        
+        vvr = vr2list[findclosest(Domelist(ϕ(gas), "sr2"), svr, (10^-3))]
+        
+        vrf1 = AMT(vlr) + Q*(vvr - vlr)
+        
+        Mol ? vrf2 = vrf1*M(gas) : vrf2 = vrf1 
+        
+        return [vc(gas)*vrf2, Q]    
+        
+    end
+    
+end
+
+function v_vdw(gas::vdWGas, u::uAmt{Float64,EX,MA}, h::hAmt{Float64,EX,MA}, Mol::Bool = false)
+    
+    FQ = FindQ(hr(h, Pc(gas), vc(gas)), ur(u, Pc(gas), vc(gas)), Domelist(ϕ(gas), "hr1"), Domelist(ϕ(gas), "hr2"), Domelist(ϕ(gas), "ur1"), Domelist(ϕ(gas), "ur2"))
+    
+    if FQ == "out"
+        
+        uroots = amt(ur(u, Pc(gas), vc(gas))).val
+        
+        hroots = amt(hr(h, Pc(gas), vc(gas))).val
+        
+        vrf0 = roots(Poly([-3, (-uroots + (9/ϕ(gas)) + hroots - 9), (3*uroots + (3*uroots/ϕ(gas)) - (3*C1()/ϕ(gas)) - 3*hroots)]))
+        
+        vrf1 = vrf0[2]
+        
+        Mol ? vrf2 = vrf1*M(gas) : vrf2 = vrf1 
+        
+        return [vc(gas)*vrf2, "out"]        
+        
+    else
+        
+        Q = FQ[1]
+        
+        hlr = AMT(FQ[2])
+        
+        hvr = ((hr(h, Pc(gas), vc(gas)) - hlr)/Q) + hlr
+        
+        vlr = vr1list[findclosest(Domelist(ϕ(gas), "hr1"), hlr, (10^-3))]
+        
+        vvr = vr2list[findclosest(Domelist(ϕ(gas), "hr2"), hvr, (10^-3))]
+        
+        vrf1 = AMT(vlr) + Q*(vvr - vlr)
+        
+        Mol ? vrf2 = vrf1*M(gas) : vrf2 = vrf1 
+        
+        return [vc(gas)*vrf2, Q]   
+        
+    end
+    
+end
+
+function v_vdw(gas::vdWGas, s::sAmt{Float64,EX,MA}, h::hAmt{Float64,EX,MA}, Mol::Bool = false)
+    
+    FQ = FindQ(sr(s, Pc(gas), vc(gas), Tc(gas)), hr(h, Pc(gas), vc(gas)), Domelist(ϕ(gas), "sr1"), Domelist(ϕ(gas), "sr2"), Domelist(ϕ(gas), "hr1"), Domelist(ϕ(gas), "hr2"))
+    
+    if FQ == "out"
+        
+        hroots = amt(hr(h, Pc(gas), vc(gas))).val
+        
+        sroots = amt(sr(s, Pc(gas), vc(gas), Tc(gas))).val
+        
+        f(vr) = ((8*ϕ(gas)/3) + (8*vr/(3*vr - 1)))*exp((3/(8*ϕ(gas)))*(sroots + C2()))*((3*vr - 1)^(-1/ϕ(gas))) - hroots + C1() - (6/vr)
+    
+        vrf1 = find_zero(f,0.5,Order1()) #metodo da secante
+        
+        Mol ? vrf2 = vrf1*M(gas) : vrf2 = vrf1 
+        
+        return [vc(gas)*vrf2, "out"] 
+        
+    else
+        
+        Q = FQ[1]
+        
+        slr = AMT(FQ[2])
+        
+        svr = ((sr(s, Pc(gas), vc(gas), Tc(gas)) - slr)/Q) + slr
+        
+        vlr = vr1list[findclosest(Domelist(ϕ(gas), "sr1"), slr, (10^-3))]
+        
+        vvr = vr2list[findclosest(Domelist(ϕ(gas), "sr2"), svr, (10^-3))]
+        
+        vrf1 = AMT(vlr) + Q*(vvr - vlr)
+        
+        Mol ? vrf2 = vrf1*M(gas) : vrf2 = vrf1 
+        
+        return [vc(gas)*vrf2, Q]      
+        
+    end
+    
+end
+
 # functions of properties not given as arguments
 
 ar(gas::vdWGas, a::aAmt{Float64,EX,MA}) = a/(Pc(gas)*vc(gas))
@@ -650,6 +856,104 @@ kt(gas::vdWGas, v::vAmt{Float64,EX,MA}, T::sysT{Float64,EX}) = ks(gas, v, T)*ϕ(
 
 k_vdw(gas::vdWGas, v::vAmt{Float64,EX,MA}, T::sysT{Float64,EX}) = 6*(4*Tr(Tc(gas), T)*ϕ(gas)*(vr(vc(gas), v)^3) + 4*Tr(Tc(gas), T)*(vr(vc(gas), v)^3) - 9*ϕ(gas)*(vr(vc(gas), v)^2) + 6*ϕ(gas)*vr(vc(gas), v) - AMT(ϕ(gas)))/(ϕ(gas)*(3*vr(vc(gas), v) - AMT(1))*(8*Tr(Tc(gas), T)*(vr(vc(gas), v)^2) - 9*vr(vc(gas), v) + AMT(3)))
 
+# Function with Quality as Argument
+
+function v_vdw(gas::vdWGas, P::sysP{Float64,EX}, Q::_Amt{Float64,EX}, Mol::Bool = false)
+    
+    if 0 <= amt(Q).val <= 1
+   
+        SatP = findclosest(Pr_sat_list, Pr(Pc(gas), P), (10^-3))
+
+        vrl = vr1list[SatP]
+
+        vrv = vr2list[SatP]
+
+        vr = AMT(vrl) + Q*(vrv - vrl)
+
+        Mol ? vrf = vr*M(gas) : vrf = vr
+
+        return vrf*vc(gas)
+        
+    else
+        
+        println("Q must be between 0 and 1")
+        
+    end
+    
+end
+
+function v_vdw(gas::vdWGas, T::sysT{Float64,EX}, Q::_Amt{Float64,EX}, Mol::Bool = false)
+    
+    if 0 <= amt(Q).val <= 1
+        
+        SatT = findclosest(Tr_sat_list, Tr(Tc(gas), T), (10^-3))
+
+        vrl = vr1list[SatT]
+
+        vrv = vr2list[SatT]
+
+        vr = AMT(vrl) + Q*(vrv - vrl)
+
+        Mol ? vrf = vr*M(gas) : vrf = vr
+
+        return vrf*vc(gas)
+        
+    else
+        
+        println("Q must be between 0 and 1")
+        
+    end
+    
+end
+
+function T_vdw(gas::vdWGas, v::vAmt{Float64,EX,MA}, Q::_Amt{Float64,EX})
+   
+    vre = amt(vr(vc(gas), v)).val
+    
+    Q = amt(Q).val
+    
+    Point = FindWithQ(vre, Q, vr1list, vr2list)
+        
+    return Tr_sat_list[Point]*Tc(gas)
+    
+end
+    
+function T_vdw(gas::vdWGas, u::uAmt{Float64,EX,MA}, Q::_Amt{Float64,EX})
+   
+    ure = amt(ur(u, Pc(gas), vc(gas))).val
+    
+    Q = amt(Q).val
+    
+    Point = FindWithQ(ure, Q, Domelist(ϕ(gas), "ur1"), Domelist(ϕ(gas), "ur2"))
+        
+    return Tr_sat_list[Point]*Tc(gas)
+    
+end
+    
+function T_vdw(gas::vdWGas, h::hAmt{Float64,EX,MA}, Q::_Amt{Float64,EX})
+   
+    hre = amt(hr(h, Pc(gas), vc(gas))).val
+    
+    Q = amt(Q).val
+    
+    Point = FindWithQ(hre, Q, Domelist(ϕ(gas), "hr1"), Domelist(ϕ(gas), "hr2"))
+        
+    return Tr_sat_list[Point]*Tc(gas)
+    
+end
+
+function T_vdw(gas::vdWGas, s::sAmt{Float64,EX,MA}, Q::_Amt{Float64,EX})
+   
+    sre = amt(sr(s, Pc(gas), vc(gas), Tc(gas))).val
+    
+    Q = amt(Q).val
+    
+    Point = FindWithQ(sre, Q, Domelist(ϕ(gas), "sr1"), Domelist(ϕ(gas), "sr2"))
+        
+    return Tr_sat_list[Point]*Tc(gas)
+    
+end
+    
 # with all the possible pairs implemented, the next step is implement a function that gets all the six properties when a random pair is given
 
 function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol::Bool = false)
@@ -1090,9 +1394,333 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         
         return St
         
+    elseif (ta == sAmt{Float64,EX,MA} && tb == hAmt{Float64,EX,MA}) || (tb == sAmt{Float64,EX,MA} && ta == hAmt{Float64,EX,MA})
+        
+        ta == sAmt{Float64,EX,MA} ? s = a : s = b
+        
+        tb == hAmt{Float64,EX,MA} ? h = b : h = a
+        
+        v = v_vdw(gas, s, h)[1]
+        
+        T = T_vdw(gas, v, s)
+                
+        P = P_vdw(gas, T, v)
+        
+        u = u_vdw(gas, T, v)[1]
+        
+        Q = v_vdw(gas, s, h)[2]
+        
+        a = a_vdw(gas, T, v)
+        
+        cv = cv_vdw(gas)
+        
+        cp = cp_vdw(gas, T, v)
+        
+        γ = gamma(cp, cv)
+        
+        β = beta(gas, v, P)
+        
+        Ks = ks(gas, v, T)
+        
+        Kt = kt(gas, v, T)
+        
+        k = k_vdw(gas, v, T)
+        
+        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k, Q] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k, Q]
+        
+        return St
+        
+    elseif (ta == sAmt{Float64,EX,MA} && tb == uAmt{Float64,EX,MA}) || (tb == sAmt{Float64,EX,MA} && ta == uAmt{Float64,EX,MA})
+        
+        ta == sAmt{Float64,EX,MA} ? s = a : s = b
+        
+        tb == uAmt{Float64,EX,MA} ? u = b : u = a
+        
+        v = v_vdw(gas, u, s)[1]
+        
+        T = T_vdw(gas, v, s)
+                
+        P = P_vdw(gas, T, v)
+        
+        h = h_vdw(gas, T, v)[1]
+        
+        Q = v_vdw(gas, u, s)[2]
+        
+        a = a_vdw(gas, T, v)
+        
+        cv = cv_vdw(gas)
+        
+        cp = cp_vdw(gas, T, v)
+        
+        γ = gamma(cp, cv)
+        
+        β = beta(gas, v, P)
+        
+        Ks = ks(gas, v, T)
+        
+        Kt = kt(gas, v, T)
+        
+        k = k_vdw(gas, v, T)
+        
+        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k, Q] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k, Q]
+        
+        return St
+        
+    elseif (ta == hAmt{Float64,EX,MA} && tb == uAmt{Float64,EX,MA}) || (tb == hAmt{Float64,EX,MA} && ta == uAmt{Float64,EX,MA})
+        
+        ta == hAmt{Float64,EX,MA} ? h = a : h = b
+        
+        tb == uAmt{Float64,EX,MA} ? u = b : u = a
+        
+        v = v_vdw(gas, u, h)[1]
+        
+        T = T_vdw(gas, v, h)
+                
+        P = P_vdw(gas, T, v)
+        
+        s = s_vdw(gas, T, v)[1]
+        
+        Q = v_vdw(gas, u, h)[2]
+        
+        a = a_vdw(gas, T, v)
+        
+        cv = cv_vdw(gas)
+        
+        cp = cp_vdw(gas, T, v)
+        
+        γ = gamma(cp, cv)
+        
+        β = beta(gas, v, P)
+        
+        Ks = ks(gas, v, T)
+        
+        Kt = kt(gas, v, T)
+        
+        k = k_vdw(gas, v, T)
+        
+        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k, Q] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k, Q]
+        
+        return St
+        
+    elseif (ta == sysT{Float64,EX} && tb == _Amt{Float64,EX}) || (tb == sysT{Float64,EX} && ta == _Amt{Float64,EX})
+        
+        ta == sysT{Float64,EX} ? T = a : T = b
+        
+        tb == _Amt{Float64,EX} ? Q = b : Q = a
+        
+        v = v_vdw(gas, T, Q)
+                
+        P = P_vdw(gas, T, v)
+        
+        u = u_vdw(gas, T, v)[1]
+        
+        h = h_vdw(gas, T, v)[1]
+        
+        s = s_vdw(gas, T, v)[1]
+        
+        a = a_vdw(gas, T, v)
+        
+        cv = cv_vdw(gas)
+        
+        cp = cp_vdw(gas, T, v)
+        
+        γ = gamma(cp, cv)
+        
+        β = beta(gas, v, P)
+        
+        Ks = ks(gas, v, T)
+        
+        Kt = kt(gas, v, T)
+        
+        k = k_vdw(gas, v, T)
+        
+        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k, Q] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k, Q]
+        
+        return St
+        
+    elseif (ta == sysP{Float64,EX} && tb == _Amt{Float64,EX}) || (tb == sysP{Float64,EX} && ta == _Amt{Float64,EX})
+        
+        ta == sysP{Float64,EX} ? P = a : P = b
+        
+        tb == _Amt{Float64,EX} ? Q = b : Q = a
+        
+        v = v_vdw(gas, P, Q)
+                
+        T = T_vdw(gas, P, v)
+        
+        u = u_vdw(gas, T, v)[1]
+        
+        h = h_vdw(gas, T, v)[1]
+        
+        s = s_vdw(gas, T, v)[1]
+        
+        a = a_vdw(gas, T, v)
+        
+        cv = cv_vdw(gas)
+        
+        cp = cp_vdw(gas, T, v)
+        
+        γ = gamma(cp, cv)
+        
+        β = beta(gas, v, P)
+        
+        Ks = ks(gas, v, T)
+        
+        Kt = kt(gas, v, T)
+        
+        k = k_vdw(gas, v, T)
+        
+        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k, Q] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k, Q]
+        
+        return St
+        
+    elseif (ta == vAmt{Float64,EX,MA} && tb == _Amt{Float64,EX}) || (tb == vAmt{Float64,EX,MA} && ta == _Amt{Float64,EX})
+        
+        ta == vAmt{Float64,EX,MA} ? v = a : v = b
+        
+        tb == _Amt{Float64,EX} ? Q = b : Q = a
+        
+        T = T_vdw(gas, v, Q)
+                
+        P = P_vdw(gas, T, v)
+        
+        u = u_vdw(gas, T, v)[1]
+        
+        h = h_vdw(gas, T, v)[1]
+        
+        s = s_vdw(gas, T, v)[1]
+        
+        a = a_vdw(gas, T, v)
+        
+        cv = cv_vdw(gas)
+        
+        cp = cp_vdw(gas, T, v)
+        
+        γ = gamma(cp, cv)
+        
+        β = beta(gas, v, P)
+        
+        Ks = ks(gas, v, T)
+        
+        Kt = kt(gas, v, T)
+        
+        k = k_vdw(gas, v, T)
+        
+        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k, Q] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k, Q]
+        
+        return St
+        
+    elseif (ta == uAmt{Float64,EX,MA} && tb == _Amt{Float64,EX}) || (tb == uAmt{Float64,EX,MA} && ta == _Amt{Float64,EX})
+        
+        ta == uAmt{Float64,EX,MA} ? u = a : u = b
+        
+        tb == _Amt{Float64,EX} ? Q = b : Q = a
+        
+        T = T_vdw(gas, u, Q)
+        
+        v = v_vdw(gas, T, u)[1]
+                
+        P = P_vdw(gas, T, v)
+        
+        h = h_vdw(gas, T, v)[1]
+        
+        s = s_vdw(gas, T, v)[1]
+        
+        a = a_vdw(gas, T, v)
+        
+        cv = cv_vdw(gas)
+        
+        cp = cp_vdw(gas, T, v)
+        
+        γ = gamma(cp, cv)
+        
+        β = beta(gas, v, P)
+        
+        Ks = ks(gas, v, T)
+        
+        Kt = kt(gas, v, T)
+        
+        k = k_vdw(gas, v, T)
+        
+        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k, Q] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k, Q]
+        
+        return St
+        
+    elseif (ta == hAmt{Float64,EX,MA} && tb == _Amt{Float64,EX}) || (tb == hAmt{Float64,EX,MA} && ta == _Amt{Float64,EX})
+        
+        ta == hAmt{Float64,EX,MA} ? h = a : h = b
+        
+        tb == _Amt{Float64,EX} ? Q = b : Q = a
+        
+        T = T_vdw(gas, h, Q)
+        
+        v = v_vdw(gas, T, h)[1]
+                
+        P = P_vdw(gas, T, v)
+        
+        u = u_vdw(gas, T, v)[1]
+        
+        s = s_vdw(gas, T, v)[1]
+        
+        a = a_vdw(gas, T, v)
+        
+        cv = cv_vdw(gas)
+        
+        cp = cp_vdw(gas, T, v)
+        
+        γ = gamma(cp, cv)
+        
+        β = beta(gas, v, P)
+        
+        Ks = ks(gas, v, T)
+        
+        Kt = kt(gas, v, T)
+        
+        k = k_vdw(gas, v, T)
+        
+        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k, Q] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k, Q]
+        
+        return St
+        
+    elseif (ta == sAmt{Float64,EX,MA} && tb == _Amt{Float64,EX}) || (tb == sAmt{Float64,EX,MA} && ta == _Amt{Float64,EX})
+        
+        ta == sAmt{Float64,EX,MA} ? s = a : s = b
+        
+        tb == _Amt{Float64,EX} ? Q = b : Q = a
+        
+        T = T_vdw(gas, s, Q)
+        
+        v = v_vdw(gas, T, s)[1]
+                
+        P = P_vdw(gas, T, v)
+        
+        h = h_vdw(gas, T, v)[1]
+        
+        u = u_vdw(gas, T, v)[1]
+        
+        a = a_vdw(gas, T, v)
+        
+        cv = cv_vdw(gas)
+        
+        cp = cp_vdw(gas, T, v)
+        
+        γ = gamma(cp, cv)
+        
+        β = beta(gas, v, P)
+        
+        Ks = ks(gas, v, T)
+        
+        Kt = kt(gas, v, T)
+        
+        k = k_vdw(gas, v, T)
+        
+        Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k, Q] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k, Q]
+        
+        return St
+        
     else
         
-        println("ERROR, the arguments needs to be properties between P,T,v,h,u,s (except (u,h), (u,s) and (s,h)) and the base for the intensive ones needs to be mass.")
+        println("ERROR, the arguments needs to be properties between P,T,v,h,u,s,Q and the base for the intensive ones needs to be mass.")
         
     end
     

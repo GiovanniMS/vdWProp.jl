@@ -4,7 +4,7 @@ This package uses the van der Waals Equation of State to implement a function wi
 
 ## Base
 
-All the functions from this package are based in the EngThermBase.jl package, so all the properties required as arguments need to be in the [EngThermBase](https://github.com/JEngTherm/EngThermBase.jl) format, and all the notations used (including this documentation) are the same as well. Also, the [EngTherm](https://github.com/JEngTherm/EngTherm.jl) page is very informative about the formats and notations.
+All the functions from this package are based in the EngThermBase.jl package, so all the properties required as arguments need to be in the [EngThermBase](https://github.com/JEngTherm/EngThermBase.jl) format, and all the notations used (including the notation used in this documentation) are the same as well. Also, the [EngTherm](https://github.com/JEngTherm/EngTherm.jl) page is very informative about the formats and notations. As an example, to use a pressure of 200 kPa as an argument, it will be in the format `P(200)`. 
 
 ## Constant Specific Heat at constant volume Hypothesis
 
@@ -77,7 +77,7 @@ vdWProp.vdWGas("Neopentane", T₆₄: 433.8 K, P₆₄: 3196 kPa, v₆₄: 0.004
 
 The substance state is calculated using the State function, this function receives as arguments, in this order,  a substance and two properties, and to calculate the state in the molar base, it needs a boolean argument, true, in the end. Also, because the arguments are in the [EngThermBase](https://github.com/JEngTherm/EngThermBase.jl) format, a line `using EngThermBase` is needed.
 
-The supported pairs of properties are any pair containing two of the properties: P, T, v, u, h, s. But excluding pairs using only u, h, s, because the absolute valor of these properties doesn't have real meaning, only its variation. The pairs including only one of these properties are useful in the calculation of processes with u, h, or s constant. The intensive properties used as arguments always needs to be in the mass base format.
+The supported pairs of properties are any pair containing two of the properties: P, T, v, u, h, s, Q. The quality (Q) don't have a specific format in the [EngThermBase](https://github.com/JEngTherm/EngThermBase.jl) package, to use it as an argument it needs to be in the format `AMT(Q)` where Q is the numerical value of the quality. The intensive properties used as arguments always needs to be in the mass base format.
 
 This function gives as result a 15x1 array whose terms are, in this order, Pressure, Temperature, Volume, Internal Energy, Enthalpy, Entropy, Helmholtz Specific Energy, Specific Heat at constant volume, Specific Heat at constant pressure, Specific Heat Ratio, Isothermal Compressibility, Isentropic Compressibility, Coefficient of Volume Expansion, Isentropic Expansion Exponent, and Quality (or the String "out" when outside of the saturation dome), like it can be seen in the example below.
 
