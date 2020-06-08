@@ -666,7 +666,7 @@ function v_vdw(gas::vdWGas, u::uAmt{Float64,EX,MA}, s::sAmt{Float64,EX,MA}, Mol:
         
         sroots = amt(sr(s, Pc(gas), vc(gas), Tc(gas))).val
         
-        f(vr) = (8*ϕ(gas)/3)*(exp((3/(8*ϕ(gas)))*(sroots + C2())))*((3*vr - 1)^(-1/ϕ(gas))) - uroots - (3/vr) + C1()
+        f(vr) = (8*ϕ(gas)/3)*(exp((3/(8*ϕ(gas)))*(sroots + C2)))*((3*vr - 1)^(-1/ϕ(gas))) - uroots - (3/vr) + C1
     
         vrf1 = find_zero(f,0.5,Order1()) #metodo da secante
         
@@ -706,7 +706,7 @@ function v_vdw(gas::vdWGas, u::uAmt{Float64,EX,MA}, h::hAmt{Float64,EX,MA}, Mol:
         
         hroots = amt(hr(h, Pc(gas), vc(gas))).val
         
-        vrf0 = roots(Poly([-3, (-uroots + (9/ϕ(gas)) + hroots - 9), (3*uroots + (3*uroots/ϕ(gas)) - (3*C1()/ϕ(gas)) - 3*hroots)]))
+        vrf0 = roots(Poly([-3, (-uroots + (9/ϕ(gas)) + hroots - 9), (3*uroots + (3*uroots/ϕ(gas)) - (3*C1/ϕ(gas)) - 3*hroots)]))
         
         vrf1 = vrf0[2]
         
@@ -746,7 +746,7 @@ function v_vdw(gas::vdWGas, s::sAmt{Float64,EX,MA}, h::hAmt{Float64,EX,MA}, Mol:
         
         sroots = amt(sr(s, Pc(gas), vc(gas), Tc(gas))).val
         
-        f(vr) = ((8*ϕ(gas)/3) + (8*vr/(3*vr - 1)))*exp((3/(8*ϕ(gas)))*(sroots + C2()))*((3*vr - 1)^(-1/ϕ(gas))) - hroots + C1() - (6/vr)
+        f(vr) = ((8*ϕ(gas)/3) + (8*vr/(3*vr - 1)))*exp((3/(8*ϕ(gas)))*(sroots + C2))*((3*vr - 1)^(-1/ϕ(gas))) - hroots + C1 - (6/vr)
     
         vrf1 = find_zero(f,0.5,Order1()) #metodo da secante
         
