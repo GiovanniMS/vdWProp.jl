@@ -54,6 +54,8 @@ export b
 
 # Substances
 
+Air = vdWGas("Air",T(132.5), P(3.77*(1000)), v(0.0883/28.97),  (N(1)^-1)*28.97, (7/2))
+
 AlBr3 = vdWGas("Aluminium bromide",T(763), P(2.89*(1000)), v(310*(10^-3)/266.69),  (N(1)^-1)*266.69, (7/2))
 
 AlCl3 = vdWGas("Aluminium chloride",T(620), P(2.63*(1000)), v(257*(10^-3)/133.34),  (N(1)^-1)*133.34, (7/2))
