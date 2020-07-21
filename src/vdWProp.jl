@@ -22,41 +22,9 @@ function FindQ(a::_Amt{Float64,EX}, b::_Amt{Float64,EX}, aArray1::Array, aArray2
         
         y = ((a - AMT(aArray1[i]))/(AMT(aArray2[i] - aArray1[i]))) - ((b - AMT(bArray1[i]))/(AMT(bArray2[i] - bArray1[i])))
         
-        Q2 = ((a - AMT(aArray1[i + 1]))/(AMT(aArray2[i + 1] - aArray1[i + 1])))
-        
-        y2 = ((a - AMT(aArray1[i + 1]))/(AMT(aArray2[i + 1] - aArray1[i + 1]))) - ((b - AMT(bArray1[i + 1]))/(AMT(bArray2[i + 1] - bArray1[i + 1])))
-        
         if abs(amt(y).val) < 0.001 && AMT(0) < Q < AMT(1) 
             
             return [Q, aArray1[i]] 
-            
-        elseif ((y*y2 < AMT(0)) && (AMT(0) < Q < AMT(1) || AMT(0) < Q2 < AMT(1))) && i < points
-            
-            if (AMT(0) < Q < AMT(1)) && (AMT(0) < Q2 < AMT(1))
-                
-                if abs(amt(y).val) > abs(amt(y2).val)
-                    
-                    return [Q2, aArray1[i + 1]]
-                    
-                else
-                    
-                    return [Q, aArray1[i]]
-                    
-                end
-                
-            else
-                
-                if AMT(0) < Q < AMT(1)
-                    
-                    return [Q, aArray1[i]] 
-                
-                else
-                
-                    return [Q2, aArray1[i + 1]] 
-                    
-                end
-                
-            end
             
         else
             
