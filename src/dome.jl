@@ -20,7 +20,13 @@ Pr_sat(V1,V2) = (27*(-V1 - V2 + (V1 + 1)*(V2 + 1) - 2)) / (((V1 + 1)^2)*((V2 + 1
 
 points = 10000
 
-℘list = range(0.0001, stop = 0.95, length = points)
+℘list0 = range(0.0001, stop = 0.95, length = points)
+
+part1 = [10e-100, 10e-90, 10e-80, 10e-70, 10e-60, 10e-50, 10e-40, 10e-30, 10e-20, 50e-20, 10e-10, 50e-10 ,10e-9, 50e-9,10e-8, 50e-8,10e-7, 50e-7,10e-6, 50e-6]
+
+℘list = vcat(part1, ℘list0)
+
+points = length(℘list)
 
 V2list = []
 
