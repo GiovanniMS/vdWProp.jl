@@ -30,11 +30,11 @@ function FindQ(a::_Amt{Float64,EX}, b::_Amt{Float64,EX}, aArray1::Array, aArray2
             
             return [Q, aArray1[i]] 
             
-        elseif (y*y2 < 0) && (AMT(0) < Q < AMT(1) || AMT(0) < Q2 < AMT(1))
+        elseif (y*y2 < AMT(0)) && (AMT(0) < Q < AMT(1) || AMT(0) < Q2 < AMT(1))
             
             if (AMT(0) < Q < AMT(1)) && (AMT(0) < Q2 < AMT(1))
                 
-                if abs(y) > abs(y2)
+                if abs(amt(y).val) > abs(amt(y2).val)
                     
                     return [Q2, aArray1[i + 1]]
                     
