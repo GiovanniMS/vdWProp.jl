@@ -18,15 +18,15 @@ function FindQ(a::_Amt{Float64,EX}, b::_Amt{Float64,EX}, aArray1::Array, aArray2
     
     while i <= points
         
-        Q = ((a - AMT(aArray1[i]))/(AMT(aArray2[i] - aArray1[i])))
+        #Q = ((a - AMT(aArray1[i]))/(AMT(aArray2[i] - aArray1[i])))
         
         y = ((a - AMT(aArray1[i]))/(AMT(aArray2[i] - aArray1[i]))) - ((b - AMT(bArray1[i]))/(AMT(bArray2[i] - bArray1[i])))
         
-        if abs(amt(y).val) < 0.001 && AMT(0) < Q < AMT(1) 
+        #if abs(amt(y).val) < 0.001 && AMT(0) < Q < AMT(1) 
             
-            return [Q, aArray1[i]] 
+        #    return [Q, aArray1[i]] 
             
-        else
+        #else
             
             yt(j) = ((a - AMT(aArray1[j]))/(AMT(aArray2[j] - aArray1[j]))) - ((b - AMT(bArray1[j]))/(AMT(bArray2[j] - bArray1[j])))
             
@@ -70,6 +70,8 @@ function FindQ(a::_Amt{Float64,EX}, b::_Amt{Float64,EX}, aArray1::Array, aArray2
                     
                 if abs(amt(y).val) < abs(amt(yt(i + 1)).val)
                 
+                    Q = ((a - AMT(aArray1[i]))/(AMT(aArray2[i] - aArray1[i])))
+                
                     return [Q, aArray1[i]] 
                     
                 else
@@ -86,7 +88,7 @@ function FindQ(a::_Amt{Float64,EX}, b::_Amt{Float64,EX}, aArray1::Array, aArray2
                 
             end
             
-        end
+        #end
         
     end
     
@@ -102,7 +104,7 @@ function FindWithQ(pr::Number, Q::Number, Array1::Array, Array2::Array)
     
         i = 1
 
-        Eq(i) = round(Q, digits = 3) - round((pr - Array1[i])/(Array2[i] - Array1[i]), digits = 3)
+        Eq(i) = Q - (pr - Array1[i])/(Array2[i] - Array1[i])
 
         i1 = Integer(round((points/2), digits = 0))
 
@@ -226,17 +228,17 @@ function findclosest(array::Array,x::AMOUNTS{Float64,EX},p::Number)
     
         y = x - array[i]
         
-        if maximum(array) < x || minimum(array) > x
-            
-            return -1
-    
-        elseif abs(y) < p
-            
-            return i
-            
-        elseif i > 1 && abs(y) > abs(x - array[i - 1])
+        if i > 1 && abs(y) > abs(x - array[i - 1])
             
             return i - 1
+        
+        #if abs(y) < p
+            
+            #return i
+        
+        elseif maximum(array) < x || minimum(array) > x
+            
+            return -1
             
         end
         
@@ -720,7 +722,7 @@ function v_vdw(gas::vdWGas, u::uAmt{Float64,EX,MA}, h::hAmt{Float64,EX,MA}, Mol:
         
         hroots = amt(hr(h, Pc(gas), vc(gas))).val
         
-        vrf0 = roots(Poly([-3, (-uroots + (9/ϕ(gas)) + hroots - 9), (3*uroots + (3*uroots/ϕ(gas)) - (3*C1/ϕ(gas)) - 3*hroots)]))
+        vrf0 = roots(Poly([ϕ(gas), ((-ϕ(gas)/3)*(uroots - C1) + 3*ϕ(gas) + 3 + (ϕ(gas)/3)*(hroots - C1) - 6*ϕ(gas)), ((ϕ(gas) + 1)*(uroots - C1) - ϕ(gas)*(hroots - C1))]))
         
         vrf1 = vrf0[2]
         
