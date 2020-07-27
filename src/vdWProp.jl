@@ -12,15 +12,15 @@ include("substances.jl")
 
 # function to find the quality of a saturated mixture when P and T are not given, and also find if the pair is inside or outside of the dome.
 
-function FindQ(a::_Amt{Float64,EX}, b::_Amt{Float64,EX}, aArray1::Array, aArray2::Array, bArray1::Array, bArray2::Array)
+#function FindQ(a::_Amt{Float64,EX}, b::_Amt{Float64,EX}, aArray1::Array, aArray2::Array, bArray1::Array, bArray2::Array)
 
-    i = 1
+#    i = 1
     
-    while i <= points
+#    while i <= points
         
         #Q = ((a - AMT(aArray1[i]))/(AMT(aArray2[i] - aArray1[i])))
         
-        y = ((a - AMT(aArray1[i]))/(AMT(aArray2[i] - aArray1[i]))) - ((b - AMT(bArray1[i]))/(AMT(bArray2[i] - bArray1[i])))
+#        y = ((a - AMT(aArray1[i]))/(AMT(aArray2[i] - aArray1[i]))) - ((b - AMT(bArray1[i]))/(AMT(bArray2[i] - bArray1[i])))
         
         #if abs(amt(y).val) < 0.001 && AMT(0) < Q < AMT(1) 
             
@@ -28,71 +28,113 @@ function FindQ(a::_Amt{Float64,EX}, b::_Amt{Float64,EX}, aArray1::Array, aArray2
             
         #else
             
-            yt(j) = ((a - AMT(aArray1[j]))/(AMT(aArray2[j] - aArray1[j]))) - ((b - AMT(bArray1[j]))/(AMT(bArray2[j] - bArray1[j])))
+#            yt(j) = ((a - AMT(aArray1[j]))/(AMT(aArray2[j] - aArray1[j]))) - ((b - AMT(bArray1[j]))/(AMT(bArray2[j] - bArray1[j])))
             
-            j1 = Integer(round(i + 0.5*points, digits = 0))
+#            j1 = Integer(round(i + 0.5*points, digits = 0))
             
-            j2 = Integer(round(i + 0.3*points, digits = 0))
+#            j2 = Integer(round(i + 0.3*points, digits = 0))
             
-            j3 = Integer(round(i + 0.1*points, digits = 0))
+#            j3 = Integer(round(i + 0.1*points, digits = 0))
             
-            j4 = Integer(round(i + 0.05*points, digits = 0))
+#            j4 = Integer(round(i + 0.05*points, digits = 0))
             
-            j5 = Integer(round(i + 0.01*points, digits = 0))
+#            j5 = Integer(round(i + 0.01*points, digits = 0))
             
-            j6 = Integer(round(i + 0.001*points, digits = 0))
+#            j6 = Integer(round(i + 0.001*points, digits = 0))
             
-            if j1 <= points && yt(j1)*y > AMT(0)
+#            if j1 <= points && yt(j1)*y > AMT(0)
                     
-                i = j1
+#                i = j1
                 
-            elseif j2 <= points && yt(j2)*y > AMT(0)
+#            elseif j2 <= points && yt(j2)*y > AMT(0)
                     
-                i = j2   
+#                i = j2   
                     
-            elseif j3 <= points && yt(j3)*y > AMT(0)
+#            elseif j3 <= points && yt(j3)*y > AMT(0)
                     
-                i = j3
+#                i = j3
                         
-            elseif j4 <= points && yt(j4)*y > AMT(0)
+#            elseif j4 <= points && yt(j4)*y > AMT(0)
                     
-                i = j4
+#                i = j4
                             
-            elseif j5 <= points && yt(j5)*y > AMT(0)
+#            elseif j5 <= points && yt(j5)*y > AMT(0)
                     
-                i = j5
+#                i = j5
                 
-            elseif j6 <= points && yt(j6)*y > AMT(0)
+#            elseif j6 <= points && yt(j6)*y > AMT(0)
                     
-                i = j6
+#                i = j6
                 
-            elseif (i + 1) <= points && yt(i + 1)*y < AMT(0)
+#            elseif (i + 1) <= points && yt(i + 1)*y < AMT(0)
                     
-                if abs(amt(y).val) < abs(amt(yt(i + 1)).val)
+#                if abs(amt(y).val) < abs(amt(yt(i + 1)).val)
                 
-                    Q = ((a - AMT(aArray1[i]))/(AMT(aArray2[i] - aArray1[i])))
+#                    Q = ((a - AMT(aArray1[i]))/(AMT(aArray2[i] - aArray1[i])))
                 
-                    return [Q, aArray1[i]] 
+#                    println(i)
+                
+#                    return [Q, aArray1[i]] 
                     
-                else
+#                else
                     
-                    Q = ((a - AMT(aArray1[i + 1]))/(AMT(aArray2[i + 1] - aArray1[i + 1])))
+#                    Q = ((a - AMT(aArray1[i + 1]))/(AMT(aArray2[i + 1] - aArray1[i + 1])))
+                
+#                    println(i)
                     
-                    return [Q, aArray1[i + 1]] 
+#                    return [Q, aArray1[i + 1]] 
                     
-                end
+#                end
             
-            else
+#            else
                 
-                i = i + 1
+#                i = i + 1
                 
-            end
+#            end
             
         #end
         
+#    end
+    
+#    return "out"
+    
+#end
+
+function FindQ(a::_Amt{Float64,EX}, b::_Amt{Float64,EX}, aArray1::Array, aArray2::Array, bArray1::Array, bArray2::Array)
+
+    i = 1
+    
+    Qarray = []
+    
+    yarray = []
+    
+    while i <= points
+        
+        Q = ((a - AMT(aArray1[i]))/(AMT(aArray2[i] - aArray1[i])))
+        
+        y = ((a - AMT(aArray1[i]))/(AMT(aArray2[i] - aArray1[i]))) - ((b - AMT(bArray1[i]))/(AMT(bArray2[i] - bArray1[i])))
+        
+        append!(Qarray, amt(Q).val)
+        
+        append!(yarray, abs(amt(y).val))
+        
+        i = i + 1
+        
     end
     
-    return "out"
+    min = minimum(yarray)
+    
+    if min < (10^-2)
+    
+        ic = findall(yarray .== min)[1]
+
+        return [AMT(Qarray[ic]), bArray1[ic]]
+        
+    else
+    
+        return "out"
+        
+    end
     
 end
 
@@ -169,8 +211,16 @@ function FindWithQ(pr::Number, Q::Number, Array1::Array, Array2::Array)
             end
 
         end
+        
+        if i <= points
 
-        return i
+            return i
+            
+        else
+            
+            println("State not supported")
+            
+        end
         
     else
         
@@ -420,9 +470,9 @@ function T_vdw(gas::vdWGas, v::vAmt{Float64,EX,MA}, s::sAmt{Float64,EX,MA})
         
     else
         
-        vlr = FQ[2]
+        slr = FQ[2]
         
-        return Tc(gas)*Tr_sat_list[findclosest(vr1list, AMT(vlr), (10^-3))]
+        return Tc(gas)*Tr_sat_list[findclosest(Domelist(ϕ(gas), "sr1"), AMT(slr), (10^-3))]
         
     end
     
@@ -438,9 +488,9 @@ function T_vdw(gas::vdWGas, v::vAmt{Float64,EX,MA}, u::uAmt{Float64,EX,MA})
         
     else
         
-        vlr = FQ[2]
+        ulr = FQ[2]
         
-        return Tc(gas)*Tr_sat_list[findclosest(vr1list, AMT(vlr), (10^-3))]
+        return Tc(gas)*Tr_sat_list[findclosest(Domelist(ϕ(gas), "ur1"), AMT(ulr), (10^-3))]
         
     end
     
@@ -456,9 +506,9 @@ function T_vdw(gas::vdWGas, v::vAmt{Float64,EX,MA}, h::hAmt{Float64,EX,MA})
         
     else
         
-        vlr = FQ[2]
+        hlr = FQ[2]
         
-        return Tc(gas)*Tr_sat_list[findclosest(vr1list, AMT(vlr), (10^-3))]
+        return Tc(gas)*Tr_sat_list[findclosest(Domelist(ϕ(gas), "hr1"), AMT(hlr), (10^-3))]
         
     end
     
@@ -674,7 +724,9 @@ end
 
 function v_vdw(gas::vdWGas, u::uAmt{Float64,EX,MA}, s::sAmt{Float64,EX,MA}, Mol::Bool = false)
     
-    FQ = FindQ(sr(s, Pc(gas), vc(gas), Tc(gas)), ur(u, Pc(gas), vc(gas)), Domelist(ϕ(gas), "sr1"), Domelist(ϕ(gas), "sr2"), Domelist(ϕ(gas), "ur1"), Domelist(ϕ(gas), "ur2"))
+    #FQ = FindQ(sr(s, Pc(gas), vc(gas), Tc(gas)), ur(u, Pc(gas), vc(gas)), Domelist(ϕ(gas), "sr1"), Domelist(ϕ(gas), "sr2"), Domelist(ϕ(gas), "ur1"), Domelist(ϕ(gas), "ur2"))
+    
+    FQ = FindQ(ur(u, Pc(gas), vc(gas)), sr(s, Pc(gas), vc(gas), Tc(gas)),Domelist(ϕ(gas), "ur1"), Domelist(ϕ(gas), "ur2"), Domelist(ϕ(gas), "sr1"), Domelist(ϕ(gas), "sr2"))
     
     if FQ == "out"
         
@@ -714,7 +766,9 @@ end
 
 function v_vdw(gas::vdWGas, u::uAmt{Float64,EX,MA}, h::hAmt{Float64,EX,MA}, Mol::Bool = false)
     
-    FQ = FindQ(hr(h, Pc(gas), vc(gas)), ur(u, Pc(gas), vc(gas)), Domelist(ϕ(gas), "hr1"), Domelist(ϕ(gas), "hr2"), Domelist(ϕ(gas), "ur1"), Domelist(ϕ(gas), "ur2"))
+    #FQ = FindQ(hr(h, Pc(gas), vc(gas)), ur(u, Pc(gas), vc(gas)), Domelist(ϕ(gas), "hr1"), Domelist(ϕ(gas), "hr2"), Domelist(ϕ(gas), "ur1"), Domelist(ϕ(gas), "ur2"))
+    
+    FQ = FindQ(ur(u, Pc(gas), vc(gas)), hr(h, Pc(gas), vc(gas)), Domelist(ϕ(gas), "ur1"), Domelist(ϕ(gas), "ur2"), Domelist(ϕ(gas), "hr1"), Domelist(ϕ(gas), "hr2"))
     
     if FQ == "out"
         
@@ -754,7 +808,9 @@ end
 
 function v_vdw(gas::vdWGas, s::sAmt{Float64,EX,MA}, h::hAmt{Float64,EX,MA}, Mol::Bool = false)
     
-    FQ = FindQ(sr(s, Pc(gas), vc(gas), Tc(gas)), hr(h, Pc(gas), vc(gas)), Domelist(ϕ(gas), "sr1"), Domelist(ϕ(gas), "sr2"), Domelist(ϕ(gas), "hr1"), Domelist(ϕ(gas), "hr2"))
+    #FQ = FindQ(sr(s, Pc(gas), vc(gas), Tc(gas)), hr(h, Pc(gas), vc(gas)), Domelist(ϕ(gas), "sr1"), Domelist(ϕ(gas), "sr2"), Domelist(ϕ(gas), "hr1"), Domelist(ϕ(gas), "hr2"))
+    
+    FQ = FindQ(hr(h, Pc(gas), vc(gas)), sr(s, Pc(gas), vc(gas), Tc(gas)), Domelist(ϕ(gas), "hr1"), Domelist(ϕ(gas), "hr2"), Domelist(ϕ(gas), "sr1"), Domelist(ϕ(gas), "sr2"))
     
     if FQ == "out"
         

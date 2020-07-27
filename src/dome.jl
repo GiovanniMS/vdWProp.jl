@@ -18,13 +18,43 @@ Pr_sat(V1,V2) = (27*(-V1 - V2 + (V1 + 1)*(V2 + 1) - 2)) / (((V1 + 1)^2)*((V2 + 1
 
 # Arrays
 
-points = 10000
+#points = 2500
 
-℘list0 = range(0.0001, stop = 0.95, length = points)
+#℘list = range(0.0008, stop = 0.0003, length = points)
 
-part1 = [10e-100, 10e-90, 10e-80, 10e-70, 10e-60, 10e-50, 10e-40, 10e-30, 10e-20, 50e-20, 10e-10, 50e-10 ,10e-9, 50e-9,10e-8, 50e-8,10e-7, 50e-7,10e-6, 50e-6]
+#℘list0 = range(0.1, stop = 0.95, length = points)
 
-℘list = vcat(part1, ℘list0)
+#℘list1 = range(0.0001, stop = 0.0999, length = points)
+
+#℘list2 = range(0.00000001, stop = 0.0000999, length = points)
+
+#℘list3 = range(0.00000000001, stop = 0.0000000999, length = points)
+
+#℘list4 = range(0.00000000000001, stop = 0.0000000000999, length = points)
+
+#℘list5 = range(0.00000000000000001, stop = 0.0000000000000999, length = points)
+
+#℘list6 = vcat(℘list1, ℘list0)
+
+#℘list = vcat(℘list2, ℘list6)
+
+#℘list8 = vcat(℘list3, ℘list7)
+
+#℘list9 = vcat(℘list4, ℘list8)
+
+#℘list = vcat(℘list5, ℘list9)
+
+points = 4999
+
+℘list = [0.95]
+
+for n in 1:points
+    
+    append!(℘list, ℘list[n]/(1.0000054^n))
+    
+    n = n + 1
+    
+end
 
 points = length(℘list)
 
