@@ -168,37 +168,37 @@ function FindWithQ(pr::Number, Q::Number, Array1::Array, Array2::Array)
 
                 break
                 
-            elseif abs(Eq(i)) < abs(Eq(i + 1))
+            elseif i < points && abs(Eq(i)) < abs(Eq(i + 1))
                     
                 break
 
             else
 
-                if (i + points/2) < points && Eq(i + i1)*Eq(i) > 0
+                if (i + round((points/2), digits = 0)) < points && Eq(i + i1)*Eq(i) > 0
 
                     i = (i + i1)
 
-                elseif (i + points/3) < points && Eq(i + i2)*Eq(i) > 0
+                elseif (i + round((points/3), digits = 0)) < points && Eq(i + i2)*Eq(i) > 0
 
                     i = (i + i2)  
 
-                elseif (i + points/4) < points && Eq(i + i3)*Eq(i) > 0
+                elseif (i + round((points/4), digits = 0)) < points && Eq(i + i3)*Eq(i) > 0
 
                     i = (i + i3)  
 
-                elseif (i + points/5) < points && Eq(i + i4)*Eq(i) > 0
+                elseif (i + round((points/5), digits = 0)) < points && Eq(i + i4)*Eq(i) > 0
 
                     i = (i + i4)  
 
-                elseif (i + points/10) < points && Eq(i + i5)*Eq(i) > 0
+                elseif (i + round((points/10), digits = 0)) < points && Eq(i + i5)*Eq(i) > 0
 
                     i = (i + i5)  
 
-                elseif (i + points/100) < points && Eq(i + i6)*Eq(i) > 0
+                elseif (i + round((points/100), digits = 0)) < points && Eq(i + i6)*Eq(i) > 0
 
                     i = (i + i6)  
 
-                elseif (i + points/1000) < points && Eq(i + i7)*Eq(i) > 0
+                elseif (i + round((points/1000), digits = 0)) < points && Eq(i + i7)*Eq(i) > 0
 
                     i = (i + i7)  
 
