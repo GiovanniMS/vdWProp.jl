@@ -143,79 +143,31 @@ end
 function FindWithQ(pr::Number, Q::Number, Array1::Array, Array2::Array)
     
     if 0 <= Q <= 1
+        
+        Eqarray = []
     
         i = 1
 
         Eq(i) = Q - (pr - Array1[i])/(Array2[i] - Array1[i])
 
-        i1 = Integer(round((points/2), digits = 0))
-
-        i2 = Integer(round((points/3), digits = 0))
-
-        i3 = Integer(round((points/4), digits = 0))
-
-        i4 = Integer(round((points/5), digits = 0))
-
-        i5 = Integer(round((points/10), digits = 0))
-
-        i6 = Integer(round((points/100), digits = 0))
-
-        i7 = Integer(round((points/1000), digits = 0))
-
         while i <= points
 
-            if Eq(i) == 0
-
-                break
-                
-            elseif i < points && abs(Eq(i)) < abs(Eq(i + 1))
-                    
-                break
-
-            else
-
-                if (i + round((points/2), digits = 0)) < points && Eq(i + i1)*Eq(i) > 0
-
-                    i = (i + i1)
-
-                elseif (i + round((points/3), digits = 0)) < points && Eq(i + i2)*Eq(i) > 0
-
-                    i = (i + i2)  
-
-                elseif (i + round((points/4), digits = 0)) < points && Eq(i + i3)*Eq(i) > 0
-
-                    i = (i + i3)  
-
-                elseif (i + round((points/5), digits = 0)) < points && Eq(i + i4)*Eq(i) > 0
-
-                    i = (i + i4)  
-
-                elseif (i + round((points/10), digits = 0)) < points && Eq(i + i5)*Eq(i) > 0
-
-                    i = (i + i5)  
-
-                elseif (i + round((points/100), digits = 0)) < points && Eq(i + i6)*Eq(i) > 0
-
-                    i = (i + i6)  
-
-                elseif (i + round((points/1000), digits = 0)) < points && Eq(i + i7)*Eq(i) > 0
-
-                    i = (i + i7)  
-
-                else
-
-                    i = i + 1
-
-                end
-                
-            end
+            te  = abs(Eq(i))
+            
+            append!(Eqarray, te)
+            
+            i = i + 1
 
         end
         
-        if i <= points
+        min = minimum(Eqarray)
+    
+        if min < (10^-2)
 
-            return i
-            
+            ic = findall(Eqarray .== min)[1]
+
+            return ic
+
         else
             
             println("State not supported")
@@ -229,6 +181,100 @@ function FindWithQ(pr::Number, Q::Number, Array1::Array, Array2::Array)
     end
     
 end
+
+#function FindWithQ(pr::Number, Q::Number, Array1::Array, Array2::Array)
+    
+#    if 0 <= Q <= 1
+    
+#        i = 1
+
+#        Eq(i) = Q - (pr - Array1[i])/(Array2[i] - Array1[i])
+
+#        i1 = Integer(round((points/2), digits = 0))
+
+#        i2 = Integer(round((points/3), digits = 0))
+
+#        i3 = Integer(round((points/4), digits = 0))
+
+#        i4 = Integer(round((points/5), digits = 0))
+
+#        i5 = Integer(round((points/10), digits = 0))
+
+#        i6 = Integer(round((points/100), digits = 0))
+
+#        i7 = Integer(round((points/1000), digits = 0))
+
+#        while i <= points
+
+#            if Eq(i) == 0
+
+#                break
+                
+#            elseif i < points && abs(Eq(i)) < abs(Eq(i + 1))
+                    
+#                break
+
+#            else
+
+#                if (i + round((points/2), digits = 0)) < points && Eq(i + i1)*Eq(i) > 0
+
+#                    i = (i + i1)
+
+#                elseif (i + round((points/3), digits = 0)) < points && Eq(i + i2)*Eq(i) > 0
+
+#                    i = (i + i2)  
+
+#                elseif (i + round((points/4), digits = 0)) < points && Eq(i + i3)*Eq(i) > 0
+
+#                    i = (i + i3)  
+
+#                elseif (i + round((points/5), digits = 0)) < points && Eq(i + i4)*Eq(i) > 0
+
+#                    i = (i + i4)  
+
+#                elseif (i + round((points/10), digits = 0)) < points && Eq(i + i5)*Eq(i) > 0
+
+#                    i = (i + i5)  
+
+#                elseif (i + round((points/100), digits = 0)) < points && Eq(i + i6)*Eq(i) > 0
+
+#                    i = (i + i6)  
+
+#                elseif (i + round((points/1000), digits = 0)) < points && Eq(i + i7)*Eq(i) > 0
+
+#                    i = (i + i7)  
+
+#                else
+
+#                    i = i + 1
+
+#                end
+                
+#            end
+
+#        end
+        
+#        if i <= points
+
+#            return i
+            
+#        elseif i == (points + 1) && abs(Eq(points)) < 0.001
+            
+#            return (i - 1)
+            
+#        else
+            
+#            println("State not supported")
+            
+#        end
+        
+#    else
+        
+#        println("Quality must be between 0 and 1")
+        
+#    end
+    
+#end
 
 # Function to find the real root in the array that will be the result for the 3 degree polinomial
 
@@ -273,30 +319,90 @@ C2 = 0
 function findclosest(array::Array,x::AMOUNTS{Float64,EX},p::Number)
     
     x = amt(x).val
+    
+    yarray = []
 
     for i in 1:points
     
         y = x - array[i]
         
-        if i > 1 && abs(y) > abs(x - array[i - 1])
-            
-            return i - 1
+        append!(yarray, abs(y))
         
-        #if abs(y) < p
-            
-            #return i
-        
-        elseif maximum(array) < x || minimum(array) > x
-            
-            return -1
-            
-        end
-        
-    end    
+    end
     
-    return points
+    min = minimum(yarray)
+    
+    if min < (10^-2)
+
+        ic = findall(yarray .== min)[1]
+
+        return ic
+
+    else
+            
+        return -1
+            
+    end
 
 end
+
+#function findclosest(array::Array,x::AMOUNTS{Float64,EX},p::Number)
+    
+#    x = amt(x).val
+
+#    for i in 1:points
+    
+#        y = x - array[i]
+        
+#        if i > 1 && abs(y) > abs(x - array[i - 1])
+            
+#            return i - 1
+        
+#        #if abs(y) < p
+            
+#            #return i
+        
+#        elseif maximum(array) < x || minimum(array) > x
+            
+#            return -1
+            
+#        end
+        
+#    end    
+    
+#    return points
+
+#end
+
+#function findclosest(array::Array,x::AMOUNTS{Float64,EX},p::Number)
+    
+#    yarray = []
+    
+#    x = amt(x).val
+    
+#    for i in 1:points
+        
+#        y = x - array[i]
+        
+#        append!(yarray, abs(y))
+        
+#    end
+    
+#    min = minimum(yarray)
+    
+#    if min < (10^-3)
+    
+#        ic = findall(yarray .== min)[1]
+
+#        return ic
+        
+#    else
+    
+#        return "out"
+        
+#    end
+
+#end
 
 # Now the functions are implemented using the vdWGas as an argument
 
@@ -374,7 +480,9 @@ function s_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA}, Mol::Bo
     
     SatP = findclosest(Tr_sat_list, Tr(Tc(gas), T), (10^-3))
     
-    if SatP > 0 && AMT(vr1list[SatP]) < vr(vc(gas), v) < AMT(vr2list[SatP])
+    vap = amt(vr(vc(gas), v)).val
+    
+    if SatP > 0 && (AMT(vr1list[SatP]) < vr(vc(gas), v) < AMT(vr2list[SatP]))# || vap <= round(vr2list[SatP], sigdigits = 3))
         
         vr1 = AMT(vr1list[SatP])
     
@@ -625,8 +733,10 @@ end
 function v_vdw(gas::vdWGas, T::sysT{Float64,EX}, u::uAmt{Float64,EX,MA}, Mol::Bool = false)
     
     SatP = findclosest(Tr_sat_list, Tr(Tc(gas), T), (10^-3))
+    
+    uap = amt(ur(u, Pc(gas), vc(gas))).val
             
-    if SatP > 0 && AMT(Domelist(ϕ(gas), "ur1")[SatP]) < ur(u, Pc(gas), vc(gas)) < AMT(Domelist(ϕ(gas), "ur2")[SatP])
+    if SatP > 0 && (AMT(Domelist(ϕ(gas), "ur1")[SatP]) < ur(u, Pc(gas), vc(gas)) < AMT(Domelist(ϕ(gas), "ur2")[SatP]))# || uap <= 1.001*(Domelist(ϕ(gas), "ur2")[SatP]))
         
         ur1 = AMT(Domelist(ϕ(gas), "ur1")[SatP])
 
@@ -858,9 +968,11 @@ cvr(gas::vdWGas, cv::cvAmt{Float64,EX,MA}) = (Tc(gas)*cv)/(Pc(gas)*vc(gas))
 
 function a_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA}, Mol::Bool = false)
     
-    SatP = findclosest(Tr_sat_list, Tr(Tc(gas), T), (10^-3))        
+    SatP = findclosest(Tr_sat_list, Tr(Tc(gas), T), (10^-3))  
     
-    if SatP > 0 && AMT(vr1list[SatP]) < vr(vc(gas), v) < AMT(vr2list[SatP])
+    vap = amt(vr(vc(gas), v)).val
+    
+    if SatP > 0 && (AMT(vr1list[SatP]) < vr(vc(gas), v) < AMT(vr2list[SatP]))# || vap <= round(vr2list[SatP], sigdigits = 3))
         
         vlr = AMT(vr1list[SatP])
 

@@ -50,7 +50,9 @@ points = 4999
 
 for n in 1:points
     
-    append!(℘list, ℘list[n]/(1.0000054^n))
+    #append!(℘list, ℘list[n]/(1.0000054^n))
+    
+    append!(℘list, ℘list[n]/(1.000001793^n))
     
     n = n + 1
     
