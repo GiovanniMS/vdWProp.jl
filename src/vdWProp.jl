@@ -185,6 +185,116 @@ end
 #function FindWithQ(pr::Number, Q::Number, Array1::Array, Array2::Array)
     
 #    if 0 <= Q <= 1
+        
+#        Eqarray1 = []
+        
+#        Eqarray2 = []
+        
+#        Eqarray3 = []
+        
+#        Eqarray4 = []
+    
+#        i = 1
+
+#        Eq(i) = Q - (pr - Array1[i])/(Array2[i] - Array1[i])
+
+#        while i <= round(points*0.7, digits = 0)
+
+#            te  = abs(Eq(i))
+            
+#            append!(Eqarray1, te)
+            
+#            i = i + 1
+
+#        end
+        
+#        while i <= round(points*0.85, digits = 0)
+
+#            te  = abs(Eq(i))
+            
+#            append!(Eqarray2, te)
+            
+#            i = i + 1
+
+#        end
+        
+#        while i <= round(points*0.97, digits = 0)
+
+#            te  = abs(Eq(i))
+            
+#            append!(Eqarray3, te)
+            
+#            i = i + 1
+
+#        end
+        
+#        while i <= round(points, digits = 0)
+
+#            te  = abs(Eq(i))
+            
+#            append!(Eqarray4, te)
+            
+#            i = i + 1
+
+#        end
+        
+#        min4 = minimum(Eqarray4)
+        
+#        min3 = minimum(Eqarray3)
+        
+#        min2 = minimum(Eqarray2)
+        
+#        min1 = minimum(Eqarray1)
+        
+#        println(findall(Eqarray1 .== min1)[1])
+        
+#        println(findall(Eqarray2 .== min2)[1])
+        
+#        println(findall(Eqarray3 .== min3)[1])
+        
+#        println(findall(Eqarray4 .== min4)[1])
+    
+#        if min1 < (10^-2)
+
+#            ic = findall(Eqarray1 .== min1)[1]
+
+#            return ic
+            
+#        elseif min2 < (10^-7)
+
+#            ic = findall(Eqarray2 .== min2)[1] + length(Eqarray1)
+
+#            return ic
+                
+#        elseif min3 < (10^-7)
+
+#            ic = findall(Eqarray3 .== min3)[1] + length(Eqarray1) + length(Eqarray2)
+
+#            return ic
+            
+#        elseif min4 < (10^-7)
+
+#            ic = findall(Eqarray4 .== min4)[1] + length(Eqarray1) + length(Eqarray2) + length(Eqarray3)
+
+#            return ic
+
+#        else
+            
+#            println("State not supported")
+            
+#        end
+        
+#    else
+        
+#        println("Quality must be between 0 and 1")
+        
+#    end
+    
+#end
+
+#function FindWithQ(pr::Number, Q::Number, Array1::Array, Array2::Array)
+    
+#    if 0 <= Q <= 1
     
 #        i = 1
 

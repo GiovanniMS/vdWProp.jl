@@ -52,7 +52,13 @@ for n in 1:points
     
     #append!(℘list, ℘list[n]/(1.0000054^n))
     
-    append!(℘list, ℘list[n]/(1.000001793^n))
+    #append!(℘list, ℘list[n]/(1.000001793^n))
+    
+    #append!(℘list, ℘list[n]/(1.00000011202^n))
+    
+    #append!(℘list, ℘list[n]/(1.0000010694^n))
+    
+    append!(℘list, ℘list[n]/(1.0000008872^n))
     
     n = n + 1
     
