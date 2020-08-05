@@ -144,27 +144,47 @@ function FindWithQ(pr::Number, Q::Number, Array1::Array, Array2::Array)
     
     if 0 <= Q <= 1
         
-        Eqarray = []
+        Eqarray1 = []
+        
+        Eqarray2 = []
     
         i = 1
 
         Eq(i) = Q - (pr - Array1[i])/(Array2[i] - Array1[i])
 
-        while i <= points
+        while i <= round(0.25*points, digits = 0)
 
             te  = abs(Eq(i))
             
-            append!(Eqarray, te)
+            append!(Eqarray1, te)
             
             i = i + 1
 
         end
         
-        min = minimum(Eqarray)
-    
-        if min < (10^-2)
+        while i <= points
 
-            ic = findall(Eqarray .== min)[1]
+            te  = abs(Eq(i))
+            
+            append!(Eqarray2, te)
+            
+            i = i + 1
+
+        end
+        
+        min1 = minimum(Eqarray1)
+        
+        min2 = minimum(Eqarray2)
+    
+        if min1 < (10^-2)
+
+            ic = findall(Eqarray1 .== min1)[1]
+
+            return ic
+            
+        elseif min2 < (10^-2)
+
+            ic = findall(Eqarray2 .== min2)[1] + length(Eqarray1)
 
             return ic
 
@@ -532,7 +552,7 @@ function P_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA})
     
     SatP = findclosest(Tr_sat_list, Tr(Tc(gas), T), (10^-3)) # Array position for the saturated fluid and gas 
     
-    if SatP > 0 && AMT(vr1list[SatP]) < vr(vc(gas), v) < AMT(vr2list[SatP])
+    if SatP > 0 && ((SatP < points && AMT(vr1list[SatP + 1]) < vr(vc(gas), v) < AMT(vr2list[SatP])) || AMT(vr1list[SatP]) < vr(vc(gas), v) < AMT(vr2list[SatP]))# || amt(AMT(vr1list[SatP])).val - amt(vr(vc(gas), v)).val < 10^-5)
         
         return Pc(gas)*(Pr_sat_list[SatP])
     

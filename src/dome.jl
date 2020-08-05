@@ -60,6 +60,8 @@ for n in 1:points
     
     append!(℘list, ℘list[n]/(1.0000008872^n))
     
+    #append!(℘list, ℘list[n]/(1.00000022175^n))
+    
     n = n + 1
     
 end
