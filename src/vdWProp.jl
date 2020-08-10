@@ -124,9 +124,9 @@ function FindQ(a::_Amt{Float64,EX}, b::_Amt{Float64,EX}, aArray1::Array, aArray2
     
     min = minimum(yarray)
     
-    if min < (10^-2)
+    ic = findall(yarray .== min)[1]
     
-        ic = findall(yarray .== min)[1]
+    if min < (10^-2) && 0 <= round(Qarray[ic], digits = 3) <= 1
 
         return [AMT(Qarray[ic]), bArray1[ic]]
         
