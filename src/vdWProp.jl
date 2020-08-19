@@ -152,7 +152,7 @@ function FindWithQ(pr::Number, Q::Number, Array1::Array, Array2::Array)
 
         Eq(i) = Q - (pr - Array1[i])/(Array2[i] - Array1[i])
 
-        while i <= round(0.25*points, digits = 0)
+        while i <= round(0.2647*points, digits = 0)
 
             te  = abs(Eq(i))
             

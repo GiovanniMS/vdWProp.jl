@@ -66,6 +66,20 @@ for n in 1:points
     
 end
 
+℘list2 = [0.99999]
+
+for n in 1:100
+    
+    append!(℘list2, ℘list2[n]/(1.0005))
+    
+    n = n + 1
+    
+end
+
+℘list = vcat(℘list2, ℘list)
+
+℘list2 = []
+
 points = length(℘list)
 
 V2list = []
