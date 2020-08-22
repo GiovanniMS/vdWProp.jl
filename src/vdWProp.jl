@@ -4,6 +4,8 @@ using EngThermBase
 
 using Polynomials
 
+using Polynomials.PolyCompat
+
 using Roots
 
 include("dome.jl")
@@ -2191,5 +2193,265 @@ end
 export State
 
 export IsoProp
+
+#Plots
+
+using Plots
+
+function PrD(vr,n)
+    
+    if vr < vr1list[n] || vr > vr2list[n]
+        
+        return 8*Tr_sat_list[n]/(3*vr - 1) - 3/(vr^2)
+        
+    else
+        
+        return Pr_sat_list[n]
+        
+    end
+    
+end
+
+PrND(vr,Tr) = 8*Tr/(3*vr - 1) - 3/(vr^2)
+
+function TrD(vr,n)
+    
+    if vr < vr1list[n] || vr > vr2list[n]
+        
+        return ((Pr_sat_list[n]*(3*vr - 1))/8) + ((3*(3*vr - 1))/(8*(vr^2)))
+        
+    else
+        
+        return Tr_sat_list[n]
+        
+    end
+    
+end
+
+TrND(vr,Pr) = ((Pr*(3*vr - 1))/8) + ((3*(3*vr - 1))/(8*(vr^2)))
+
+function PlotDome(Tconst::Array = [], T::Bool = false, vpoints::Number = 1000 ,str::String = "log")
+    
+    labels = ["sat. liquid" "sat. vapor"]
+    
+    x = [vr1list, vr2list]
+    
+    xlog = [log.(vr1list), log.(vr2list)]
+    
+    if T == false
+        
+        Ts = "Tᵣ - "
+
+        data = [Pr_sat_list, Pr_sat_list]
+        
+        datalog = [log.(Pr_sat_list), log.(Pr_sat_list)]
+        
+        is = []
+        
+        vx = Array(range(0.3697942021696152, vpoints; length = 100000))
+            
+        for n in 1:length(Tconst)
+            
+            Tv = string(Tconst[n])
+            
+            labels = hcat(labels, [string(Ts,Tv)])
+
+            append!(is, findclosest(Tr_sat_list, AMT(Tconst[n]), (10^-3)))
+            
+            x = vcat(x, [vx])
+            
+            xlog = vcat(xlog, [log.(vx)])
+            
+            if is[n] == -1
+            
+                data = vcat(data, [PrND.(vx, Tconst[n])])
+                
+                datalog = vcat(datalog, [log.(PrND.(vx, Tconst[n]))])
+                
+            else
+                
+                data = vcat(data, [PrD.(vx, is[n])])
+                
+                datalog = vcat(datalog, [log.(PrD.(vx, is[n]))])
+                
+            end
+
+        end
+        
+        str == "original" ? plot(x, data, title = "Pᵣ x vᵣ", label = labels,xlabel = "vᵣ", ylabel = "Pᵣ", markersize = 6, tickfontsize = 12, guidefontsize = 16, legendfontsize = 9, titlefontsize = 17, width = 3) :
+        
+        str == "log" ? plot(xlog, datalog, title = "log(Pᵣ) x log(vᵣ)", label = labels, xlabel = "log(vᵣ)", ylabel = "log(Pᵣ)", markersize = 6, tickfontsize = 12, guidefontsize = 16, legendfontsize = 9, titlefontsize = 17, width = 3) :
+        
+        println("For log(Pᵣ) x log(vᵣ) there is no need for string argument / For Pᵣ x vᵣ use the string original")
+        
+    else
+        
+        Ps = "Pᵣ - "
+        
+        data = [Tr_sat_list, Tr_sat_list]
+        
+        datalog = [log.(Tr_sat_list), log.(Tr_sat_list)]
+        
+        is = []
+        
+        vx = Array(range(0.3697942021696152, vpoints; length = 100000))
+            
+        for n in 1:length(Tconst)
+            
+            Pv = string(Tconst[n])
+            
+            labels = hcat(labels, [string(Ps,Pv)])
+
+            append!(is, findclosest(Pr_sat_list, AMT(Tconst[n]), (10^-3)))
+            
+            x = vcat(x, [vx])
+            
+            xlog = vcat(xlog, [log.(vx)])
+            
+            if is[n] == -1
+            
+                data = vcat(data, [TrND.(vx, Tconst[n])])
+                
+                datalog = vcat(datalog, [log.(TrND.(vx, Tconst[n]))])
+                
+            else
+                
+                data = vcat(data, [TrD.(vx, is[n])])
+                
+                datalog = vcat(datalog, [log.(TrD.(vx, is[n]))])
+                
+            end
+
+        end
+        
+        str == "original" ? plot(x, data, title = "Tᵣ x vᵣ",label = labels, xlabel = "vᵣ", ylabel = "Tᵣ", markersize = 6, tickfontsize = 12, guidefontsize = 16, legendfontsize = 9, titlefontsize = 17, width = 3) :
+        
+        str == "log" ? plot(xlog, datalog, title = "log(Tᵣ) x log(vᵣ)",label = labels, xlabel = "log(vᵣ)", ylabel = "log(Tᵣ)", markersize = 6, tickfontsize = 12, guidefontsize = 16, legendfontsize = 9, titlefontsize = 17, width = 3) :
+        
+        println("For log(Tᵣ) x log(vᵣ) there is no need for string argument / For Tᵣ x vᵣ use the string original")
+        
+    end
+
+end    
+
+function PlotDome(gas::vdWGas, Tconst::Array = [], T::Bool = false, vpoints::Number = 1000 ,str::String = "log")
+    
+    vcr = amt(vc(gas)).val
+    
+    Tcr = amt(Tc(gas)).val
+    
+    Pcr = amt(Pc(gas)).val
+    
+    v1 = vr1list*vcr
+    
+    v2 = vr2list*vcr
+    
+    Psat = Pr_sat_list*Pcr
+    
+    Tsat = Tr_sat_list*Tcr
+
+    labels = ["sat. liquid" "sat. vapor"]
+    
+    x = [v1, v2]
+    
+    xlog = [log.(v1), log.(v2)]
+    
+    if T == false
+        
+        Ts = "T - "
+
+        data = [Psat, Psat]
+        
+        datalog = [log.(Psat), log.(Psat)]
+        
+        is = []
+        
+        vx = Array(range(0.3697942021696152, vpoints; length = 100000))
+            
+        for n in 1:length(Tconst)
+            
+            Tv = string(Tconst[n])
+            
+            labels = hcat(labels, [string(Ts,Tv," K")])
+
+            append!(is, vdWProp.findclosest(Tr_sat_list, AMT(Tconst[n]/Tcr), (10^-3)))
+            
+            x = vcat(x, [vx*vcr])
+            
+            xlog = vcat(xlog, [log.(vx*vcr)])
+            
+            if is[n] == -1
+            
+                data = vcat(data, [Pcr*PrND.(vx, Tconst[n]/Tcr)])
+                
+                datalog = vcat(datalog, [log.(Pcr*PrND.(vx, Tconst[n]/Tcr))])
+                
+            else
+                
+                data = vcat(data, [Pcr*PrD.(vx, is[n])])
+                
+                datalog = vcat(datalog, [log.(Pcr*PrD.(vx, is[n]))])
+                
+            end
+
+        end
+        
+        str == "original" ? plot(x, data, title = "P x v", label = labels,xlabel = "v[m³/kg]", ylabel = "P[kPa]", markersize = 6, tickfontsize = 12, guidefontsize = 16, legendfontsize = 9, titlefontsize = 17, width = 3) :
+        
+        str == "log" ? plot(xlog, datalog, title = "log(P) x log(v)", label = labels, xlabel = "log(v[m³/kg])", ylabel = "log(P[kPa])", markersize = 6, tickfontsize = 12, guidefontsize = 16, legendfontsize = 9, titlefontsize = 17, width = 3) :
+        
+        println("For log(P) x log(v) there is no need for string argument / For P x v use the string original")
+        
+    else
+        
+        Ps = "P - "
+        
+        data = [Tsat, Tsat]
+        
+        datalog = [log.(Tsat), log.(Tsat)]
+        
+        is = []
+        
+        vx = Array(range(0.3697942021696152, vpoints; length = 100000))
+            
+        for n in 1:length(Tconst)
+            
+            Pv = string(Tconst[n])
+            
+            labels = hcat(labels, [string(Ps,Pv," kPa")])
+
+            append!(is, vdWProp.findclosest(Pr_sat_list, AMT(Tconst[n]/Pcr), (10^-3)))
+            
+            x = vcat(x, [vx*vcr])
+            
+            xlog = vcat(xlog, [log.(vcr*vx)])
+            
+            if is[n] == -1
+            
+                data = vcat(data, [Tcr*TrND.(vx, Tconst[n]/Pcr)])
+                
+                datalog = vcat(datalog, [log.(Tcr*TrND.(vx, Tconst[n]/Pcr))])
+                
+            else
+                
+                data = vcat(data, [Tcr*TrD.(vx, is[n])])
+                
+                datalog = vcat(datalog, [log.(Tcr*TrD.(vx, is[n]))])
+                
+            end
+
+        end
+        
+        str == "original" ? plot(x, data, title = "T x v",label = labels, xlabel = "v[m³/kg]", ylabel = "T[K]", markersize = 6, tickfontsize = 12, guidefontsize = 16, legendfontsize = 9, titlefontsize = 17, width = 3) :
+        
+        str == "log" ? plot(xlog, datalog, title = "log(T) x log(v)",label = labels, xlabel = "log(v[m³/kg])", ylabel = "log(T[K])", markersize = 6, tickfontsize = 12, guidefontsize = 16, legendfontsize = 9, titlefontsize = 17, width = 3) :
+        
+        println("For log(T) x log(v) there is no need for string argument / For T x v use the string original")
+        
+    end
+    
+end    
+
+export PlotDome
 
 end #module
