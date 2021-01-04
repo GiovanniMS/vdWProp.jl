@@ -1130,7 +1130,7 @@ function a_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA}, Mol::Bo
     
 end
 
-cv_vdw(gas::vdWGas) = cv((8/3)*ϕ(gas))
+cv_vdw(gas::vdWGas) = cv(Pc(gas)*vc(gas)*((8/3)*ϕ(gas))/Tc(gas))
 
 function cp_vdw(gas::vdWGas, T::sysT{Float64,EX}, v::vAmt{Float64,EX,MA}, Mol::Bool = false)
     
