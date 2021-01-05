@@ -79,7 +79,7 @@ The substance state is calculated using the State function, this function receiv
 
 The supported pairs of properties are any pair containing two of the properties: P, T, v, u, h, s, Q. The quality (Q) don't have a specific format in the [EngThermBase](https://github.com/JEngTherm/EngThermBase.jl) package, to use it as an argument it needs to be in the format `AMT(Q)` where Q is the numerical value of the quality. The intensive properties used as arguments always needs to be in the mass base format.
 
-This function gives as result a 15x1 array whose terms are, in this order, Pressure, Temperature, Volume, Internal Energy, Enthalpy, Entropy, Helmholtz Specific Energy, Specific Heat at constant volume, Specific Heat at constant pressure, Specific Heat Ratio, Isothermal Compressibility, Isentropic Compressibility, Coefficient of Volume Expansion, Isentropic Expansion Exponent, and Quality (or the String "out" when outside of the saturation dome), like it can be seen in the example below.
+This function gives as result a 16x1 array whose terms are, in this order, Pressure, Temperature, Volume, Internal Energy, Enthalpy, Entropy, Helmholtz Specific Energy, Specific Heat at constant volume, Specific Heat at constant pressure, Specific Heat Ratio, Isothermal Compressibility, Isentropic Compressibility, Coefficient of Volume Expansion, Isentropic Expansion Exponent, Speed of Sound and Quality (or the String "out" when outside of the saturation dome), like it can be seen in the example below.
 
 ```julia
 julia> using EngThermBase
@@ -89,7 +89,7 @@ julia> using vdWProp
 # Example 1 - Outside of the saturation dome
 
 julia> State(vdWProp.Hg, T(1500), P(1000))
-15-element Array{Any,1}:
+16-element Array{Any,1}:
  P₆₄: 1000 kPa
  T₆₄: 1500 K
  v₆₄: 0.084067 m³/kg
@@ -104,12 +104,13 @@ julia> State(vdWProp.Hg, T(1500), P(1000))
  ?₆₄: 0.0010025 kPa^-1
  ?₆₄: 0.00059989 kPa^-1
  ?₆₄: 1.667 
+ 𝕍₆₄: 61.65 √kJ/kg
  "out"
  
 # Example 2 - Inside of the saturation dome
  
 julia> State(vdWProp.Hg, T(1000), v(0.00022))
-15-element Array{AMOUNTS{Float64,EX},1}:
+16-element Array{Any,1}:
  P₆₄: 11210 kPa
  T₆₄: 1000 K
  v₆₄: 0.00022 m³/kg
@@ -124,12 +125,13 @@ julia> State(vdWProp.Hg, T(1000), v(0.00022))
  ?₆₄: -2.3829e-06 kPa^-1
  ?₆₄: -2.1647e-05 kPa^-1
  ?₆₄: 0.41364 
+ "Speed of Sound out of Domain"
  ?₆₄: 0.028394 
  
 # Example 3 - Molar Base
  
 julia> State(vdWProp.Hg, T(1000), v(0.00022), true)
-15-element Array{AMOUNTS{Float64,EX},1}:
+16-element Array{Any,1}:
  P₆₄: 11210 kPa
  T₆₄: 1000 K
  v̄₆₄: 0.04413 m³/kmol
@@ -144,6 +146,7 @@ julia> State(vdWProp.Hg, T(1000), v(0.00022), true)
  ?₆₄: -2.3829e-06 kPa^-1
  ?₆₄: -2.1647e-05 kPa^-1
  ?₆₄: 0.41364 
+ "Speed of Sound out of Domain"
  ?₆₄: 0.028394 
  
 ```
@@ -152,7 +155,7 @@ julia> State(vdWProp.Hg, T(1000), v(0.00022), true)
 
 This function calculates two states of a process of the "iso-type", meaning one of the properties in the first state is going to stay the same in the second state. The arguments for this function are, in this order, a substance, two properties of the first state, one property of the second state, a string with the property that is going to stay constant ("P", "T", "v", "u", "h", or "s"), and if the states are wanted in the molar form, a boolean argument true. The intensive properties used as arguments always needs to be in the mass base format.
 
-This function results in a 15x2 array, with each state in one of the columns, giving the same properties in the same order as the State function. It can be seen in the example below.
+This function results in a 16x2 array, with each state in one of the columns, giving the same properties in the same order as the State function. It can be seen in the example below.
 
 ```julia
 julia> using EngThermBase
@@ -162,7 +165,7 @@ julia> using vdWProp
 # Example 1 - Outside of the saturation dome
 
 julia> IsoProp(vdWProp.Hg, T(1500), P(1000), T(1600), "v")
-15×2 Array{Any,2}:
+16×2 Array{Any,2}:
  P₆₄: 1000 kPa           P₆₄: 1066.9 kPa
  T₆₄: 1500 K             T₆₄: 1600 K
  v₆₄: 0.084067 m³/kg     v₆₄: 0.084067 m³/kg
@@ -177,32 +180,34 @@ julia> IsoProp(vdWProp.Hg, T(1500), P(1000), T(1600), "v")
  ?₆₄: 0.0010025 kPa^-1   ?₆₄: 0.00093946 kPa^-1
  ?₆₄: 0.00059989 kPa^-1  ?₆₄: 0.00056226 kPa^-1
  ?₆₄: 1.667              ?₆₄: 1.667 
+ 𝕍₆₄: 61.65 √kJ/kg       𝕍₆₄: 63.68 √kJ/kg
  "out"                   "out"
 
 # Example 2 - Inside of the saturation dome
 
 julia> IsoProp(vdWProp.Hg, T(1000),v(0.00022), T(900),"s")
-15×2 Array{AMOUNTS{Float64,EX},2}:
- P₆₄: 11210 kPa           P₆₄: 5767.6 kPa
- T₆₄: 1000 K              T₆₄: 900 K
- v₆₄: 0.00022 m³/kg       v₆₄: 0.00073307 m³/kg
- u₆₄: -169.03 kJ/kg       u₆₄: -173.07 kJ/kg
- h₆₄: -166.56 kJ/kg       h₆₄: -168.84 kJ/kg
- s₆₄: -0.11129 kJ/K/kg    s₆₄: -0.11129 kJ/K/kg
- a₆₄: -57.735 kJ/kg       a₆₄: -72.916 kJ/kg
- cv₆₄: 0.084277 kJ/K/kg   cv₆₄: 0.084277 kJ/K/kg
- cp₆₄: 0.18164 kJ/K/kg    cp₆₄: 0.17188 kJ/K/kg
- ?₆₄: 2.1552              ?₆₄: 2.0395 
- ?₆₄: -0.0015916 K^-1     ?₆₄: -0.0025758 K^-1
- ?₆₄: -2.3829e-06 kPa^-1  ?₆₄: -0.00028047 kPa^-1
- ?₆₄: -2.1647e-05 kPa^-1  ?₆₄: 1.8907e-05 kPa^-1
- ?₆₄: 0.41364             ?₆₄: 1.6372 
- ?₆₄: 0.028394            ?₆₄: 0.078088
+16×2 Array{Any,2}:
+ P₆₄: 11210 kPa                  P₆₄: 5767.6 kPa
+ T₆₄: 1000 K                     T₆₄: 900 K
+ v₆₄: 0.00022 m³/kg              v₆₄: 0.00073307 m³/kg
+ u₆₄: -169.03 kJ/kg              u₆₄: -173.07 kJ/kg
+ h₆₄: -166.56 kJ/kg              h₆₄: -168.84 kJ/kg
+ s₆₄: -0.11129 kJ/K/kg           s₆₄: -0.11129 kJ/K/kg
+ a₆₄: -57.735 kJ/kg              a₆₄: -72.916 kJ/kg
+ cv₆₄: 0.084277 kJ/K/kg          cv₆₄: 0.084277 kJ/K/kg
+ cp₆₄: 0.18164 kJ/K/kg           cp₆₄: 0.17188 kJ/K/kg
+ ?₆₄: 2.1552                     ?₆₄: 2.0395 
+ ?₆₄: -0.0015916 K^-1            ?₆₄: -0.0025758 K^-1
+ ?₆₄: -2.3829e-06 kPa^-1         ?₆₄: -0.00028047 kPa^-1
+ ?₆₄: -2.1647e-05 kPa^-1         ?₆₄: 1.8907e-05 kPa^-1
+ ?₆₄: 0.41364                    ?₆₄: 1.6372 
+ "Speed of Sound out of Domain"  𝕍₆₄: 32.428 √kJ/kg
+ ?₆₄: 0.028394                   ?₆₄: 0.078088 
  
 # Example 3 - Molar Base
 
 julia> IsoProp(vdWProp.Hg, T(1500), P(1000), T(1600), "v", true)
-15×2 Array{Any,2}:
+16×2 Array{Any,2}:
  P₆₄: 1000 kPa            P₆₄: 1066.9 kPa
  T₆₄: 1500 K              T₆₄: 1600 K
  v̄₆₄: 16.863 m³/kmol     v̄₆₄: 16.863 m³/kmol
@@ -217,6 +222,7 @@ julia> IsoProp(vdWProp.Hg, T(1500), P(1000), T(1600), "v", true)
  ?₆₄: 0.0010025 kPa^-1    ?₆₄: 0.00093946 kPa^-1
  ?₆₄: 0.00059989 kPa^-1   ?₆₄: 0.00056226 kPa^-1
  ?₆₄: 1.667               ?₆₄: 1.667 
+ 𝕍₆₄: 61.65 √kJ/kg        𝕍₆₄: 63.68 √kJ/kg
  "out"                    "out"
   
 ```
