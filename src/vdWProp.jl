@@ -2291,7 +2291,7 @@ TrND(vr,Pr) = ((Pr*(3*vr - 1))/8) + ((3*(3*vr - 1))/(8*(vr^2)))
 
 function PlotDome(Tconst::Array = [], T::Bool = false, vpoints::Number = 1000 ,str::String = "log")
     
-    labels = ["sat. liquid" "sat. vapor"]
+    labels = []
     
     x = [vr1list, vr2list]
     
@@ -2313,7 +2313,15 @@ function PlotDome(Tconst::Array = [], T::Bool = false, vpoints::Number = 1000 ,s
             
             Tv = string(Tconst[n])
             
-            labels = hcat(labels, [string(Ts,Tv)])
+            if n == 1
+            
+                labels = [string(Ts,Tv)]
+                
+            else
+                
+                labels = hcat(labels, [string(Ts,Tv)])
+                
+            end
 
             append!(is, findclosest(Tr_sat_list, AMT(Tconst[n]), (10^-3)))
             
@@ -2337,9 +2345,15 @@ function PlotDome(Tconst::Array = [], T::Bool = false, vpoints::Number = 1000 ,s
 
         end
         
-        str == "original" ? plot(x, data, title = "Pᵣ x vᵣ", label = labels,xlabel = "vᵣ", ylabel = "Pᵣ", markersize = 6, tickfontsize = 12, guidefontsize = 16, legendfontsize = 9, titlefontsize = 17, width = 3) :
+        str == "original" ? plot(x[3:end], data[3:end], title = "Pᵣ x vᵣ", label = labels,xlabel = "vᵣ", ylabel = "Pᵣ", markersize = 3, tickfontsize = 6, guidefontsize = 8, legendfontsize = 5, titlefontsize = 9, width = 1, thickness_scaling = 2) :
         
-        str == "log" ? plot(xlog, datalog, title = "log(Pᵣ) x log(vᵣ)", label = labels, xlabel = "log(vᵣ)", ylabel = "log(Pᵣ)", markersize = 6, tickfontsize = 12, guidefontsize = 16, legendfontsize = 9, titlefontsize = 17, width = 3) :
+        str == "log" ? plot(xlog[3:end], datalog[3:end], title = "log(Pᵣ) x log(vᵣ)", label = labels, xlabel = "log(vᵣ)", ylabel = "log(Pᵣ)", markersize = 3, tickfontsize = 6, guidefontsize = 8, legendfontsize = 5, titlefontsize = 9, width = 1, thickness_scaling = 2) :
+        
+        nothing
+        
+        str == "original" ? plot!(x[1:2], data[1:2], width = 2, color = :black, label = ["Saturation Dome" nothing]) :
+        
+        str == "log" ? plot!(xlog[1:2], datalog[1:2], width = 2, color = :black, label = ["Saturation Dome" nothing]) :
         
         println("For log(Pᵣ) x log(vᵣ) there is no need for string argument / For Pᵣ x vᵣ use the string original")
         
@@ -2359,7 +2373,15 @@ function PlotDome(Tconst::Array = [], T::Bool = false, vpoints::Number = 1000 ,s
             
             Pv = string(Tconst[n])
             
-            labels = hcat(labels, [string(Ps,Pv)])
+            if n == 1
+                
+                labels = [string(Ps,Pv)]
+                
+            else
+            
+                labels = hcat(labels, [string(Ps,Pv)])
+                
+            end
 
             append!(is, findclosest(Pr_sat_list, AMT(Tconst[n]), (10^-3)))
             
@@ -2383,11 +2405,17 @@ function PlotDome(Tconst::Array = [], T::Bool = false, vpoints::Number = 1000 ,s
 
         end
         
-        str == "original" ? plot(x, data, title = "Tᵣ x vᵣ",label = labels, xlabel = "vᵣ", ylabel = "Tᵣ", markersize = 6, tickfontsize = 12, guidefontsize = 16, legendfontsize = 9, titlefontsize = 17, width = 3) :
+        str == "original" ? plot(x[3:end], data[3:end], title = "Tᵣ x vᵣ",label = labels, xlabel = "vᵣ", ylabel = "Tᵣ", markersize = 3, tickfontsize = 6, guidefontsize = 8, legendfontsize = 5, titlefontsize = 9, width = 1, thickness_scaling = 2) :
         
-        str == "log" ? plot(xlog, datalog, title = "log(Tᵣ) x log(vᵣ)",label = labels, xlabel = "log(vᵣ)", ylabel = "log(Tᵣ)", markersize = 6, tickfontsize = 12, guidefontsize = 16, legendfontsize = 9, titlefontsize = 17, width = 3) :
+        str == "log" ? plot(xlog[3:end], datalog[3:end], title = "log(Tᵣ) x log(vᵣ)",label = labels, xlabel = "log(vᵣ)", ylabel = "log(Tᵣ)", markersize = 3, tickfontsize = 6, guidefontsize = 8, legendfontsize = 5, titlefontsize = 9, width = 1, thickness_scaling = 2) :
         
-        println("For log(Tᵣ) x log(vᵣ) there is no need for string argument / For Tᵣ x vᵣ use the string original")
+        nothing
+        
+        str == "original" ? plot!(x[1:2], data[1:2], width = 2, color = :black, label = ["Saturation Dome" nothing]) :
+        
+        str == "log" ? plot!(xlog[1:2], datalog[1:2], width = 2, color = :black, label = ["Saturation Dome" nothing]) :
+        
+        println("For log(Pᵣ) x log(vᵣ) there is no need for string argument / For Pᵣ x vᵣ use the string original")
         
     end
 
@@ -2409,7 +2437,7 @@ function PlotDome(gas::vdWGas, Tconst::Array = [], T::Bool = false, vpoints::Num
     
     Tsat = Tr_sat_list*Tcr
 
-    labels = ["sat. liquid" "sat. vapor"]
+    labels = []
     
     x = [v1, v2]
     
@@ -2431,7 +2459,15 @@ function PlotDome(gas::vdWGas, Tconst::Array = [], T::Bool = false, vpoints::Num
             
             Tv = string(Tconst[n])
             
-            labels = hcat(labels, [string(Ts,Tv," K")])
+            if n == 1
+            
+                labels = [string(Ts,Tv,"K")]
+                
+            else
+                
+                labels = hcat(labels, [string(Ts,Tv,"K")])
+                
+            end
 
             append!(is, vdWProp.findclosest(Tr_sat_list, AMT(Tconst[n]/Tcr), (10^-3)))
             
@@ -2455,9 +2491,15 @@ function PlotDome(gas::vdWGas, Tconst::Array = [], T::Bool = false, vpoints::Num
 
         end
         
-        str == "original" ? plot(x, data, title = "P x v", label = labels,xlabel = "v[m³/kg]", ylabel = "P[kPa]", markersize = 6, tickfontsize = 12, guidefontsize = 16, legendfontsize = 9, titlefontsize = 17, width = 3) :
+        str == "original" ? plot(x[3:end], data[3:end], title = "P x v", label = labels,xlabel = "v[m³/kg]", ylabel = "P[kPa]", markersize = 3, tickfontsize = 6, guidefontsize = 8, legendfontsize = 5, titlefontsize = 9, width = 1, thickness_scaling = 2) :
         
-        str == "log" ? plot(xlog, datalog, title = "log(P) x log(v)", label = labels, xlabel = "log(v[m³/kg])", ylabel = "log(P[kPa])", markersize = 6, tickfontsize = 12, guidefontsize = 16, legendfontsize = 9, titlefontsize = 17, width = 3) :
+        str == "log" ? plot(xlog[3:end], datalog[3:end], title = "log(P) x log(v)", label = labels, xlabel = "log(v[m³/kg])", ylabel = "log(P[kPa])", markersize = 3, tickfontsize = 6, guidefontsize = 8, legendfontsize = 5, titlefontsize = 9, width = 1, thickness_scaling = 2) :
+        
+        nothing
+        
+        str == "original" ? plot!(x[1:2], data[1:2], width = 2, color = :black, label = ["Saturation Dome" nothing]) :
+        
+        str == "log" ? plot!(xlog[1:2], datalog[1:2], width = 2, color = :black, label = ["Saturation Dome" nothing]) :
         
         println("For log(P) x log(v) there is no need for string argument / For P x v use the string original")
         
@@ -2477,7 +2519,15 @@ function PlotDome(gas::vdWGas, Tconst::Array = [], T::Bool = false, vpoints::Num
             
             Pv = string(Tconst[n])
             
-            labels = hcat(labels, [string(Ps,Pv," kPa")])
+            if n == 1
+                
+                labels = [string(Ps,Pv,"kPa")]
+                
+            else
+            
+                labels = hcat(labels, [string(Ps,Pv,"kPa")])
+                
+            end
 
             append!(is, vdWProp.findclosest(Pr_sat_list, AMT(Tconst[n]/Pcr), (10^-3)))
             
@@ -2501,9 +2551,15 @@ function PlotDome(gas::vdWGas, Tconst::Array = [], T::Bool = false, vpoints::Num
 
         end
         
-        str == "original" ? plot(x, data, title = "T x v",label = labels, xlabel = "v[m³/kg]", ylabel = "T[K]", markersize = 6, tickfontsize = 12, guidefontsize = 16, legendfontsize = 9, titlefontsize = 17, width = 3) :
+        str == "original" ? plot(x[3:end], data[3:end], title = "T x v",label = labels, xlabel = "v[m³/kg]", ylabel = "T[K]", markersize = 3, tickfontsize = 6, guidefontsize = 8, legendfontsize = 5, titlefontsize = 9, width = 1, thickness_scaling = 2) :
         
-        str == "log" ? plot(xlog, datalog, title = "log(T) x log(v)",label = labels, xlabel = "log(v[m³/kg])", ylabel = "log(T[K])", markersize = 6, tickfontsize = 12, guidefontsize = 16, legendfontsize = 9, titlefontsize = 17, width = 3) :
+        str == "log" ? plot(xlog[3:end], datalog[3:end], title = "log(T) x log(v)",label = labels, xlabel = "log(v[m³/kg])", ylabel = "log(T[K])", markersize = 3, tickfontsize = 6, guidefontsize = 8, legendfontsize = 5, titlefontsize = 9, width = 1, thickness_scaling = 2) :
+        
+        nothing
+        
+        str == "original" ? plot!(x[1:2], data[1:2], width = 2, color = :black, label = ["Saturation Dome" nothing]) :
+        
+        str == "log" ? plot!(xlog[1:2], datalog[1:2], width = 2, color = :black, label = ["Saturation Dome" nothing]) :
         
         println("For log(T) x log(v) there is no need for string argument / For T x v use the string original")
         
