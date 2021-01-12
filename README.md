@@ -75,7 +75,7 @@ vdWProp.vdWGas("Neopentane", T₆₄: 433.8 K, P₆₄: 3196 kPa, v₆₄: 0.004
 
 ## State Function
 
-The substance state is calculated using the State function, this function receives as arguments, in this order,  a substance and two properties, and to calculate the state in the molar base, it needs a boolean argument, true, in the end. Also, because the arguments are in the [EngThermBase](https://github.com/JEngTherm/EngThermBase.jl) format, a line `using EngThermBase` is needed.
+The substance state is calculated using the State function, this function receives as arguments, in this order,  a substance and two properties, and to calculate the state in the molar base, it needs a boolean argument, `true`, in the end. Also, because the arguments are in the [EngThermBase](https://github.com/JEngTherm/EngThermBase.jl) format, a line `using EngThermBase` is needed.
 
 The supported pairs of properties are any pair containing two of the properties: P, T, v, u, h, s, Q. The quality (Q) don't have a specific format in the [EngThermBase](https://github.com/JEngTherm/EngThermBase.jl) package, to use it as an argument it needs to be in the format `AMT(Q)` where Q is the numerical value of the quality. The intensive properties used as arguments always needs to be in the mass base format.
 
@@ -153,7 +153,7 @@ julia> State(vdWProp.Hg, T(1000), v(0.00022), true)
 
 ## IsoProp Function
 
-This function calculates two states of a process of the "iso-type", meaning one of the properties in the first state is going to stay the same in the second state. The arguments for this function are, in this order, a substance, two properties of the first state, one property of the second state, a string with the property that is going to stay constant ("P", "T", "v", "u", "h", or "s"), and if the states are wanted in the molar form, a boolean argument true. The intensive properties used as arguments always needs to be in the mass base format.
+This function calculates two states of a process of the "iso-type", meaning one of the properties in the first state is going to stay the same in the second state. The arguments for this function are, in this order, a substance, two properties of the first state, one property of the second state, a string with the property that is going to stay constant ("P", "T", "v", "u", "h", or "s"), and if the states are wanted in the molar form, a boolean argument `true`. The intensive properties used as arguments always needs to be in the mass base format.
 
 This function results in a 16x2 array, with each state in one of the columns, giving the same properties in the same order as the State function. It can be seen in the example below.
 
@@ -226,3 +226,38 @@ julia> IsoProp(vdWProp.Hg, T(1500), P(1000), T(1600), "v", true)
  "out"                    "out"
   
 ```
+
+## Plots
+
+This package has a Plotting Function that uses [Plots.jl](https://github.com/JuliaPlots/Plots.jl) as dependence. The function consists of plotting the saturation dome for van der Waals substances in a P-v or T-v diagram (reduced or dimensional form) with the possibility to insert isotherm or isobaric lines depending on the diagram type. There are five arguments to use it, the substance (not necessary for reduced diagrams), an array with the temperatures of the isotherms (or pressures for isobaric lines), a boolean argument with `false` resulting in the P-v diagram and `true` resulting in the T-v diagram (`false` is the default), the final value of the volume for the iso-lines, and a string argument with `"log"` as the default that returns the logarithmic diagram and `"original"` for the not logarithmic diagram (not recommendable because of the low visibility). 
+
+```julia
+julia> PlotDome()
+
+```
+![plot](./png/f1.png)
+```julia
+julia> PlotDome([1, 0.8, 0.6, 0.4])
+
+```
+![plot](./png/f2.png)
+```julia
+julia> PlotDome([], false, 1000, "original")
+
+```
+![plot](./png/f3.png)
+```julia
+julia> PlotDome([1, 0.7, 0.4, 0.1, 0.05], true)
+
+```
+![plot](./png/f4.png)
+```julia
+julia> PlotDome(vdWProp.Hg, [1500, 1200, 1000, 800, 700, 600])
+
+```
+![plot](./png/f5.png)
+```julia
+julia> PlotDome(vdWProp.O2, [10000, 3000, 1000], true, 10)
+
+```
+![plot](./png/f6.png)

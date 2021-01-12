@@ -2345,6 +2345,8 @@ function PlotDome(Tconst::Array = [], T::Bool = false, vpoints::Number = 1000 ,s
 
         end
         
+        labels == [] ? labels = nothing : nothing
+        
         str == "original" ? plot(x[3:end], data[3:end], title = "Pᵣ x vᵣ", label = labels,xlabel = "vᵣ", ylabel = "Pᵣ", markersize = 3, tickfontsize = 6, guidefontsize = 8, legendfontsize = 5, titlefontsize = 9, width = 1, thickness_scaling = 2) :
         
         str == "log" ? plot(xlog[3:end], datalog[3:end], title = "log(Pᵣ) x log(vᵣ)", label = labels, xlabel = "log(vᵣ)", ylabel = "log(Pᵣ)", markersize = 3, tickfontsize = 6, guidefontsize = 8, legendfontsize = 5, titlefontsize = 9, width = 1, thickness_scaling = 2) :
@@ -2404,6 +2406,8 @@ function PlotDome(Tconst::Array = [], T::Bool = false, vpoints::Number = 1000 ,s
             end
 
         end
+        
+        labels == [] ? labels = nothing : nothing
         
         str == "original" ? plot(x[3:end], data[3:end], title = "Tᵣ x vᵣ",label = labels, xlabel = "vᵣ", ylabel = "Tᵣ", markersize = 3, tickfontsize = 6, guidefontsize = 8, legendfontsize = 5, titlefontsize = 9, width = 1, thickness_scaling = 2) :
         
@@ -2491,6 +2495,8 @@ function PlotDome(gas::vdWGas, Tconst::Array = [], T::Bool = false, vpoints::Num
 
         end
         
+        labels == [] ? labels = nothing : nothing
+        
         str == "original" ? plot(x[3:end], data[3:end], title = "P x v", label = labels,xlabel = "v[m³/kg]", ylabel = "P[kPa]", markersize = 3, tickfontsize = 6, guidefontsize = 8, legendfontsize = 5, titlefontsize = 9, width = 1, thickness_scaling = 2) :
         
         str == "log" ? plot(xlog[3:end], datalog[3:end], title = "log(P) x log(v)", label = labels, xlabel = "log(v[m³/kg])", ylabel = "log(P[kPa])", markersize = 3, tickfontsize = 6, guidefontsize = 8, legendfontsize = 5, titlefontsize = 9, width = 1, thickness_scaling = 2) :
@@ -2550,6 +2556,8 @@ function PlotDome(gas::vdWGas, Tconst::Array = [], T::Bool = false, vpoints::Num
             end
 
         end
+        
+        labels == [] ? labels = nothing : nothing
         
         str == "original" ? plot(x[3:end], data[3:end], title = "T x v",label = labels, xlabel = "v[m³/kg]", ylabel = "T[K]", markersize = 3, tickfontsize = 6, guidefontsize = 8, legendfontsize = 5, titlefontsize = 9, width = 1, thickness_scaling = 2) :
         
