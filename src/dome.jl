@@ -44,7 +44,9 @@ Pr_sat(V1,V2) = (27*(-V1 - V2 + (V1 + 1)*(V2 + 1) - 2)) / (((V1 + 1)^2)*((V2 + 1
 
 #℘list = vcat(℘list5, ℘list9)
 
-points = 4999
+#points = 4999 # rev 4
+
+points = 7109
 
 ℘list = [0.95]
 

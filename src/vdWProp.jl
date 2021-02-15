@@ -148,13 +148,25 @@ function FindWithQ(pr::Number, Q::Number, Array1::Array, Array2::Array)
         
         Eqarray1 = []
         
-        Eqarray2 = []
+        #Eqarray2 = []
     
         i = 1
 
         Eq(i) = Q - (pr - Array1[i])/(Array2[i] - Array1[i])
 
-        while i <= round(0.2647*points, digits = 0)
+        # rev 4 while i <= round(0.2647*points, digits = 0)
+        
+        #while i <= round(0.1872*points, digits = 0)
+
+        #    te  = abs(Eq(i))
+            
+        #    append!(Eqarray1, te)
+            
+        #    i = i + 1
+
+        #end
+        
+        while i <= points
 
             te  = abs(Eq(i))
             
@@ -164,19 +176,9 @@ function FindWithQ(pr::Number, Q::Number, Array1::Array, Array2::Array)
 
         end
         
-        while i <= points
-
-            te  = abs(Eq(i))
-            
-            append!(Eqarray2, te)
-            
-            i = i + 1
-
-        end
-        
         min1 = minimum(Eqarray1)
         
-        min2 = minimum(Eqarray2)
+        #min2 = minimum(Eqarray2)
     
         if min1 < (10^-2)
 
@@ -184,11 +186,11 @@ function FindWithQ(pr::Number, Q::Number, Array1::Array, Array2::Array)
 
             return ic
             
-        elseif min2 < (10^-2)
+        #elseif min2 < (10^-2)
 
-            ic = findall(Eqarray2 .== min2)[1] + length(Eqarray1)
+        #    ic = findall(Eqarray2 .== min2)[1] + length(Eqarray1)
 
-            return ic
+        #    return ic
 
         else
             
@@ -452,6 +454,8 @@ function findclosest(array::Array,x::AMOUNTS{Float64,EX},p::Number)
     
     x = amt(x).val
     
+    xi = Integer(round(x, digits = 0))
+    
     yarray = []
 
     for i in 1:points
@@ -463,8 +467,8 @@ function findclosest(array::Array,x::AMOUNTS{Float64,EX},p::Number)
     end
     
     min = minimum(yarray)
-    
-    if min < (10^-2)
+        
+    if (min < 10^(length("$xi"))*10^(-3)) || (x > 10 && min < 10^(length("$xi"))*10^(-2))
 
         ic = findall(yarray .== min)[1]
 
@@ -868,7 +872,7 @@ function v_vdw(gas::vdWGas, T::sysT{Float64,EX}, u::uAmt{Float64,EX,MA}, Mol::Bo
     
     uap = amt(ur(u, Pc(gas), vc(gas))).val
             
-    if SatP > 0 && (AMT(Domelist(ϕ(gas), "ur1")[SatP]) < ur(u, Pc(gas), vc(gas)) < AMT(Domelist(ϕ(gas), "ur2")[SatP]))# || uap <= 1.001*(Domelist(ϕ(gas), "ur2")[SatP]))
+    if SatP > 0 && AMT(Domelist(ϕ(gas), "ur1")[SatP]) < (ur(u, Pc(gas), vc(gas))) < AMT(Domelist(ϕ(gas), "ur2")[SatP])# || uap <= 1.001*(Domelist(ϕ(gas), "ur2")[SatP]))
         
         ur1 = AMT(Domelist(ϕ(gas), "ur1")[SatP])
 
@@ -902,8 +906,8 @@ function v_vdw(gas::vdWGas, T::sysT{Float64,EX}, s::sAmt{Float64,EX,MA}, Mol::Bo
     
     SatP = findclosest(Tr_sat_list, Tr(Tc(gas), T), (10^-3))        
     
-    if SatP > 0 && AMT(Domelist(ϕ(gas), "sr1")[SatP]) < sr(s, Pc(gas), vc(gas), Tc(gas)) < AMT(Domelist(ϕ(gas), "sr2")[SatP])
-        
+    if SatP > 0 && AMT(Domelist(ϕ(gas), "sr1")[SatP]) < (sr(s, Pc(gas), vc(gas), Tc(gas))) < AMT(Domelist(ϕ(gas), "sr2")[SatP])
+
         sr1 = AMT(Domelist(ϕ(gas), "sr1")[SatP])
 
         sr2 = AMT(Domelist(ϕ(gas), "sr2")[SatP])
@@ -917,7 +921,7 @@ function v_vdw(gas::vdWGas, T::sysT{Float64,EX}, s::sAmt{Float64,EX,MA}, Mol::Bo
         return [vc(gas)*vrf2, Q]
         
     else 
-        
+
         vrf1 = (1/3)*(((Tr(Tc(gas), T)/exp((3/(8*ϕ(gas)))*(amt(sr(s, Pc(gas), vc(gas), Tc(gas))).val + C2)))^(-ϕ(gas))) + AMT(1))
         
         Mol ? vrf2 = vrf1*M(gas) : vrf2 = vrf1 
@@ -1164,15 +1168,97 @@ end
 
 gamma(cp::cpAmt{Float64,EX,MA}, cv::cvAmt{Float64,EX,MA}) = cp/cv
 
-beta(gas::vdWGas, v::vAmt{Float64,EX,MA}, P::sysP{Float64,EX}) = 8*(vr(vc(gas), v)^2)/(3*Tc(gas)*(Pr(Pc(gas), P)*(vr(vc(gas), v)^3) - 3*vr(vc(gas), v) + AMT(2)))
+beta1(gas::vdWGas, v::vAmt{Float64,EX,MA}, P::sysP{Float64,EX}) = 8*(vr(vc(gas), v)^2)/(3*Tc(gas)*(Pr(Pc(gas), P)*(vr(vc(gas), v)^3) - 3*vr(vc(gas), v) + AMT(2)))
 
-ks(gas::vdWGas, v::vAmt{Float64,EX,MA}, T::sysT{Float64,EX}) = (vr(vc(gas), v)^2)*((3*vr(vc(gas), v) - AMT(1))^2)/(6*Pc(gas)*(4*Tr(Tc(gas), T)*(vr(vc(gas), v)^3) - 9*(vr(vc(gas),v)^2) + 6*vr(vc(gas), v) - AMT(1)))
+function beta(gas::vdWGas, v::vAmt{Float64,EX,MA}, P::sysP{Float64,EX}, Q)  
+    
+    if Q == "out"
 
-kt(gas::vdWGas, v::vAmt{Float64,EX,MA}, T::sysT{Float64,EX}) = ks(gas, v, T)*ϕ(gas)*(4*Tr(Tc(gas), T)*(vr(vc(gas), v)^3) - (3*vr(vc(gas), v) - AMT(1))^2)/(4*Tr(Tc(gas), T)*(vr(vc(gas), v)^3) + ϕ(gas)*(4*Tr(Tc(gas), T)*(vr(vc(gas), v)^3) - (3*vr(vc(gas), v) - AMT(1))^2))
+        return beta1(gas, v, P)
+        
+    else
+        
+        ic = findclosest(Pr_sat_list, Pr(Pc(gas), P), (10^-3))
+        
+        vl = vr1list[ic]*vc(gas)
+        
+        vv = vr2list[ic]*vc(gas)
+        
+        return beta1(gas, vl, P) + Q*(beta1(gas, vv, P) - beta1(gas, vl, P))
+        
+    end
+    
+end
 
-k_vdw(gas::vdWGas, v::vAmt{Float64,EX,MA}, T::sysT{Float64,EX}) = 6*(4*Tr(Tc(gas), T)*ϕ(gas)*(vr(vc(gas), v)^3) + 4*Tr(Tc(gas), T)*(vr(vc(gas), v)^3) - 9*ϕ(gas)*(vr(vc(gas), v)^2) + 6*ϕ(gas)*vr(vc(gas), v) - AMT(ϕ(gas)))/(ϕ(gas)*(3*vr(vc(gas), v) - AMT(1))*(8*Tr(Tc(gas), T)*(vr(vc(gas), v)^2) - 9*vr(vc(gas), v) + AMT(3)))
+ks1(gas::vdWGas, v::vAmt{Float64,EX,MA}, T::sysT{Float64,EX}) = (vr(vc(gas), v)^2)*((3*vr(vc(gas), v) - AMT(1))^2)/(6*Pc(gas)*(4*Tr(Tc(gas), T)*(vr(vc(gas), v)^3) - 9*(vr(vc(gas),v)^2) + 6*vr(vc(gas), v) - AMT(1)))
+    
+function ks(gas::vdWGas, v::vAmt{Float64,EX,MA}, T::sysT{Float64,EX}, Q)
+    
+    if Q == "out"
 
-function c_vdw(gas::vdWGas, v::vAmt{Float64,EX,MA}, T::sysT{Float64,EX}) 
+        return ks1(gas, v, T)
+        
+    else
+        
+        ic = findclosest(Tr_sat_list, Tr(Tc(gas), T), (10^-3))
+        
+        vl = vr1list[ic]*vc(gas)
+        
+        vv = vr2list[ic]*vc(gas)
+        
+        return ks1(gas, vl, T) + Q*(ks1(gas, vv, T) - ks1(gas, vl, T))
+        
+    end
+        
+end
+
+kt1(gas::vdWGas, v::vAmt{Float64,EX,MA}, T::sysT{Float64,EX}, Q) = ks(gas, v, T, Q)*ϕ(gas)*(4*Tr(Tc(gas), T)*(vr(vc(gas), v)^3) - (3*vr(vc(gas), v) - AMT(1))^2)/(4*Tr(Tc(gas), T)*(vr(vc(gas), v)^3) + ϕ(gas)*(4*Tr(Tc(gas), T)*(vr(vc(gas), v)^3) - (3*vr(vc(gas), v) - AMT(1))^2))
+
+function kt(gas::vdWGas, v::vAmt{Float64,EX,MA}, T::sysT{Float64,EX}, Q)
+    
+    if Q == "out"
+
+        return kt1(gas, v, T, Q)
+        
+    else
+        
+        ic = findclosest(Tr_sat_list, Tr(Tc(gas), T), (10^-3))
+        
+        vl = vr1list[ic]*vc(gas)
+        
+        vv = vr2list[ic]*vc(gas)
+        
+        return kt1(gas, vl, T, Q) + Q*(kt1(gas, vv, T, Q) - kt1(gas, vl, T, Q))
+        
+    end
+    
+end
+
+k1_vdw(gas::vdWGas, v::vAmt{Float64,EX,MA}, T::sysT{Float64,EX}) = 6*(4*Tr(Tc(gas), T)*ϕ(gas)*(vr(vc(gas), v)^3) + 4*Tr(Tc(gas), T)*(vr(vc(gas), v)^3) - 9*ϕ(gas)*(vr(vc(gas), v)^2) + 6*ϕ(gas)*vr(vc(gas), v) - AMT(ϕ(gas)))/(ϕ(gas)*(3*vr(vc(gas), v) - AMT(1))*(8*Tr(Tc(gas), T)*(vr(vc(gas), v)^2) - 9*vr(vc(gas), v) + AMT(3)))
+
+function k_vdw(gas::vdWGas, v::vAmt{Float64,EX,MA}, T::sysT{Float64,EX}, Q)
+
+    if Q == "out"
+
+        return k1_vdw(gas, v, T)
+        
+    else
+        
+        ic = findclosest(Tr_sat_list, Tr(Tc(gas), T), (10^-3))
+        
+        vl = vr1list[ic]*vc(gas)
+        
+        vv = vr2list[ic]*vc(gas)
+        
+        return k1_vdw(gas, vl, T) + Q*(k1_vdw(gas, vv, T) - k1_vdw(gas, vl, T))
+        
+    end
+
+end
+
+c1_vdw(gas::vdWGas, v::vAmt{Float64,EX,MA}, T::sysT{Float64,EX}) = (((AMT(1000*sqrt(6)))/(sqrt(ϕ(gas))*sqrt(vr(vc(gas), v))*abs(3*vr(vc(gas),v) - AMT(1))))*(sqrt(4*Tr(Tc(gas), T)*(vr(vc(gas), v)^3) + ϕ(gas)*(4*Tr(Tc(gas), T)*(vr(vc(gas), v)^3) - ((3*vr(vc(gas), v) - AMT(1))^2)))))*(AMT(1u"m/s"))
+
+function c_vdw(gas::vdWGas, v::vAmt{Float64,EX,MA}, T::sysT{Float64,EX}, Q) 
     
     if amt((4*Tr(Tc(gas), T)*(vr(vc(gas), v)^3) + ϕ(gas)*(4*Tr(Tc(gas), T)*(vr(vc(gas), v)^3) - ((3*vr(vc(gas), v) - AMT(1))^2)))).val < 0
         
@@ -1180,9 +1266,23 @@ function c_vdw(gas::vdWGas, v::vAmt{Float64,EX,MA}, T::sysT{Float64,EX})
         
     else
         
-        c = (((AMT(1000*sqrt(6)))/(sqrt(ϕ(gas))*sqrt(vr(vc(gas), v))*abs(3*vr(vc(gas),v) - AMT(1))))*(sqrt(4*Tr(Tc(gas), T)*(vr(vc(gas), v)^3) + ϕ(gas)*(4*Tr(Tc(gas), T)*(vr(vc(gas), v)^3) - ((3*vr(vc(gas), v) - AMT(1))^2)))))*(AMT(1u"m/s"))
         
-        return c
+        if Q == "out"
+
+            return c1_vdw(gas, v, T)
+        
+        else
+        
+            ic = findclosest(Tr_sat_list, Tr(Tc(gas), T), (10^-3))
+
+            vl = vr1list[ic]*vc(gas)
+
+            vv = vr2list[ic]*vc(gas)
+
+            return c1_vdw(gas, vl, T) + Q*(c1_vdw(gas, vv, T) - c1_vdw(gas, vl, T))
+        
+        end
+        
         
     end
     
@@ -1194,18 +1294,34 @@ end
 function v_vdw(gas::vdWGas, P::sysP{Float64,EX}, Q::_Amt{Float64,EX}, Mol::Bool = false)
     
     if 0 <= amt(Q).val <= 1
+        
+        if round(amt(Q).val, digits = 2) == 0 #rev4
+        
+            ic = findclosest(Pr_sat_list, Pr(Pc(gas), P), (10^-3))
+
+            return [Pr_sat_list[ic]*Pc(gas), Tr_sat_list[ic]*Tc(gas), vr1list[ic]*vc(gas), u1*amt(Domelist(ϕ(gas), "ur1")[ic]*Pc(gas)*vc(gas)).val, h1*amt(Domelist(ϕ(gas), "hr1")[ic]*Pc(gas)*vc(gas)).val, Domelist(ϕ(gas), "sr1")[ic]*Pc(gas)*vc(gas)/Tc(gas)]
+        
+        elseif amt(Q).val == 1
+
+            ic = findclosest(Pr_sat_list, Pr(Pc(gas), P), (10^-3))
+
+            return [Pr_sat_list[ic]*Pc(gas), Tr_sat_list[ic]*Tc(gas), vr2list[ic]*vc(gas), u1*amt(Domelist(ϕ(gas), "ur2")[ic]*Pc(gas)*vc(gas)).val, h1*amt(Domelist(ϕ(gas), "hr2")[ic]*Pc(gas)*vc(gas)).val, Domelist(ϕ(gas), "sr2")[ic]*Pc(gas)*vc(gas)/Tc(gas)]
+            
+        else
    
-        SatP = findclosest(Pr_sat_list, Pr(Pc(gas), P), (10^-3))
+            SatP = findclosest(Pr_sat_list, Pr(Pc(gas), P), (10^-3))
 
-        vrl = vr1list[SatP]
+            vrl = vr1list[SatP]
 
-        vrv = vr2list[SatP]
+            vrv = vr2list[SatP]
 
-        vr = AMT(vrl) + Q*(vrv - vrl)
+            vr = AMT(vrl) + Q*(vrv - vrl)
 
-        Mol ? vrf = vr*M(gas) : vrf = vr
+            Mol ? vrf = vr*M(gas) : vrf = vr
 
-        return vrf*vc(gas)
+            return vrf*vc(gas)
+            
+        end
         
     else
         
@@ -1219,6 +1335,20 @@ function v_vdw(gas::vdWGas, T::sysT{Float64,EX}, Q::_Amt{Float64,EX}, Mol::Bool 
     
     if 0 <= amt(Q).val <= 1
         
+        if round(amt(Q).val, digits = 2) == 0 #rev4
+        
+            ic = findclosest(Tr_sat_list, Tr(Tc(gas), T), (10^-3))
+
+            return [Pr_sat_list[ic]*Pc(gas), Tr_sat_list[ic]*Tc(gas), vr1list[ic]*vc(gas), u1*amt(Domelist(ϕ(gas), "ur1")[ic]*Pc(gas)*vc(gas)).val, h1*amt(Domelist(ϕ(gas), "hr1")[ic]*Pc(gas)*vc(gas)).val, Domelist(ϕ(gas), "sr1")[ic]*Pc(gas)*vc(gas)/Tc(gas)]
+        
+        elseif amt(Q).val == 1
+
+            ic = findclosest(Tr_sat_list, Tr(Tc(gas), T), (10^-3))
+
+            return [Pr_sat_list[ic]*Pc(gas), Tr_sat_list[ic]*Tc(gas), vr2list[ic]*vc(gas), u1*amt(Domelist(ϕ(gas), "ur2")[ic]*Pc(gas)*vc(gas)).val, h1*amt(Domelist(ϕ(gas), "hr2")[ic]*Pc(gas)*vc(gas)).val, Domelist(ϕ(gas), "sr2")[ic]*Pc(gas)*vc(gas)/Tc(gas)]
+            
+        else
+        
         SatT = findclosest(Tr_sat_list, Tr(Tc(gas), T), (10^-3))
 
         vrl = vr1list[SatT]
@@ -1230,6 +1360,8 @@ function v_vdw(gas::vdWGas, T::sysT{Float64,EX}, Q::_Amt{Float64,EX}, Mol::Bool 
         Mol ? vrf = vr*M(gas) : vrf = vr
 
         return vrf*vc(gas)
+            
+        end
         
     else
         
@@ -1240,50 +1372,114 @@ function v_vdw(gas::vdWGas, T::sysT{Float64,EX}, Q::_Amt{Float64,EX}, Mol::Bool 
 end
 
 function T_vdw(gas::vdWGas, v::vAmt{Float64,EX,MA}, Q::_Amt{Float64,EX})
-   
-    vre = amt(vr(vc(gas), v)).val
     
-    Q = amt(Q).val
-    
-    Point = FindWithQ(vre, Q, vr1list, vr2list)
+    if round(amt(Q).val, digits = 2) == 0 #rev4
         
-    return Tr_sat_list[Point]*Tc(gas)
+        ic = findclosest(vr1list, vr(vc(gas), v), (10^-3))
+        
+        return [Pr_sat_list[ic]*Pc(gas), Tr_sat_list[ic]*Tc(gas), vr1list[ic]*vc(gas), u1*amt(Domelist(ϕ(gas), "ur1")[ic]*Pc(gas)*vc(gas)).val, h1*amt(Domelist(ϕ(gas), "hr1")[ic]*Pc(gas)*vc(gas)).val, Domelist(ϕ(gas), "sr1")[ic]*Pc(gas)*vc(gas)/Tc(gas)]
+        
+    elseif amt(Q).val == 1
+        
+        ic = findclosest(vr2list, vr(vc(gas), v), (10^-3))
+        
+        return [Pr_sat_list[ic]*Pc(gas), Tr_sat_list[ic]*Tc(gas), vr2list[ic]*vc(gas), u1*amt(Domelist(ϕ(gas), "ur2")[ic]*Pc(gas)*vc(gas)).val, h1*amt(Domelist(ϕ(gas), "hr2")[ic]*Pc(gas)*vc(gas)).val, Domelist(ϕ(gas), "sr2")[ic]*Pc(gas)*vc(gas)/Tc(gas)]
+        
+    else
+   
+        vre = amt(vr(vc(gas), v)).val
+
+        Q = amt(Q).val
+
+        Point = FindWithQ(vre, Q, vr1list, vr2list)
+
+        return Tr_sat_list[Point]*Tc(gas)
+        
+    end
     
 end
     
 function T_vdw(gas::vdWGas, u::uAmt{Float64,EX,MA}, Q::_Amt{Float64,EX})
-   
-    ure = amt(ur(u, Pc(gas), vc(gas))).val
     
-    Q = amt(Q).val
-    
-    Point = FindWithQ(ure, Q, Domelist(ϕ(gas), "ur1"), Domelist(ϕ(gas), "ur2"))
+    if round(amt(Q).val, digits = 2) == 0 #rev4
         
-    return Tr_sat_list[Point]*Tc(gas)
+        ic = findclosest(Domelist(ϕ(gas), "ur1"), ur(u, Pc(gas), vc(gas)), (10^-3))
+        
+        return [Pr_sat_list[ic]*Pc(gas), Tr_sat_list[ic]*Tc(gas), vr1list[ic]*vc(gas), u1*amt(Domelist(ϕ(gas), "ur1")[ic]*Pc(gas)*vc(gas)).val, h1*amt(Domelist(ϕ(gas), "hr1")[ic]*Pc(gas)*vc(gas)).val, Domelist(ϕ(gas), "sr1")[ic]*Pc(gas)*vc(gas)/Tc(gas)]
+        
+    elseif amt(Q).val == 1
+        
+        ic = findclosest(Domelist(ϕ(gas), "ur2"), ur(u, Pc(gas), vc(gas)), (10^-3))
+        
+        return [Pr_sat_list[ic]*Pc(gas), Tr_sat_list[ic]*Tc(gas), vr2list[ic]*vc(gas), u1*amt(Domelist(ϕ(gas), "ur2")[ic]*Pc(gas)*vc(gas)).val, h1*amt(Domelist(ϕ(gas), "hr2")[ic]*Pc(gas)*vc(gas)).val, Domelist(ϕ(gas), "sr2")[ic]*Pc(gas)*vc(gas)/Tc(gas)]
+        
+    else
+   
+        ure = amt(ur(u, Pc(gas), vc(gas))).val
+
+        Q = amt(Q).val
+
+        Point = FindWithQ(ure, Q, Domelist(ϕ(gas), "ur1"), Domelist(ϕ(gas), "ur2"))
+
+        return Tr_sat_list[Point]*Tc(gas)
+        
+    end
     
 end
     
 function T_vdw(gas::vdWGas, h::hAmt{Float64,EX,MA}, Q::_Amt{Float64,EX})
-   
-    hre = amt(hr(h, Pc(gas), vc(gas))).val
     
-    Q = amt(Q).val
-    
-    Point = FindWithQ(hre, Q, Domelist(ϕ(gas), "hr1"), Domelist(ϕ(gas), "hr2"))
+    if round(amt(Q).val, digits = 2) == 0 #rev4
         
-    return Tr_sat_list[Point]*Tc(gas)
+        ic = findclosest(Domelist(ϕ(gas), "hr1"), hr(h, Pc(gas), vc(gas)), (10^-3))
+        
+        return [Pr_sat_list[ic]*Pc(gas), Tr_sat_list[ic]*Tc(gas), vr1list[ic]*vc(gas), u1*amt(Domelist(ϕ(gas), "ur1")[ic]*Pc(gas)*vc(gas)).val, h1*amt(Domelist(ϕ(gas), "hr1")[ic]*Pc(gas)*vc(gas)).val, Domelist(ϕ(gas), "sr1")[ic]*Pc(gas)*vc(gas)/Tc(gas)]
+        
+    elseif amt(Q).val == 1
+        
+        ic = findclosest(Domelist(ϕ(gas), "hr2"), hr(h, Pc(gas), vc(gas)), (10^-3))
+        
+        return [Pr_sat_list[ic]*Pc(gas), Tr_sat_list[ic]*Tc(gas), vr2list[ic]*vc(gas), u1*amt(Domelist(ϕ(gas), "ur2")[ic]*Pc(gas)*vc(gas)).val, h1*amt(Domelist(ϕ(gas), "hr2")[ic]*Pc(gas)*vc(gas)).val, Domelist(ϕ(gas), "sr2")[ic]*Pc(gas)*vc(gas)/Tc(gas)]
+        
+    else
+   
+        hre = amt(hr(h, Pc(gas), vc(gas))).val
+
+        Q = amt(Q).val
+
+        Point = FindWithQ(hre, Q, Domelist(ϕ(gas), "hr1"), Domelist(ϕ(gas), "hr2"))
+
+        return Tr_sat_list[Point]*Tc(gas)
+        
+    end
     
 end
 
 function T_vdw(gas::vdWGas, s::sAmt{Float64,EX,MA}, Q::_Amt{Float64,EX})
-   
-    sre = amt(sr(s, Pc(gas), vc(gas), Tc(gas))).val
     
-    Q = amt(Q).val
-    
-    Point = FindWithQ(sre, Q, Domelist(ϕ(gas), "sr1"), Domelist(ϕ(gas), "sr2"))
+    if round(amt(Q).val, digits = 2) == 0 #rev4
         
-    return Tr_sat_list[Point]*Tc(gas)
+        ic = findclosest(Domelist(ϕ(gas), "sr1"), sr(s, Pc(gas), vc(gas), Tc(gas)), (10^-3))
+        
+        return [Pr_sat_list[ic]*Pc(gas), Tr_sat_list[ic]*Tc(gas), vr1list[ic]*vc(gas), u1*amt(Domelist(ϕ(gas), "ur1")[ic]*Pc(gas)*vc(gas)).val, h1*amt(Domelist(ϕ(gas), "hr1")[ic]*Pc(gas)*vc(gas)).val, Domelist(ϕ(gas), "sr1")[ic]*Pc(gas)*vc(gas)/Tc(gas)]
+        
+    elseif amt(Q).val == 1
+        
+        ic = findclosest(Domelist(ϕ(gas), "sr2"), sr(s, Pc(gas), vc(gas), Tc(gas)), (10^-3))
+        
+        return [Pr_sat_list[ic]*Pc(gas), Tr_sat_list[ic]*Tc(gas), vr2list[ic]*vc(gas), u1*amt(Domelist(ϕ(gas), "ur2")[ic]*Pc(gas)*vc(gas)).val, h1*amt(Domelist(ϕ(gas), "hr2")[ic]*Pc(gas)*vc(gas)).val, Domelist(ϕ(gas), "sr2")[ic]*Pc(gas)*vc(gas)/Tc(gas)]
+        
+    else
+   
+        sre = amt(sr(s, Pc(gas), vc(gas), Tc(gas))).val
+
+        Q = amt(Q).val
+
+        Point = FindWithQ(sre, Q, Domelist(ϕ(gas), "sr1"), Domelist(ϕ(gas), "sr2"))
+
+        return Tr_sat_list[Point]*Tc(gas)
+        
+    end
     
 end
     
@@ -1319,15 +1515,15 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         
         γ = gamma(cp, cv)
         
-        β = beta(gas, v, P)
+        β = beta(gas, v, P, Q)
         
-        Ks = ks(gas, v, T)
+        Ks = ks(gas, v, T, Q)
         
-        Kt = kt(gas, v, T)
+        Kt = kt(gas, v, T, Q)
         
-        k = k_vdw(gas, v, T)
+        k = k_vdw(gas, v, T, Q)
         
-        c = c_vdw(gas, v, T)
+        c = c_vdw(gas, v, T, Q)
         
         Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k, c, Q] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k, c, Q]
         
@@ -1357,15 +1553,15 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         
         γ = gamma(cp, cv)
         
-        β = beta(gas, v, P)
+        β = beta(gas, v, P, Q)
         
-        Ks = ks(gas, v, T)
+        Ks = ks(gas, v, T, Q)
         
-        Kt = kt(gas, v, T)
+        Kt = kt(gas, v, T, Q)
         
-        k = k_vdw(gas, v, T)
+        k = k_vdw(gas, v, T, Q)
         
-        c = c_vdw(gas, v, T)
+        c = c_vdw(gas, v, T, Q)
         
         Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k, c, Q] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k, c, Q]
         
@@ -1395,15 +1591,15 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         
         γ = gamma(cp, cv)
         
-        β = beta(gas, v, P)
+        β = beta(gas, v, P, Q)
         
-        Ks = ks(gas, v, T)
+        Ks = ks(gas, v, T, Q)
         
-        Kt = kt(gas, v, T)
+        Kt = kt(gas, v, T, Q)
         
-        k = k_vdw(gas, v, T)
+        k = k_vdw(gas, v, T, Q)
         
-        c = c_vdw(gas, v, T)
+        c = c_vdw(gas, v, T, Q)
         
         Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k, c, Q] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k, c, Q]
         
@@ -1433,15 +1629,15 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         
         γ = gamma(cp, cv)
         
-        β = beta(gas, v, P)
+       β = beta(gas, v, P, Q)
         
-        Ks = ks(gas, v, T)
+        Ks = ks(gas, v, T, Q)
         
-        Kt = kt(gas, v, T)
+        Kt = kt(gas, v, T, Q)
         
-        k = k_vdw(gas, v, T)
+        k = k_vdw(gas, v, T, Q)
         
-        c = c_vdw(gas, v, T)
+        c = c_vdw(gas, v, T, Q)
         
         Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k, c, Q] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k, c, Q]
         
@@ -1471,15 +1667,15 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         
         γ = gamma(cp, cv)
         
-        β = beta(gas, v, P)
+        β = beta(gas, v, P, Q)
         
-        Ks = ks(gas, v, T)
+        Ks = ks(gas, v, T, Q)
         
-        Kt = kt(gas, v, T)
+        Kt = kt(gas, v, T, Q)
         
-        k = k_vdw(gas, v, T)
+        k = k_vdw(gas, v, T, Q)
         
-        c = c_vdw(gas, v, T)
+        c = c_vdw(gas, v, T, Q)
         
         Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k, c, Q] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k, c, Q]
         
@@ -1509,15 +1705,15 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         
         γ = gamma(cp, cv)
         
-        β = beta(gas, v, P)
+        β = beta(gas, v, P, Q)
         
-        Ks = ks(gas, v, T)
+        Ks = ks(gas, v, T, Q)
         
-        Kt = kt(gas, v, T)
+        Kt = kt(gas, v, T, Q)
         
-        k = k_vdw(gas, v, T)
+        k = k_vdw(gas, v, T, Q)
         
-        c = c_vdw(gas, v, T)
+        c = c_vdw(gas, v, T, Q)
         
         Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k, c, Q] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k, c, Q]
         
@@ -1547,15 +1743,15 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         
         γ = gamma(cp, cv)
         
-        β = beta(gas, v, P)
+        β = beta(gas, v, P, Q)
         
-        Ks = ks(gas, v, T)
+        Ks = ks(gas, v, T, Q)
         
-        Kt = kt(gas, v, T)
+        Kt = kt(gas, v, T, Q)
         
-        k = k_vdw(gas, v, T)
+        k = k_vdw(gas, v, T, Q)
         
-        c = c_vdw(gas, v, T)
+        c = c_vdw(gas, v, T, Q)
         
         Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k, c, Q] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k, c, Q]
         
@@ -1585,15 +1781,15 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         
         γ = gamma(cp, cv)
         
-        β = beta(gas, v, P)
+        β = beta(gas, v, P, Q)
         
-        Ks = ks(gas, v, T)
+        Ks = ks(gas, v, T, Q)
         
-        Kt = kt(gas, v, T)
+        Kt = kt(gas, v, T, Q)
         
-        k = k_vdw(gas, v, T)
+        k = k_vdw(gas, v, T, Q)
         
-        c = c_vdw(gas, v, T)
+        c = c_vdw(gas, v, T, Q)
         
         Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k, c, Q] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k, c, Q]
         
@@ -1623,15 +1819,15 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         
         γ = gamma(cp, cv)
         
-        β = beta(gas, v, P)
+        β = beta(gas, v, P, Q)
         
-        Ks = ks(gas, v, T)
+        Ks = ks(gas, v, T, Q)
         
-        Kt = kt(gas, v, T)
+        Kt = kt(gas, v, T, Q)
         
-        k = k_vdw(gas, v, T)
+        k = k_vdw(gas, v, T, Q)
         
-        c = c_vdw(gas, v, T)
+        c = c_vdw(gas, v, T, Q)
         
         Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k, c, Q] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k, c, Q]
         
@@ -1661,15 +1857,15 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         
         γ = gamma(cp, cv)
         
-        β = beta(gas, v, P)
+        β = beta(gas, v, P, Q)
         
-        Ks = ks(gas, v, T)
+        Ks = ks(gas, v, T, Q)
         
-        Kt = kt(gas, v, T)
+        Kt = kt(gas, v, T, Q)
         
-        k = k_vdw(gas, v, T)
+        k = k_vdw(gas, v, T, Q)
         
-        c = c_vdw(gas, v, T)
+        c = c_vdw(gas, v, T, Q)
         
         Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k, c, Q] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k, c, Q]
         
@@ -1699,15 +1895,15 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         
         γ = gamma(cp, cv)
         
-        β = beta(gas, v, P)
+        β = beta(gas, v, P, Q)
         
-        Ks = ks(gas, v, T)
+        Ks = ks(gas, v, T, Q)
         
-        Kt = kt(gas, v, T)
+        Kt = kt(gas, v, T, Q)
         
-        k = k_vdw(gas, v, T)
+        k = k_vdw(gas, v, T, Q)
         
-        c = c_vdw(gas, v, T)
+        c = c_vdw(gas, v, T, Q)
         
         Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k, c, Q] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k, c, Q]
         
@@ -1737,15 +1933,15 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         
         γ = gamma(cp, cv)
         
-        β = beta(gas, v, P)
+        β = beta(gas, v, P, Q)
         
-        Ks = ks(gas, v, T)
+        Ks = ks(gas, v, T, Q)
         
-        Kt = kt(gas, v, T)
+        Kt = kt(gas, v, T, Q)
         
-        k = k_vdw(gas, v, T)
+        k = k_vdw(gas, v, T, Q)
         
-        c = c_vdw(gas, v, T)
+        c = c_vdw(gas, v, T, Q)
         
         Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k, c, Q] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k, c, Q]
         
@@ -1775,15 +1971,15 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         
         γ = gamma(cp, cv)
         
-        β = beta(gas, v, P)
+        β = beta(gas, v, P, Q)
         
-        Ks = ks(gas, v, T)
+        Ks = ks(gas, v, T, Q)
         
-        Kt = kt(gas, v, T)
+        Kt = kt(gas, v, T, Q)
         
-        k = k_vdw(gas, v, T)
+        k = k_vdw(gas, v, T, Q)
         
-        c = c_vdw(gas, v, T)
+        c = c_vdw(gas, v, T, Q)
         
         Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k, c, Q] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k, c, Q]
         
@@ -1813,15 +2009,15 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         
         γ = gamma(cp, cv)
         
-        β = beta(gas, v, P)
+        β = beta(gas, v, P, Q)
         
-        Ks = ks(gas, v, T)
+        Ks = ks(gas, v, T, Q)
         
-        Kt = kt(gas, v, T)
+        Kt = kt(gas, v, T, Q)
         
-        k = k_vdw(gas, v, T)
+        k = k_vdw(gas, v, T, Q)
         
-        c = c_vdw(gas, v, T)
+        c = c_vdw(gas, v, T, Q)
         
         Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k, c, Q] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k, c, Q]
         
@@ -1851,15 +2047,15 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         
         γ = gamma(cp, cv)
         
-        β = beta(gas, v, P)
+        β = beta(gas, v, P, Q)
         
-        Ks = ks(gas, v, T)
+        Ks = ks(gas, v, T, Q)
         
-        Kt = kt(gas, v, T)
+        Kt = kt(gas, v, T, Q)
         
-        k = k_vdw(gas, v, T)
+        k = k_vdw(gas, v, T, Q)
         
-        c = c_vdw(gas, v, T)
+        c = c_vdw(gas, v, T, Q)
         
         Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k, c, Q] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k, c, Q]
         
@@ -1871,15 +2067,31 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         
         tb == _Amt{Float64,EX} ? Q = b : Q = a
         
-        v = v_vdw(gas, T, Q)
-                
-        P = P_vdw(gas, T, v)
+        if round(amt(Q).val, digits = 2) == 0 || amt(Q).val == 1
+            
+            P = v_vdw(gas, T, Q)[1]
+            
+            v = v_vdw(gas, T, Q)[3]
+            
+            u = v_vdw(gas, T, Q)[4]
+            
+            h = v_vdw(gas, T, Q)[5]
+            
+            s = v_vdw(gas, T, Q)[6]
+            
+        else 
         
-        u = u_vdw(gas, T, v)[1]
-        
-        h = h_vdw(gas, T, v)[1]
-        
-        s = s_vdw(gas, T, v)[1]
+            v = v_vdw(gas, T, Q)
+
+            P = P_vdw(gas, T, v)
+
+            u = u_vdw(gas, T, v)[1]
+
+            h = h_vdw(gas, T, v)[1]
+
+            s = s_vdw(gas, T, v)[1]
+            
+        end
         
         a = a_vdw(gas, T, v)
         
@@ -1889,15 +2101,15 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         
         γ = gamma(cp, cv)
         
-        β = beta(gas, v, P)
+        β = beta(gas, v, P, Q)
         
-        Ks = ks(gas, v, T)
+        Ks = ks(gas, v, T, Q)
         
-        Kt = kt(gas, v, T)
+        Kt = kt(gas, v, T, Q)
         
-        k = k_vdw(gas, v, T)
+        k = k_vdw(gas, v, T, Q)
         
-        c = c_vdw(gas, v, T)
+        c = c_vdw(gas, v, T, Q)
         
         Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k, c, Q] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k, c, Q]
         
@@ -1909,15 +2121,31 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         
         tb == _Amt{Float64,EX} ? Q = b : Q = a
         
-        v = v_vdw(gas, P, Q)
-                
-        T = T_vdw(gas, P, v)
+        if round(amt(Q).val, digits = 2) == 0 || amt(Q).val == 1
+            
+            T = v_vdw(gas, P, Q)[2]
+            
+            v = v_vdw(gas, P, Q)[3]
+            
+            u = v_vdw(gas, P, Q)[4]
+            
+            h = v_vdw(gas, P, Q)[5]
+            
+            s = v_vdw(gas, P, Q)[6]
+            
+        else 
         
-        u = u_vdw(gas, T, v)[1]
-        
-        h = h_vdw(gas, T, v)[1]
-        
-        s = s_vdw(gas, T, v)[1]
+            v = v_vdw(gas, P, Q)
+
+            T = T_vdw(gas, P, v)
+
+            u = u_vdw(gas, T, v)[1]
+
+            h = h_vdw(gas, T, v)[1]
+
+            s = s_vdw(gas, T, v)[1]
+            
+        end
         
         a = a_vdw(gas, T, v)
         
@@ -1927,15 +2155,15 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         
         γ = gamma(cp, cv)
         
-        β = beta(gas, v, P)
+        β = beta(gas, v, P, Q)
         
-        Ks = ks(gas, v, T)
+        Ks = ks(gas, v, T, Q)
         
-        Kt = kt(gas, v, T)
+        Kt = kt(gas, v, T, Q)
         
-        k = k_vdw(gas, v, T)
+        k = k_vdw(gas, v, T, Q)
         
-        c = c_vdw(gas, v, T)
+        c = c_vdw(gas, v, T, Q)
         
         Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k, c, Q] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k, c, Q]
         
@@ -1947,15 +2175,31 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         
         tb == _Amt{Float64,EX} ? Q = b : Q = a
         
-        T = T_vdw(gas, v, Q)
-                
-        P = P_vdw(gas, T, v)
+        if round(amt(Q).val, digits = 2) == 0 || amt(Q).val == 1
+            
+            P = T_vdw(gas, v, Q)[1]
+            
+            T = T_vdw(gas, v, Q)[2]
+            
+            u = T_vdw(gas, v, Q)[4]
+            
+            h = T_vdw(gas, v, Q)[5]
+            
+            s = T_vdw(gas, v, Q)[6]
+            
+        else 
         
-        u = u_vdw(gas, T, v)[1]
-        
-        h = h_vdw(gas, T, v)[1]
-        
-        s = s_vdw(gas, T, v)[1]
+            T = T_vdw(gas, v, Q)
+
+            P = P_vdw(gas, T, v)
+
+            u = u_vdw(gas, T, v)[1]
+
+            h = h_vdw(gas, T, v)[1]
+
+            s = s_vdw(gas, T, v)[1]
+            
+        end
         
         a = a_vdw(gas, T, v)
         
@@ -1965,15 +2209,15 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         
         γ = gamma(cp, cv)
         
-        β = beta(gas, v, P)
+        β = beta(gas, v, P, Q)
         
-        Ks = ks(gas, v, T)
+        Ks = ks(gas, v, T, Q)
         
-        Kt = kt(gas, v, T)
+        Kt = kt(gas, v, T, Q)
         
-        k = k_vdw(gas, v, T)
+        k = k_vdw(gas, v, T, Q)
         
-        c = c_vdw(gas, v, T)
+        c = c_vdw(gas, v, T, Q)
         
         Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k, c, Q] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k, c, Q]
         
@@ -1985,15 +2229,31 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         
         tb == _Amt{Float64,EX} ? Q = b : Q = a
         
-        T = T_vdw(gas, u, Q)
+        if round(amt(Q).val, digits = 2) == 0 || amt(Q).val == 1
+            
+            P = T_vdw(gas, u, Q)[1]
+            
+            T = T_vdw(gas, u, Q)[2]
+            
+            v = T_vdw(gas, u, Q)[3]
+            
+            h = T_vdw(gas, u, Q)[5]
+            
+            s = T_vdw(gas, u, Q)[6]
+            
+        else 
         
-        v = v_vdw(gas, T, u)[1]
-                
-        P = P_vdw(gas, T, v)
-        
-        h = h_vdw(gas, T, v)[1]
-        
-        s = s_vdw(gas, T, v)[1]
+            T = T_vdw(gas, u, Q)
+
+            v = v_vdw(gas, T, u)[1]
+
+            P = P_vdw(gas, T, v)
+
+            h = h_vdw(gas, T, v)[1]
+
+            s = s_vdw(gas, T, v)[1]
+            
+        end
         
         a = a_vdw(gas, T, v)
         
@@ -2003,15 +2263,15 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         
         γ = gamma(cp, cv)
         
-        β = beta(gas, v, P)
+        β = beta(gas, v, P, Q)
         
-        Ks = ks(gas, v, T)
+        Ks = ks(gas, v, T, Q)
         
-        Kt = kt(gas, v, T)
+        Kt = kt(gas, v, T, Q)
         
-        k = k_vdw(gas, v, T)
+        k = k_vdw(gas, v, T, Q)
         
-        c = c_vdw(gas, v, T)
+        c = c_vdw(gas, v, T, Q)
         
         Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k, c, Q] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k, c, Q]
         
@@ -2023,15 +2283,31 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         
         tb == _Amt{Float64,EX} ? Q = b : Q = a
         
-        T = T_vdw(gas, h, Q)
+        if round(amt(Q).val, digits = 2) == 0 || amt(Q).val == 1
+            
+            P = T_vdw(gas, h, Q)[1]
+            
+            T = T_vdw(gas, h, Q)[2]
+            
+            v = T_vdw(gas, h, Q)[3]
+            
+            u = T_vdw(gas, h, Q)[4]
+            
+            s = T_vdw(gas, h, Q)[6]
+            
+        else 
         
-        v = v_vdw(gas, T, h)[1]
-                
-        P = P_vdw(gas, T, v)
-        
-        u = u_vdw(gas, T, v)[1]
-        
-        s = s_vdw(gas, T, v)[1]
+            T = T_vdw(gas, h, Q)
+
+            v = v_vdw(gas, T, h)[1]
+
+            P = P_vdw(gas, T, v)
+
+            u = u_vdw(gas, T, v)[1]
+
+            s = s_vdw(gas, T, v)[1]
+            
+        end
         
         a = a_vdw(gas, T, v)
         
@@ -2041,15 +2317,15 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         
         γ = gamma(cp, cv)
         
-        β = beta(gas, v, P)
+        β = beta(gas, v, P, Q)
         
-        Ks = ks(gas, v, T)
+        Ks = ks(gas, v, T, Q)
         
-        Kt = kt(gas, v, T)
+        Kt = kt(gas, v, T, Q)
         
-        k = k_vdw(gas, v, T)
+        k = k_vdw(gas, v, T, Q)
         
-        c = c_vdw(gas, v, T)
+        c = c_vdw(gas, v, T, Q)
         
         Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k, c, Q] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k, c, Q]
         
@@ -2061,33 +2337,49 @@ function State(gas::vdWGas, a::AMOUNTS{Float64,EX}, b::AMOUNTS{Float64,EX}, Mol:
         
         tb == _Amt{Float64,EX} ? Q = b : Q = a
         
-        T = T_vdw(gas, s, Q)
+        if round(amt(Q).val, digits = 2) == 0 || amt(Q).val == 1
+            
+            P = T_vdw(gas, s, Q)[1]
+            
+            T = T_vdw(gas, s, Q)[2]
+            
+            v = T_vdw(gas, s, Q)[3]
+            
+            u = T_vdw(gas, s, Q)[4]
+            
+            h = T_vdw(gas, s, Q)[5]
+            
+        else    
         
-        v = v_vdw(gas, T, s)[1]
-                
-        P = P_vdw(gas, T, v)
-        
-        h = h_vdw(gas, T, v)[1]
-        
-        u = u_vdw(gas, T, v)[1]
-        
+            T = T_vdw(gas, s, Q)
+
+            v = v_vdw(gas, T, s)[1]
+
+            P = P_vdw(gas, T, v)
+
+            h = h_vdw(gas, T, v)[1]
+
+            u = u_vdw(gas, T, v)[1]
+            
+        end
+
         a = a_vdw(gas, T, v)
-        
+
         cv = cv_vdw(gas)
-        
+
         cp = cp_vdw(gas, T, v)
-        
+
         γ = gamma(cp, cv)
+
+        β = beta(gas, v, P, Q)
         
-        β = beta(gas, v, P)
+        Ks = ks(gas, v, T, Q)
         
-        Ks = ks(gas, v, T)
+        Kt = kt(gas, v, T, Q)
         
-        Kt = kt(gas, v, T)
+        k = k_vdw(gas, v, T, Q)
         
-        k = k_vdw(gas, v, T)
-        
-        c = c_vdw(gas, v, T)
+        c = c_vdw(gas, v, T, Q)
         
         Mol ? St = [P, T, v*M(gas), u*M(gas), h*M(gas), s*M(gas), a*M(gas), cv*M(gas), cp*M(gas), γ, β, Ks, Kt, k, c, Q] : St = [P, T, v, u, h, s, a, cv, cp, γ, β, Ks, Kt, k, c, Q]
         
@@ -2289,7 +2581,7 @@ end
 
 TrND(vr,Pr) = ((Pr*(3*vr - 1))/8) + ((3*(3*vr - 1))/(8*(vr^2)))
 
-function PlotDome(Tconst::Array = [], T::Bool = false, vpoints::Number = 1000 ,str::String = "log")
+function PlotDome(Tconst::Array = [], T::Bool = false, vpoints::Number = 9.3672917718184e7 ,str::String = "log")
     
     labels = []
     
@@ -2307,7 +2599,15 @@ function PlotDome(Tconst::Array = [], T::Bool = false, vpoints::Number = 1000 ,s
         
         is = []
         
-        vx = Array(range(0.3697942021696152, vpoints; length = 100000))
+        if vpoints <= 3000
+            
+            vx = Array(range(0.3496149073373103, vpoints; length = 50000))
+            
+        else 
+        
+            vx = vcat(Array(range(0.3496149073373103, 3000; length = 50000)), Array(range(3000, vpoints; length = 50000)))
+            
+        end
             
         for n in 1:length(Tconst)
             
@@ -2369,7 +2669,15 @@ function PlotDome(Tconst::Array = [], T::Bool = false, vpoints::Number = 1000 ,s
         
         is = []
         
-        vx = Array(range(0.3697942021696152, vpoints; length = 100000))
+        if vpoints <= 3000
+            
+            vx = Array(range(0.3496149073373103, vpoints; length = 50000))
+            
+        else 
+        
+            vx = vcat(Array(range(0.3496149073373103, 3000; length = 50000)), Array(range(3000, vpoints; length = 50000)))
+            
+        end
             
         for n in 1:length(Tconst)
             
@@ -2425,7 +2733,7 @@ function PlotDome(Tconst::Array = [], T::Bool = false, vpoints::Number = 1000 ,s
 
 end    
 
-function PlotDome(gas::vdWGas, Tconst::Array = [], T::Bool = false, vpoints::Number = 1000 ,str::String = "log")
+function PlotDome(gas::vdWGas, Tconst::Array = [], T::Bool = false, vpoints::Number = 9.3672917718184e7 ,str::String = "log")
     
     vcr = amt(vc(gas)).val
     
@@ -2457,7 +2765,15 @@ function PlotDome(gas::vdWGas, Tconst::Array = [], T::Bool = false, vpoints::Num
         
         is = []
         
-        vx = Array(range(0.3697942021696152, vpoints; length = 100000))
+        if vpoints <= 3000
+            
+            vx = Array(range(0.3496149073373103, vpoints; length = 50000))
+            
+        else 
+        
+            vx = vcat(Array(range(0.3496149073373103, 3000; length = 50000)), Array(range(3000, vpoints; length = 50000)))
+            
+        end
             
         for n in 1:length(Tconst)
             
@@ -2519,7 +2835,17 @@ function PlotDome(gas::vdWGas, Tconst::Array = [], T::Bool = false, vpoints::Num
         
         is = []
         
-        vx = Array(range(0.3697942021696152, vpoints; length = 100000))
+        #0.3697942021696152
+        
+        if vpoints <= 3000
+            
+            vx = Array(range(0.3496149073373103, vpoints; length = 50000))
+            
+        else 
+        
+            vx = vcat(Array(range(0.3496149073373103, 3000; length = 50000)), Array(range(3000, vpoints; length = 50000)))
+            
+        end
             
         for n in 1:length(Tconst)
             
